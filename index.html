@@ -492,6 +492,15 @@ function roundRect(ctx, x, y, w, h, r){
   ctx.closePath();
 }
 
+function toCanvasSafeUrl(url){
+  // Le serveur d'images de TMDB n'autorise pas la lecture des pixels par un <canvas>
+  // (restriction CORS). On passe par un proxy public gratuit qui ajoute l'autorisation
+  // nécessaire, uniquement pour la génération de l'image de story.
+  if(!url) return null;
+  const stripped = url.replace(/^https?:\/\//, '');
+  return `https://images.weserv.nl/?url=${encodeURIComponent(stripped)}`;
+}
+
 function loadImageSafe(url){
   return new Promise((resolve) => {
     if(!url){ resolve(null); return; }
@@ -499,7 +508,7 @@ function loadImageSafe(url){
     img.crossOrigin = 'anonymous';
     img.onload = () => resolve(img);
     img.onerror = () => resolve(null);
-    img.src = url;
+    img.src = toCanvasSafeUrl(url);
   });
 }
 

@@ -30,13 +30,13 @@
   .subtitle{ color:var(--muted); font-size:15px; margin-top:6px; }
   main{ max-width:920px; margin:0 auto; padding:30px 20px 80px; }
   .arena{ display:flex; align-items:center; justify-content:center; gap:0; position:relative; margin-bottom:26px; flex-wrap:wrap; }
-  .card{ flex:1 1 320px; max-width:360px; background:linear-gradient(160deg, var(--card), #141217); border:1px solid var(--line); border-radius:6px; padding:26px 22px; cursor:pointer; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; position:relative; min-height:220px; display:flex; flex-direction:column; justify-content:flex-end; }
+  .card{ flex:1 1 320px; max-width:360px; background:linear-gradient(160deg, var(--card), #141217); border:1px solid var(--line); border-radius:6px; padding:26px 22px; cursor:pointer; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; position:relative; min-height:380px; display:flex; flex-direction:column; justify-content:flex-end; }
   .card:hover{ transform: translateY(-6px); border-color: var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 0 1px rgba(232,184,74,0.15); }
   .card:active{ transform: translateY(-2px) scale(0.99); }
   .card .genre-tag{ position:absolute; top:18px; left:22px; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--teal); border:1px solid var(--teal); padding:3px 8px; border-radius:20px; }
-  .card .title{ font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:0.02em; line-height:1.05; color:var(--cream); }
+  .card .title{ font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:0.02em; line-height:1.05; color:var(--cream); text-shadow: 0 2px 8px rgba(0,0,0,0.6); }
   .card .year{ color:var(--muted); font-size:13px; font-family:'JetBrains Mono', monospace; margin-bottom:8px; }
-  .card .blurb{ color:var(--muted); font-size:13.5px; line-height:1.4; margin-top:8px; }
+  .card .blurb{ color:var(--muted); font-size:13.5px; line-height:1.4; margin-top:8px; text-shadow: 0 2px 6px rgba(0,0,0,0.7); }
   .streak-badge{
     position:absolute; top:18px; right:18px;
     font-family:'JetBrains Mono', monospace;
@@ -117,6 +117,10 @@
 const SUPABASE_URL = "https://rddujgdhgxkansmazcqa.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_LOztlk77N0NE3an9beeKgA_Z3EetKB0";
 
+// ⚠️ Clé gratuite TMDB pour récupérer les affiches (themoviedb.org > compte > paramètres > API)
+// Laisse vide ("") si tu ne veux pas encore d'affiches — l'app fonctionne très bien sans.
+const TMDB_API_KEY = "e5833edea3bfa10c62388a2bc2adfbf3";
+
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
     persistSession: false,
@@ -160,7 +164,35 @@ const SEED_MOVIES = [
   {id:'lotr', title:'Le Seigneur des Anneaux', year:2001, genre:'Fantastique', blurb:"Un anneau à détruire, et neuf compagnons pour l'accompagner jusqu'au bout.", rating:1500, votes:0},
   {id:'alien', title:'Alien', year:1979, genre:'Horreur', blurb:"Un vaisseau silencieux, et quelque chose à bord qui ne l'est pas.", rating:1500, votes:0},
   {id:'gladiator', title:'Gladiator', year:2000, genre:'Historique', blurb:"Un général trahi qui redevient esclave, puis légende de l'arène.", rating:1500, votes:0},
-  {id:'departed', title:'Les Infiltrés', year:2006, genre:'Policier', blurb:"Deux taupes, deux camps, et personne qui sait vraiment qui trahit qui.", rating:1500, votes:0}
+  {id:'departed', title:'Les Infiltrés', year:2006, genre:'Policier', blurb:"Deux taupes, deux camps, et personne qui sait vraiment qui trahit qui.", rating:1500, votes:0},
+  {id:'titanic', title:'Titanic', year:1997, genre:'Romance', blurb:"Un amour de trois jours, et un paquebot qui n'a pas eu le temps d'arriver.", rating:1500, votes:0},
+  {id:'roilion', title:'Le Roi Lion', year:1994, genre:'Animation', blurb:"Un jeune prince exilé qui doit reprendre la place qui lui revient.", rating:1500, votes:0},
+  {id:'forrestgump', title:'Forrest Gump', year:1994, genre:'Drame', blurb:"Un homme simple qui traverse par hasard toute une époque.", rating:1500, votes:0},
+  {id:'retourfutur', title:'Retour vers le futur', year:1985, genre:'Science-fiction', blurb:"Un ado propulsé dans le passé qui manque d'effacer sa propre existence.", rating:1500, votes:0},
+  {id:'starwars', title:'Star Wars : Un nouvel espoir', year:1977, genre:'Science-fiction', blurb:"Un fermier orphelin qui découvre qu'il a un rôle à jouer dans la galaxie.", rating:1500, votes:0},
+  {id:'et', title:"E.T. l'extra-terrestre", year:1982, genre:'Fantastique', blurb:"Un enfant qui cache dans son placard la plus grande amitié de sa vie.", rating:1500, votes:0},
+  {id:'jurassicpark', title:'Jurassic Park', year:1993, genre:'Aventure', blurb:"Un parc d'attractions où les clients ne sont plus tout à fait en haut de la chaîne alimentaire.", rating:1500, votes:0},
+  {id:'silenceagneaux', title:'Le Silence des agneaux', year:1991, genre:'Thriller', blurb:"Une jeune enquêtrice qui doit négocier avec l'esprit qu'elle redoute le plus.", rating:1500, votes:0},
+  {id:'requiem', title:'Requiem for a Dream', year:2000, genre:'Drame', blurb:"Quatre existences qui s'effondrent chacune à leur rythme, sans retour possible.", rating:1500, votes:0},
+  {id:'americanhistoryx', title:'American History X', year:1998, genre:'Drame', blurb:"Un grand frère qui tente de désamorcer la haine qu'il a lui-même transmise.", rating:1500, votes:0},
+  {id:'leprestige', title:'Le Prestige', year:2006, genre:'Thriller', blurb:"Deux magiciens prêts à tout sacrifier pour garder le dernier secret.", rating:1500, votes:0},
+  {id:'memento', title:'Memento', year:2000, genre:'Thriller', blurb:"Un homme sans mémoire qui doit se faire confiance à lui-même, dix minutes à la fois.", rating:1500, votes:0},
+  {id:'djangounchained', title:'Django Unchained', year:2012, genre:'Western', blurb:"Un homme affranchi qui remonte tout le Sud pour retrouver celle qu'il aime.", rating:1500, votes:0},
+  {id:'killbill', title:'Kill Bill Vol. 1', year:2003, genre:'Action', blurb:"Une liste de noms, une épée, et rien d'autre à faire que la vider.", rating:1500, votes:0},
+  {id:'joker', title:'Joker', year:2019, genre:'Drame', blurb:"Un homme que la ville a fini par façonner en exactement ce qu'elle craignait.", rating:1500, votes:0},
+  {id:'1917', title:'1917', year:2019, genre:'Guerre', blurb:"Deux soldats qui n'ont que quelques heures pour traverser les lignes ennemies.", rating:1500, votes:0},
+  {id:'ratatouille', title:'Ratatouille', year:2007, genre:'Animation', blurb:"Un rat qui rêve de cuisine dans une ville qui ne veut pas de lui aux fourneaux.", rating:1500, votes:0},
+  {id:'walle', title:'WALL-E', year:2008, genre:'Animation', blurb:"Un petit robot solitaire qui range une planète entière en attendant quelqu'un.", rating:1500, votes:0},
+  {id:'insideout', title:'Vice-Versa', year:2015, genre:'Animation', blurb:"Cinq émotions aux commandes d'une enfant qui déménage et ne va pas bien.", rating:1500, votes:0},
+  {id:'rocky', title:'Rocky', year:1976, genre:'Sport', blurb:"Un boxeur inconnu à qui on offre, une fois, le combat de sa vie.", rating:1500, votes:0},
+  {id:'snatch', title:'Snatch, tu braques ou tu raques', year:2000, genre:'Comédie noire', blurb:"Un diamant volé, et beaucoup trop de monde qui veut mettre la main dessus.", rating:1500, votes:0},
+  {id:'prisoners', title:'Prisoners', year:2013, genre:'Thriller', blurb:"Un père qui décide de mener l'enquête à sa manière, sans attendre la police.", rating:1500, votes:0},
+  {id:'trumanshow', title:'The Truman Show', year:1998, genre:'Comédie dramatique', blurb:"Un homme qui ignore que sa vie entière est un plateau de télévision.", rating:1500, votes:0},
+  {id:'eternalsunshine', title:'Eternal Sunshine of the Spotless Mind', year:2004, genre:'Romance', blurb:"Un homme qui choisit d'effacer un amour, puis regrette chaque souvenir supprimé.", rating:1500, votes:0},
+  {id:'labyrinthepan', title:'Le Labyrinthe de Pan', year:2006, genre:'Fantastique', blurb:"Une fillette qui préfère un monde souterrain à la guerre qui l'entoure.", rating:1500, votes:0},
+  {id:'avengersendgame', title:'Avengers: Endgame', year:2019, genre:'Action', blurb:"Une équipe de héros qui n'a qu'une dernière chance de réparer l'irréparable.", rating:1500, votes:0},
+  {id:'lesTempsModernes', title:'Les Temps modernes', year:1936, genre:'Comédie', blurb:"Un ouvrier avalé par une machine qu'il n'a jamais vraiment su suivre.", rating:1500, votes:0},
+  {id:'unnight', title:'Léon', year:1994, genre:'Action', blurb:"Un tueur solitaire qui accepte, malgré lui, de veiller sur une enfant.", rating:1500, votes:0}
 ];
 
 let movies = {};
@@ -179,29 +211,51 @@ async function loadData(){
     console.error(error);
     return false;
   }
-  if(!data || data.length === 0){
-    statusLine.textContent = "Table vide, remplissage en cours…";
-    // table vide : on seed avec les films de départ
-    const { error: seedError } = await supabaseClient.from('movies').upsert(SEED_MOVIES, { onConflict: 'id', ignoreDuplicates: true });
+  (data || []).forEach(m => movies[m.id] = m);
+
+  // Ajoute les films de la liste qui ne sont pas encore dans la base
+  // (que la table soit vide au départ, ou qu'on ait juste rajouté des titres au code)
+  const missing = SEED_MOVIES.filter(m => !movies[m.id]);
+  if(missing.length > 0){
+    statusLine.textContent = `Ajout de ${missing.length} nouveau(x) film(s)…`;
+    const { error: seedError } = await supabaseClient.from('movies').upsert(missing, { onConflict: 'id', ignoreDuplicates: true });
     if(seedError){
       statusLine.textContent = "ERREUR (remplissage) : " + (seedError.message || JSON.stringify(seedError));
       console.error(seedError);
       return false;
     }
-    const { data: seeded, error: reloadError } = await supabaseClient.from('movies').select('*');
-    if(reloadError){
-      statusLine.textContent = "ERREUR (relecture) : " + (reloadError.message || JSON.stringify(reloadError));
-      return false;
-    }
-    (seeded || []).forEach(m => movies[m.id] = m);
-    if(!seeded || seeded.length === 0){
-      statusLine.textContent = "Le remplissage n'a rien ajouté — vérifie les policies RLS dans Supabase.";
-      return false;
-    }
-  } else {
-    data.forEach(m => movies[m.id] = m);
+    missing.forEach(m => movies[m.id] = m);
   }
+
+  if(Object.keys(movies).length === 0){
+    statusLine.textContent = "Aucun film n'a pu être chargé — vérifie les policies RLS dans Supabase.";
+    return false;
+  }
+
+  // Récupère les affiches manquantes en tâche de fond (n'empêche pas de commencer à voter)
+  if(TMDB_API_KEY) fetchMissingPosters();
+
   return true;
+}
+
+async function fetchMissingPosters(){
+  const toFetch = Object.values(movies).filter(m => !m.poster_url);
+  for(const movie of toFetch){
+    try{
+      const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(movie.title)}&year=${movie.year}&language=fr-FR`);
+      const json = await res.json();
+      const result = (json.results && json.results[0]) || null;
+      if(result && result.poster_path){
+        const posterUrl = `https://image.tmdb.org/t/p/w500${result.poster_path}`;
+        movies[movie.id].poster_url = posterUrl;
+        await supabaseClient.from('movies').update({poster_url: posterUrl}).eq('id', movie.id);
+        // Réaffiche si le film concerné est visible dans le duel en cours
+        if(currentPair && currentPair.includes(movie.id)){ renderArena(); }
+      }
+    }catch(e){
+      console.error('Affiche introuvable pour', movie.title, e);
+    }
+  }
 }
 
 let streaks = {}; // compteur de victoires consécutives, remis à zéro à chaque rechargement de page
@@ -233,14 +287,17 @@ function renderArena(){
   const streakBadge = (id) => (streaks[id] >= 2)
     ? `<div class="streak-badge">🔥 ${streaks[id]} victoires</div>`
     : '';
+  const cardStyle = (m) => m.poster_url
+    ? `style="background-image: linear-gradient(180deg, rgba(11,11,13,0.15) 45%, rgba(11,11,13,0.97) 92%), url('${m.poster_url}'); background-size: cover; background-position: center top;"`
+    : '';
   arena.innerHTML = `
-    <div class="card" id="cardA" data-id="${idA}">
+    <div class="card" id="cardA" data-id="${idA}" ${cardStyle(a)}>
       <div class="genre-tag">${a.genre}</div><div class="year">${a.year}</div>
       <div class="title">${a.title}</div><div class="blurb">${a.blurb}</div>
       ${streakBadge(idA)}
     </div>
     <div class="vs-badge">VS</div>
-    <div class="card" id="cardB" data-id="${idB}">
+    <div class="card" id="cardB" data-id="${idB}" ${cardStyle(b)}>
       <div class="genre-tag">${b.genre}</div><div class="year">${b.year}</div>
       <div class="title">${b.title}</div><div class="blurb">${b.blurb}</div>
       ${streakBadge(idB)}

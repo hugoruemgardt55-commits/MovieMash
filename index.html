@@ -71,6 +71,16 @@
   form.add-form button:hover{ filter:brightness(1.08); }
   .disclaimer{ text-align:center; color:var(--muted); font-size:11.5px; margin-top:30px; line-height:1.6; }
   .empty-msg{ color:var(--muted); font-size:13px; padding:20px 0; text-align:center; }
+  .shared-card{ background: var(--bg-alt); border:1px solid var(--gold); border-radius:8px; padding:30px; margin: 20px auto 34px; max-width:600px; }
+  .shared-card h2{ font-family:'Bebas Neue', sans-serif; font-size:30px; color:var(--gold); margin:0 0 4px; letter-spacing:0.02em; }
+  .shared-card .shared-sub{ color:var(--muted); font-size:13px; margin-bottom:18px; }
+  .shared-row{ display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); }
+  .shared-row:last-child{ border-bottom:none; }
+  .shared-rank{ font-family:'Bebas Neue', sans-serif; font-size:22px; color:var(--velvet); width:34px; text-shadow:0 0 10px rgba(154,40,70,0.5); }
+  .shared-poster{ width:40px; height:60px; border-radius:3px; object-fit:cover; background:var(--card); flex-shrink:0; }
+  .shared-title{ font-size:14.5px; }
+  .cta-own{ text-align:center; margin-top:22px; }
+  .cta-own a{ display:inline-block; background:var(--gold); color:#1a1500; font-weight:700; padding:10px 22px; border-radius:4px; text-decoration:none; font-size:13.5px; }
 </style>
 </head>
 <body>
@@ -83,30 +93,53 @@
 </header>
 
 <main>
-  <div class="status-line" id="statusLine">Ouverture du rideau…</div>
-  <div class="arena" id="arena"></div>
 
-  <section class="panel">
-    <div class="panel-header">
-      <div class="panel-title">Le classement</div>
-      <div class="panel-sub" id="voteCount">— votes au total</div>
-    </div>
-    <div id="leaderboardWrap"><div class="empty-msg">Chargement du classement…</div></div>
-  </section>
-
-  <section class="panel">
-    <div class="panel-header"><div class="panel-title">Ajouter un film à l'arène</div></div>
-    <form class="add-form" id="addForm">
-      <input type="text" id="inpTitle" placeholder="Titre du film" required>
-      <input type="number" id="inpYear" placeholder="Année" min="1900" max="2100" required style="flex:0 1 90px;">
-      <input type="text" id="inpGenre" placeholder="Genre" required style="flex:0 1 140px;">
-      <input type="text" id="inpBlurb" placeholder="Une phrase pour le décrire" required style="flex:2 1 220px;">
-      <button type="submit">Ajouter</button>
+  <section class="panel" id="pseudoGate" style="display:none;">
+    <div class="panel-header"><div class="panel-title">Avant de commencer</div></div>
+    <p style="color:var(--muted); font-size:13.5px; margin-top:0;">Choisis un pseudo pour garder ton propre Top 10 et pouvoir le montrer à tes potes.</p>
+    <form class="add-form" id="pseudoForm">
+      <input type="text" id="inpPseudo" placeholder="Ton pseudo" maxlength="24" required style="flex:1 1 200px;">
+      <button type="submit">C'est parti</button>
     </form>
   </section>
 
-  <div class="disclaimer">
-    Le classement est public — chaque vote et chaque film ajouté est visible par tout le monde.
+  <div id="sharedViewWrap"></div>
+
+  <div id="mainApp" style="display:none;">
+    <div class="status-line" id="statusLine">Ouverture du rideau…</div>
+    <div class="arena" id="arena"></div>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Le classement</div>
+        <div class="panel-sub" id="voteCount">— votes au total</div>
+      </div>
+      <div id="leaderboardWrap"><div class="empty-msg">Chargement du classement…</div></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <div class="panel-title">Mon Top 10, <span id="pseudoDisplay"></span></div>
+        <button id="shareBtn" style="background:var(--gold); color:#1a1500; border:none; padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Partager mon Top</button>
+      </div>
+      <div id="personalTopWrap"><div class="empty-msg">Vote pour commencer à construire ton Top 10.</div></div>
+      <div class="panel-sub" id="shareStatus" style="margin-top:10px;"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header"><div class="panel-title">Ajouter un film à l'arène</div></div>
+      <form class="add-form" id="addForm">
+        <input type="text" id="inpTitle" placeholder="Titre du film" required>
+        <input type="number" id="inpYear" placeholder="Année" min="1900" max="2100" required style="flex:0 1 90px;">
+        <input type="text" id="inpGenre" placeholder="Genre" required style="flex:0 1 140px;">
+        <input type="text" id="inpBlurb" placeholder="Une phrase pour le décrire" required style="flex:2 1 220px;">
+        <button type="submit">Ajouter</button>
+      </form>
+    </section>
+
+    <div class="disclaimer">
+      Le classement est public — chaque vote et chaque film ajouté est visible par tout le monde.
+    </div>
   </div>
 </main>
 <div class="perf bottom"></div>
@@ -197,6 +230,18 @@ const SEED_MOVIES = [
 
 let movies = {};
 let currentPair = null;
+let personalRatings = {}; // { movieId: {rating, votes} } pour le visiteur courant
+let visitorId = null;
+let pseudo = null;
+
+function getOrCreateVisitorId(){
+  let id = localStorage.getItem('moviemash_visitor_id');
+  if(!id){
+    id = (crypto.randomUUID ? crypto.randomUUID() : 'v-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+    localStorage.setItem('moviemash_visitor_id', id);
+  }
+  return id;
+}
 
 function slugify(str){
   return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') + '-' + Math.random().toString(36).slice(2,6);
@@ -317,12 +362,26 @@ async function handleVote(winnerId, loserId){
   loser.rating = Math.round(loser.rating + K * (0 - expLose));
   winner.votes += 1; loser.votes += 1;
 
+  // Classement personnel du visiteur (séparé du classement global)
+  if(!personalRatings[winnerId]) personalRatings[winnerId] = {rating:1500, votes:0};
+  if(!personalRatings[loserId]) personalRatings[loserId] = {rating:1500, votes:0};
+  const pWinner = personalRatings[winnerId], pLoser = personalRatings[loserId];
+  const pExpWin = expectedScore(pWinner.rating, pLoser.rating);
+  const pExpLose = expectedScore(pLoser.rating, pWinner.rating);
+  pWinner.rating = Math.round(pWinner.rating + K * (1 - pExpWin));
+  pLoser.rating = Math.round(pLoser.rating + K * (0 - pExpLose));
+  pWinner.votes += 1; pLoser.votes += 1;
+
   const winnerSlot = winnerId === currentPair[0] ? 0 : 1;
   const winnerCard = document.getElementById(winnerSlot === 0 ? 'cardA' : 'cardB');
   if(winnerCard) winnerCard.classList.add('flash');
 
   const { error: e1 } = await supabaseClient.from('movies').update({rating: winner.rating, votes: winner.votes}).eq('id', winnerId);
   const { error: e2 } = await supabaseClient.from('movies').update({rating: loser.rating, votes: loser.votes}).eq('id', loserId);
+  await supabaseClient.from('personal_ratings').upsert([
+    {visitor_id: visitorId, movie_id: winnerId, rating: pWinner.rating, votes: pWinner.votes},
+    {visitor_id: visitorId, movie_id: loserId, rating: pLoser.rating, votes: pLoser.votes}
+  ], { onConflict: 'visitor_id,movie_id' });
   statusLine.textContent = (e1 || e2) ? "Le vote n'a pas pu être enregistré. Réessaie." : 'Vote enregistré. Le champion attend son prochain défi…';
 
   streaks[winnerId] = (streaks[winnerId] || 0) + 1;
@@ -336,6 +395,7 @@ async function handleVote(winnerId, loserId){
   }
   renderArena();
   renderLeaderboard();
+  renderPersonalTop();
 }
 
 function renderLeaderboard(){
@@ -347,6 +407,69 @@ function renderLeaderboard(){
   wrap.innerHTML = `<table><thead><tr><th>Rang</th><th>Film</th><th style="text-align:right;">Score</th><th style="text-align:right;">Votes</th></tr></thead>
     <tbody>${list.map((m, i) => `<tr><td class="rank">#${i+1}</td><td>${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></td><td class="rating">${m.rating}</td><td class="votes">${m.votes}</td></tr>`).join('')}</tbody></table>`;
 }
+
+function renderPersonalTop(){
+  const wrap = document.getElementById('personalTopWrap');
+  const entries = Object.entries(personalRatings)
+    .filter(([id, r]) => r.votes > 0 && movies[id])
+    .sort((a,b) => b[1].rating - a[1].rating)
+    .slice(0, 10);
+  if(entries.length === 0){
+    wrap.innerHTML = '<div class="empty-msg">Vote pour commencer à construire ton Top 10.</div>';
+    return;
+  }
+  wrap.innerHTML = `<table><thead><tr><th>Rang</th><th>Film</th><th style="text-align:right;">Score</th></tr></thead>
+    <tbody>${entries.map(([id, r], i) => `<tr><td class="rank">#${i+1}</td><td>${movies[id].title} <span style="color:var(--muted); font-size:12px;">(${movies[id].year})</span></td><td class="rating">${r.rating}</td></tr>`).join('')}</tbody></table>`;
+}
+
+async function renderSharedView(sharedVisitorId){
+  const wrap = document.getElementById('sharedViewWrap');
+  wrap.innerHTML = '<div class="empty-msg">Chargement du Top partagé…</div>';
+  const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', sharedVisitorId).maybeSingle();
+  const { data: ratings, error } = await supabaseClient.from('personal_ratings').select('*').eq('visitor_id', sharedVisitorId);
+  if(error || !ratings || ratings.length === 0){
+    wrap.innerHTML = `
+      <div class="shared-card">
+        <h2>Top introuvable</h2>
+        <div class="shared-sub">Ce classement n'existe pas ou n'a pas encore de votes.</div>
+        <div class="cta-own"><a href="${window.location.pathname}">Voter et créer mon propre Top 10</a></div>
+      </div>`;
+    return;
+  }
+  const top = ratings.sort((a,b) => b.rating - a.rating).slice(0, 10);
+  const name = profile ? profile.pseudo : 'Quelqu\u2019un';
+  wrap.innerHTML = `
+    <div class="shared-card">
+      <h2>Le Top ${top.length} de ${name}</h2>
+      <div class="shared-sub">Classement personnel construit par ses votes sur MovieMash</div>
+      ${top.map((r, i) => {
+        const m = movies[r.movie_id] || { title: r.movie_id, year: '', poster_url: null };
+        return `<div class="shared-row">
+          <div class="shared-rank">#${i+1}</div>
+          ${m.poster_url ? `<img class="shared-poster" src="${m.poster_url}" alt="">` : ''}
+          <div class="shared-title">${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></div>
+        </div>`;
+      }).join('')}
+      <div class="cta-own"><a href="${window.location.pathname}">Voter et créer mon propre Top 10</a></div>
+    </div>`;
+}
+
+async function loadPersonalRatings(){
+  const { data } = await supabaseClient.from('personal_ratings').select('*').eq('visitor_id', visitorId);
+  personalRatings = {};
+  (data || []).forEach(r => { personalRatings[r.movie_id] = {rating: r.rating, votes: r.votes}; });
+}
+
+document.getElementById('shareBtn').addEventListener('click', async () => {
+  const shareStatus = document.getElementById('shareStatus');
+  const url = `${window.location.origin}${window.location.pathname}?u=${encodeURIComponent(visitorId)}`;
+  try{
+    await navigator.clipboard.writeText(url);
+    shareStatus.textContent = 'Lien copié : ' + url;
+  }catch(e){
+    shareStatus.textContent = 'Voici ton lien à copier : ' + url;
+  }
+});
 
 document.getElementById('addForm').addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -373,13 +496,53 @@ document.getElementById('addForm').addEventListener('submit', async (e) => {
 });
 
 (async function init(){
+  // 1. Charge toujours la liste des films (nécessaire pour afficher titres/affiches, y compris en vue partagée)
   const ok = await loadData();
   if(!ok) return;
+
+  const params = new URLSearchParams(window.location.search);
+  const sharedId = params.get('u');
+
+  if(sharedId){
+    // Vue "Top d'un ami" : lecture seule, pas besoin de pseudo
+    document.getElementById('statusLine').textContent = '';
+    renderSharedView(sharedId);
+    return;
+  }
+
+  visitorId = getOrCreateVisitorId();
+  pseudo = localStorage.getItem('moviemash_pseudo');
+
+  if(!pseudo){
+    document.getElementById('pseudoGate').style.display = 'block';
+    document.getElementById('statusLine').textContent = '';
+    return; // la suite se lance après soumission du formulaire pseudo
+  }
+
+  await startMainApp();
+})();
+
+document.getElementById('pseudoForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const value = document.getElementById('inpPseudo').value.trim();
+  if(!value) return;
+  pseudo = value;
+  localStorage.setItem('moviemash_pseudo', pseudo);
+  await supabaseClient.from('profiles').upsert([{id: visitorId, pseudo: pseudo}], { onConflict: 'id' });
+  document.getElementById('pseudoGate').style.display = 'none';
+  await startMainApp();
+});
+
+async function startMainApp(){
+  document.getElementById('mainApp').style.display = 'block';
+  document.getElementById('pseudoDisplay').textContent = pseudo;
+  await loadPersonalRatings();
   currentPair = pickPair();
   document.getElementById('statusLine').textContent = '';
   renderArena();
   renderLeaderboard();
-})();
+  renderPersonalTop();
+}
 </script>
 </body>
 </html>

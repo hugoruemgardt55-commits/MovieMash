@@ -305,21 +305,42 @@ async function fetchMissingPosters(){
 }
 
 let streaks = {}; // compteur de victoires consécutives, remis à zéro à chaque rechargement de page
+let recentlyShown = []; // file des derniers films montrés, pour éviter de les reproposer trop vite
+const RECENT_WINDOW = 40; // ne reproposer un film qu'après ~40 autres films vus (ajuste selon la taille du catalogue)
+
+function markShown(...ids){
+  ids.forEach(id => {
+    recentlyShown = recentlyShown.filter(x => x !== id); // évite les doublons dans la file
+    recentlyShown.push(id);
+  });
+  if(recentlyShown.length > RECENT_WINDOW){
+    recentlyShown = recentlyShown.slice(recentlyShown.length - RECENT_WINDOW);
+  }
+}
 
 function pickPair(){
-  const ids = Object.keys(movies);
-  if(ids.length < 2) return null;
-  let a = ids[Math.floor(Math.random()*ids.length)];
-  let b = ids[Math.floor(Math.random()*ids.length)];
-  let guard = 0;
-  while(b === a && guard < 20){ b = ids[Math.floor(Math.random()*ids.length)]; guard++; }
+  const all = Object.keys(movies);
+  if(all.length < 2) return null;
+  // On essaie d'abord d'éviter tout ce qui a été montré récemment
+  let pool = all.filter(id => !recentlyShown.includes(id));
+  if(pool.length < 2) pool = all; // si le catalogue est petit, on relâche la contrainte
+  let a = pool[Math.floor(Math.random()*pool.length)];
+  let bPool = pool.filter(id => id !== a);
+  if(bPool.length === 0) bPool = all.filter(id => id !== a);
+  let b = bPool[Math.floor(Math.random()*bPool.length)];
+  markShown(a, b);
   return [a, b];
 }
 
 function pickChallenger(excludeId){
-  const ids = Object.keys(movies).filter(id => id !== excludeId);
-  if(ids.length === 0) return null;
-  return ids[Math.floor(Math.random()*ids.length)];
+  const all = Object.keys(movies).filter(id => id !== excludeId);
+  if(all.length === 0) return null;
+  // Priorité aux films non montrés récemment, pour forcer la diversité plutôt que de reproposer un film déjà écarté
+  let pool = all.filter(id => !recentlyShown.includes(id));
+  if(pool.length === 0) pool = all; // si tout le catalogue a été vu récemment, on relâche la contrainte
+  const challenger = pool[Math.floor(Math.random()*pool.length)];
+  markShown(challenger);
+  return challenger;
 }
 
 function renderArena(){

@@ -129,13 +129,6 @@
       <div class="panel-sub" id="shareStatus" style="margin-top:10px;"></div>
     </section>
 
-    <section class="panel">
-      <div class="panel-header"><div class="panel-title">Importer des films depuis TMDB</div></div>
-      <p style="color:var(--muted); font-size:13px; margin-top:0;">Ajoute d'un coup des centaines de films populaires et acclamés, avec leurs affiches. Peut prendre 1-2 minutes. Sans risque à relancer plusieurs fois (les doublons sont ignorés).</p>
-      <button id="importBtn" style="background:var(--teal); color:var(--cream); border:none; padding:9px 18px; border-radius:4px; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif; font-size:13px;">Importer ~500 films populaires</button>
-      <div class="panel-sub" id="importStatus" style="margin-top:10px;"></div>
-    </section>
-
     <div class="disclaimer">
       Le classement est public — chaque vote et chaque film ajouté est visible par tout le monde.
     </div>
@@ -282,11 +275,20 @@ async function loadData(){
   return true;
 }
 
+function isTmdbBearerToken(key){
+  return key.split('.').length === 3 && key.length > 100;
+}
+
 async function fetchMissingPosters(){
   const toFetch = Object.values(movies).filter(m => !m.poster_url);
+  const useBearer = isTmdbBearerToken(TMDB_API_KEY);
   for(const movie of toFetch){
     try{
-      const res = await fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(movie.title)}&year=${movie.year}&language=fr-FR`);
+      const url = useBearer
+        ? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movie.title)}&year=${movie.year}&language=fr-FR`
+        : `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(movie.title)}&year=${movie.year}&language=fr-FR`;
+      const opts = useBearer ? { headers: { Authorization: `Bearer ${TMDB_API_KEY}` } } : {};
+      const res = await fetch(url, opts);
       const json = await res.json();
       const result = (json.results && json.results[0]) || null;
       if(result && result.poster_path){
@@ -649,79 +651,6 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
     shareStatus.textContent = 'Voici ton lien à copier : ' + url;
   }
 });
-
-async function fetchGenreMap(){
-  try{
-    const res = await fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${TMDB_API_KEY}&language=fr-FR`);
-    const json = await res.json();
-    const map = {};
-    (json.genres || []).forEach(g => map[g.id] = g.name);
-    return map;
-  }catch(e){
-    return {};
-  }
-}
-
-function tmdbMovieToRow(m, genreMap){
-  const year = (m.release_date && m.release_date.length >= 4) ? parseInt(m.release_date.slice(0,4), 10) : 0;
-  const genreName = (m.genre_ids && m.genre_ids.length && genreMap[m.genre_ids[0]]) ? genreMap[m.genre_ids[0]] : 'Divers';
-  return {
-    id: `tmdb-${m.id}`,
-    title: m.title || m.original_title || 'Sans titre',
-    year: year,
-    genre: genreName,
-    blurb: '',
-    poster_url: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
-    rating: 1500,
-    votes: 0
-  };
-}
-
-async function importFromTMDB(){
-  if(!TMDB_API_KEY){
-    document.getElementById('importStatus').textContent = "Il faut d'abord renseigner TMDB_API_KEY dans le code.";
-    return;
-  }
-  const btn = document.getElementById('importBtn');
-  const status = document.getElementById('importStatus');
-  btn.disabled = true;
-  btn.style.opacity = '0.6';
-
-  const genreMap = await fetchGenreMap();
-  const categories = ['popular', 'top_rated'];
-  const pagesPerCategory = 13; // ~13 pages x 20 films x 2 catégories ≈ 500 films (avec quelques doublons ignorés)
-  let imported = 0;
-
-  for(const category of categories){
-    for(let page = 1; page <= pagesPerCategory; page++){
-      status.textContent = `Import en cours : ${category === 'popular' ? 'films populaires' : 'films les mieux notés'}, page ${page}/${pagesPerCategory}…`;
-      try{
-        const res = await fetch(`https://api.themoviedb.org/3/movie/${category}?api_key=${TMDB_API_KEY}&language=fr-FR&page=${page}`);
-        const json = await res.json();
-        const rows = (json.results || []).map(m => tmdbMovieToRow(m, genreMap));
-        if(rows.length > 0){
-          const { error } = await supabaseClient.from('movies').upsert(rows, { onConflict: 'id', ignoreDuplicates: true });
-          if(error){ console.error(error); }
-          else {
-            rows.forEach(r => { if(!movies[r.id]) { movies[r.id] = r; imported++; } });
-          }
-        }
-      }catch(e){
-        console.error('Erreur import page', category, page, e);
-      }
-      await new Promise(r => setTimeout(r, 250)); // petite pause pour rester tranquille avec le taux limite de TMDB
-    }
-  }
-
-  status.textContent = `Import terminé : ${imported} nouveaux films ajoutés. Total : ${Object.keys(movies).length} films.`;
-  btn.disabled = false;
-  btn.style.opacity = '1';
-  if(!currentPair) currentPair = pickPair();
-  renderArena();
-  renderLeaderboard();
-}
-
-document.getElementById('importBtn').addEventListener('click', importFromTMDB);
 
 (async function init(){
   // 1. Charge toujours la liste des films (nécessaire pour afficher titres/affiches, y compris en vue partagée)

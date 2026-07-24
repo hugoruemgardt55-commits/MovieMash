@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MovieMash</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg: #0B0B0D;
+    --bg-alt: #17151B;
+    --card: #1E1B22;
+    --gold: #E8B84B;
+    --velvet: #9A2846;
+    --cream: #F5EDE0;
+    --teal: #3C6E68;
+    --muted: #948E86;
+    --line: #322E36;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--cream); font-family:'Inter',sans-serif; min-height:100vh; }
+  @media (prefers-reduced-motion: reduce){ *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;} }
+  .perf{ height:14px; background-image: radial-gradient(circle, var(--bg) 3px, transparent 3.5px); background-size: 22px 14px; background-color: var(--gold); opacity:0.85; }
+  .perf.bottom{ transform: scaleY(-1); }
+  header{ text-align:center; padding:36px 20px 20px; }
+  .eyebrow{ font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--teal); margin-bottom:6px; }
+  h1{ font-family:'Bebas Neue', sans-serif; font-size:64px; letter-spacing:0.04em; margin:0; color:var(--gold); text-shadow: 0 0 24px rgba(232,184,74,0.25); }
+  .subtitle{ color:var(--muted); font-size:15px; margin-top:6px; }
+  main{ max-width:920px; margin:0 auto; padding:30px 20px 80px; }
+  .arena{ display:flex; align-items:center; justify-content:center; gap:0; position:relative; margin-bottom:26px; flex-wrap:wrap; }
+  .card{ flex:1 1 320px; max-width:360px; background:linear-gradient(160deg, var(--card), #141217); border:1px solid var(--line); border-radius:6px; padding:26px 22px; cursor:pointer; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; position:relative; min-height:220px; display:flex; flex-direction:column; justify-content:flex-end; }
+  .card:hover{ transform: translateY(-6px); border-color: var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 0 1px rgba(232,184,74,0.15); }
+  .card:active{ transform: translateY(-2px) scale(0.99); }
+  .card .genre-tag{ position:absolute; top:18px; left:22px; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--teal); border:1px solid var(--teal); padding:3px 8px; border-radius:20px; }
+  .card .title{ font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:0.02em; line-height:1.05; color:var(--cream); }
+  .card .year{ color:var(--muted); font-size:13px; font-family:'JetBrains Mono', monospace; margin-bottom:8px; }
+  .card .blurb{ color:var(--muted); font-size:13.5px; line-height:1.4; margin-top:8px; }
+  .vs-badge{ width:64px; height:64px; border-radius:50%; background: radial-gradient(circle at 35% 30%, var(--velvet), #5c1729); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue', sans-serif; font-size:22px; color:var(--gold); flex-shrink:0; margin: 0 -8px; z-index:2; position:relative; box-shadow: 0 0 0 4px var(--bg); }
+  .vs-badge::before{ content:''; position:absolute; inset:-8px; border-radius:50%; background: conic-gradient(from 0deg, var(--gold), transparent 20%, transparent 80%, var(--gold)); animation: spin 3.5s linear infinite; z-index:-1; opacity:0.5; }
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  .status-line{ text-align:center; font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--muted); min-height:18px; margin-bottom:8px; }
+  .flash{ animation: flash-anim 0.5s ease; }
+  @keyframes flash-anim{ 0%{ box-shadow: 0 0 0 0 rgba(232,184,74,0.5); } 100%{ box-shadow: 0 0 0 0 rgba(232,184,74,0); } }
+  section.panel{ background: var(--bg-alt); border:1px solid var(--line); border-radius:6px; padding:24px; margin-top:34px; }
+  .panel-header{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
+  .panel-title{ font-family:'Bebas Neue', sans-serif; font-size:24px; letter-spacing:0.03em; color:var(--gold); }
+  .panel-sub{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); }
+  table{ width:100%; border-collapse:collapse; }
+  th{ text-align:left; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); padding:8px 6px; border-bottom:1px solid var(--line); }
+  td{ padding:10px 6px; border-bottom:1px solid var(--line); font-size:14px; }
+  tr:last-child td{ border-bottom:none; }
+  .rank{ font-family:'JetBrains Mono', monospace; color:var(--teal); width:36px; }
+  .rating{ font-family:'JetBrains Mono', monospace; color:var(--gold); text-align:right; }
+  .votes{ font-family:'JetBrains Mono', monospace; color:var(--muted); text-align:right; width:70px; }
+  form.add-form{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
+  form.add-form input{ background:var(--card); border:1px solid var(--line); color:var(--cream); padding:9px 12px; border-radius:4px; font-family:'Inter',sans-serif; font-size:13px; flex:1 1 140px; }
+  form.add-form input:focus{ outline:2px solid var(--gold); outline-offset:1px; }
+  form.add-form button{ background:var(--gold); color:#1a1500; border:none; padding:9px 18px; border-radius:4px; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif; font-size:13px; }
+  form.add-form button:hover{ filter:brightness(1.08); }
+  .disclaimer{ text-align:center; color:var(--muted); font-size:11.5px; margin-top:30px; line-height:1.6; }
+  .empty-msg{ color:var(--muted); font-size:13px; padding:20px 0; text-align:center; }
+</style>
+</head>
+<body>
+
+<div class="perf"></div>
+<header>
+  <div class="eyebrow">Un classement écrit par vos clics</div>
+  <h1>MOVIEMASH</h1>
+  <div class="subtitle">Deux films. Un choix. Aucun compromis.</div>
+</header>
+
+<main>
+  <div class="status-line" id="statusLine">Ouverture du rideau…</div>
+  <div class="arena" id="arena"></div>
+
+  <section class="panel">
+    <div class="panel-header">
+      <div class="panel-title">Le classement</div>
+      <div class="panel-sub" id="voteCount">— votes au total</div>
+    </div>
+    <div id="leaderboardWrap"><div class="empty-msg">Chargement du classement…</div></div>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header"><div class="panel-title">Ajouter un film à l'arène</div></div>
+    <form class="add-form" id="addForm">
+      <input type="text" id="inpTitle" placeholder="Titre du film" required>
+      <input type="number" id="inpYear" placeholder="Année" min="1900" max="2100" required style="flex:0 1 90px;">
+      <input type="text" id="inpGenre" placeholder="Genre" required style="flex:0 1 140px;">
+      <input type="text" id="inpBlurb" placeholder="Une phrase pour le décrire" required style="flex:2 1 220px;">
+      <button type="submit">Ajouter</button>
+    </form>
+  </section>
+
+  <div class="disclaimer">
+    Le classement est public — chaque vote et chaque film ajouté est visible par tout le monde.
+  </div>
+</main>
+<div class="perf bottom"></div>
+
+<script>
+// ⚠️ REMPLACE ces deux valeurs par celles de ton projet Supabase
+// (Supabase > Project Settings > API)
+const SUPABASE_URL = "https://TON-PROJET.supabase.co";
+const SUPABASE_ANON_KEY = "TA-CLE-ANON-PUBLIQUE";
+
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const SEED_MOVIES = [
+  {id:'inception', title:'Inception', year:2010, genre:'Science-fiction', blurb:"Un architecte des rêves qui finit par se perdre dans les siens.", rating:1500, votes:0},
+  {id:'parrain', title:'Le Parrain', year:1972, genre:'Crime', blurb:"Une famille qui confond loyauté et pouvoir, génération après génération.", rating:1500, votes:0},
+  {id:'parasite', title:'Parasite', year:2019, genre:'Thriller social', blurb:"Deux familles, un seul escalier, et tout ce qu'il révèle.", rating:1500, votes:0},
+  {id:'pulpfiction', title:'Pulp Fiction', year:1994, genre:'Crime', blurb:"Des destins qui se croisent sans jamais suivre l'ordre attendu.", rating:1500, votes:0},
+  {id:'chihiro', title:'Le Voyage de Chihiro', year:2001, genre:'Animation', blurb:"Une fillette qui doit se souvenir de son prénom pour rentrer chez elle.", rating:1500, votes:0},
+  {id:'darkknight', title:'The Dark Knight', year:2008, genre:'Action', blurb:"Un justicier face à un chaos qu'aucune règle ne peut contenir.", rating:1500, votes:0},
+  {id:'lalaland', title:'La La Land', year:2016, genre:'Comédie musicale', blurb:"Deux rêves qui avancent ensemble, jusqu'à devoir choisir un chemin.", rating:1500, votes:0},
+  {id:'whiplash', title:'Whiplash', year:2014, genre:'Drame', blurb:"Un métronome qui devient une arme entre un élève et son professeur.", rating:1500, votes:0},
+  {id:'interstellar', title:'Interstellar', year:2014, genre:'Science-fiction', blurb:"Un père qui traverse le temps pour tenir une promesse.", rating:1500, votes:0},
+  {id:'budapest', title:'The Grand Budapest Hotel', year:2014, genre:'Comédie', blurb:"Un concierge et son groom, gardiens d'un monde déjà disparu.", rating:1500, votes:0},
+  {id:'getout', title:'Get Out', year:2017, genre:'Horreur', blurb:"Un week-end chez les beaux-parents qui tourne mal, très vite.", rating:1500, votes:0},
+  {id:'madmax', title:'Mad Max: Fury Road', year:2015, genre:'Action', blurb:"Une course-poursuite de deux heures à travers un désert sans loi.", rating:1500, votes:0},
+  {id:'her', title:'Her', year:2013, genre:'Science-fiction', blurb:"Un homme seul qui tombe amoureux d'une voix dans son oreille.", rating:1500, votes:0},
+  {id:'eeaao', title:'Everything Everywhere All at Once', year:2022, genre:'Science-fiction', blurb:"Une mère qui doit sauver le multivers pour sauver sa fille.", rating:1500, votes:0},
+  {id:'matrix', title:'Matrix', year:1999, genre:'Science-fiction', blurb:"Une pilule rouge, une pilule bleue, et plus rien d'autre à choisir.", rating:1500, votes:0},
+  {id:'casablanca', title:'Casablanca', year:1942, genre:'Romance', blurb:"Un bar, une guerre, et un amour qu'il faut sacrifier pour survivre.", rating:1500, votes:0},
+  {id:'fightclub', title:'Fight Club', year:1999, genre:'Drame', blurb:"Un homme qui perd le sommeil, puis un peu plus que ça.", rating:1500, votes:0},
+  {id:'amelie', title:'Amélie Poulain', year:2001, genre:'Comédie', blurb:"Une serveuse qui répare la vie des autres avant d'oser réparer la sienne.", rating:1500, votes:0},
+  {id:'nocountry', title:'No Country for Old Men', year:2007, genre:'Thriller', blurb:"Une valise pleine d'argent, et un homme qu'on ne peut pas négocier.", rating:1500, votes:0},
+  {id:'evades', title:'Les Évadés', year:1994, genre:'Drame', blurb:"Une amitié construite pierre par pierre, pendant vingt ans de prison.", rating:1500, votes:0},
+  {id:'br2049', title:'Blade Runner 2049', year:2017, genre:'Science-fiction', blurb:"Un enquêteur artificiel qui cherche ce qui le rendrait réel.", rating:1500, votes:0},
+  {id:'portrait', title:'Portrait de la jeune fille en feu', year:2019, genre:'Romance', blurb:"Une peintre et son modèle, et le peu de temps qu'il leur reste.", rating:1500, votes:0},
+  {id:'knivesout', title:'À couteaux tirés', year:2019, genre:'Policier', blurb:"Un testament, une famille entière de suspects, et un détective très patient.", rating:1500, votes:0},
+  {id:'dune', title:'Dune', year:2021, genre:'Science-fiction', blurb:"Un désert, une prophétie, et un héritier qui n'en a pas demandé tant.", rating:1500, votes:0},
+  {id:'oldboy', title:'Oldboy', year:2003, genre:'Thriller', blurb:"Quinze ans enfermé sans raison, et cinq jours pour comprendre pourquoi.", rating:1500, votes:0},
+  {id:'citedieu', title:'La Cité de Dieu', year:2002, genre:'Drame', blurb:"Grandir dans une favela où l'enfance ne dure jamais longtemps.", rating:1500, votes:0},
+  {id:'coco', title:'Coco', year:2017, genre:'Animation', blurb:"Un petit garçon qui traverse la mort pour retrouver sa musique.", rating:1500, votes:0},
+  {id:'spiderverse', title:'Spider-Man: New Generation', year:2018, genre:'Animation', blurb:"Plusieurs versions du même héros, et une seule ville à sauver ensemble.", rating:1500, votes:0},
+  {id:'nomadland', title:'Nomadland', year:2020, genre:'Drame', blurb:"Une femme qui refait sa vie sur la route, un camping-car à la fois.", rating:1500, votes:0},
+  {id:'socialnetwork', title:'The Social Network', year:2010, genre:'Drame', blurb:"Un site créé par dépit qui finit par redéfinir l'amitié elle-même.", rating:1500, votes:0},
+  {id:'childrenofmen', title:"Les Fils de l'homme", year:2006, genre:'Science-fiction', blurb:"Un monde qui n'a plus vu naître un enfant depuis dix-huit ans.", rating:1500, votes:0},
+  {id:'lotr', title:'Le Seigneur des Anneaux', year:2001, genre:'Fantastique', blurb:"Un anneau à détruire, et neuf compagnons pour l'accompagner jusqu'au bout.", rating:1500, votes:0},
+  {id:'alien', title:'Alien', year:1979, genre:'Horreur', blurb:"Un vaisseau silencieux, et quelque chose à bord qui ne l'est pas.", rating:1500, votes:0},
+  {id:'gladiator', title:'Gladiator', year:2000, genre:'Historique', blurb:"Un général trahi qui redevient esclave, puis légende de l'arène.", rating:1500, votes:0},
+  {id:'departed', title:'Les Infiltrés', year:2006, genre:'Policier', blurb:"Deux taupes, deux camps, et personne qui sait vraiment qui trahit qui.", rating:1500, votes:0}
+];
+
+let movies = {};
+let currentPair = null;
+
+function slugify(str){
+  return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') + '-' + Math.random().toString(36).slice(2,6);
+}
+function expectedScore(a, b){ return 1 / (1 + Math.pow(10, (b - a) / 400)); }
+
+async function loadData(){
+  const statusLine = document.getElementById('statusLine');
+  const { data, error } = await supabaseClient.from('movies').select('*');
+  if(error){
+    statusLine.textContent = "Le classement n'a pas pu être chargé. Vérifie ta configuration Supabase.";
+    console.error(error);
+    return false;
+  }
+  if(!data || data.length === 0){
+    // table vide : on seed avec les films de départ
+    const { error: seedError } = await supabaseClient.from('movies').upsert(SEED_MOVIES, { onConflict: 'id', ignoreDuplicates: true });
+    if(seedError){ console.error(seedError); }
+    const { data: seeded } = await supabaseClient.from('movies').select('*');
+    (seeded || []).forEach(m => movies[m.id] = m);
+  } else {
+    data.forEach(m => movies[m.id] = m);
+  }
+  return true;
+}
+
+function pickPair(){
+  const ids = Object.keys(movies);
+  if(ids.length < 2) return null;
+  let a = ids[Math.floor(Math.random()*ids.length)];
+  let b = ids[Math.floor(Math.random()*ids.length)];
+  let guard = 0;
+  while(b === a && guard < 20){ b = ids[Math.floor(Math.random()*ids.length)]; guard++; }
+  return [a, b];
+}
+
+function renderArena(){
+  const arena = document.getElementById('arena');
+  if(!currentPair){
+    arena.innerHTML = '<div class="empty-msg">Ajoute au moins deux films pour commencer à voter.</div>';
+    return;
+  }
+  const [idA, idB] = currentPair;
+  const a = movies[idA], b = movies[idB];
+  arena.innerHTML = `
+    <div class="card" id="cardA" data-id="${idA}">
+      <div class="genre-tag">${a.genre}</div><div class="year">${a.year}</div>
+      <div class="title">${a.title}</div><div class="blurb">${a.blurb}</div>
+    </div>
+    <div class="vs-badge">VS</div>
+    <div class="card" id="cardB" data-id="${idB}">
+      <div class="genre-tag">${b.genre}</div><div class="year">${b.year}</div>
+      <div class="title">${b.title}</div><div class="blurb">${b.blurb}</div>
+    </div>`;
+  document.getElementById('cardA').addEventListener('click', () => handleVote(idA, idB));
+  document.getElementById('cardB').addEventListener('click', () => handleVote(idB, idA));
+}
+
+async function handleVote(winnerId, loserId){
+  const statusLine = document.getElementById('statusLine');
+  statusLine.textContent = 'Enregistrement du vote…';
+  const winner = movies[winnerId], loser = movies[loserId];
+  const K = 32;
+  const expWin = expectedScore(winner.rating, loser.rating);
+  const expLose = expectedScore(loser.rating, winner.rating);
+  winner.rating = Math.round(winner.rating + K * (1 - expWin));
+  loser.rating = Math.round(loser.rating + K * (0 - expLose));
+  winner.votes += 1; loser.votes += 1;
+
+  const winnerCard = document.getElementById(winnerId === currentPair[0] ? 'cardA' : 'cardB');
+  if(winnerCard) winnerCard.classList.add('flash');
+
+  const { error: e1 } = await supabaseClient.from('movies').update({rating: winner.rating, votes: winner.votes}).eq('id', winnerId);
+  const { error: e2 } = await supabaseClient.from('movies').update({rating: loser.rating, votes: loser.votes}).eq('id', loserId);
+  statusLine.textContent = (e1 || e2) ? "Le vote n'a pas pu être enregistré. Réessaie." : 'Vote enregistré. Nouveau duel…';
+
+  currentPair = pickPair();
+  renderArena();
+  renderLeaderboard();
+}
+
+function renderLeaderboard(){
+  const wrap = document.getElementById('leaderboardWrap');
+  const list = Object.values(movies).sort((x,y) => y.rating - x.rating);
+  if(list.length === 0){ wrap.innerHTML = '<div class="empty-msg">Aucun film pour l\\'instant.</div>'; return; }
+  const totalVotes = list.reduce((sum,m) => sum + m.votes, 0) / 2;
+  document.getElementById('voteCount').textContent = `${Math.round(totalVotes)} votes au total`;
+  wrap.innerHTML = `<table><thead><tr><th>Rang</th><th>Film</th><th style="text-align:right;">Score</th><th style="text-align:right;">Votes</th></tr></thead>
+    <tbody>${list.map((m, i) => `<tr><td class="rank">#${i+1}</td><td>${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></td><td class="rating">${m.rating}</td><td class="votes">${m.votes}</td></tr>`).join('')}</tbody></table>`;
+}
+
+document.getElementById('addForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const title = document.getElementById('inpTitle').value.trim();
+  const year = parseInt(document.getElementById('inpYear').value, 10);
+  const genre = document.getElementById('inpGenre').value.trim();
+  const blurb = document.getElementById('inpBlurb').value.trim();
+  if(!title || !year || !genre || !blurb) return;
+  const id = slugify(title);
+  const newMovie = {id, title, year, genre, blurb, rating: 1500, votes: 0};
+  const { error } = await supabaseClient.from('movies').insert([newMovie]);
+  const statusLine = document.getElementById('statusLine');
+  if(error){
+    statusLine.textContent = "Le film n'a pas pu être ajouté. Réessaie.";
+    console.error(error);
+  } else {
+    movies[id] = newMovie;
+    statusLine.textContent = `"${title}" a rejoint l'arène.`;
+    if(!currentPair) currentPair = pickPair();
+  }
+  e.target.reset();
+  renderArena();
+  renderLeaderboard();
+});
+
+(async function init(){
+  const ok = await loadData();
+  if(!ok) return;
+  currentPair = pickPair();
+  document.getElementById('statusLine').textContent = '';
+  renderArena();
+  renderLeaderboard();
+})();
+</script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MovieMash</title>
+<title>MoviesMash</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -88,7 +88,7 @@
 <div class="perf"></div>
 <header>
   <div class="eyebrow">Un classement écrit par vos clics</div>
-  <h1>MOVIEMASH</h1>
+  <h1>MOVIESMASH</h1>
   <div class="subtitle">Deux films. Un choix. Aucun compromis.</div>
 </header>
 
@@ -463,7 +463,7 @@ async function renderSharedView(sharedVisitorId){
   wrap.innerHTML = `
     <div class="shared-card">
       <h2>Le Top ${top.length} de ${name}</h2>
-      <div class="shared-sub">Classement personnel construit par ses votes sur MovieMash</div>
+      <div class="shared-sub">Classement personnel construit par ses votes sur MoviesMash</div>
       ${top.map((r, i) => {
         const m = movies[r.movie_id] || { title: r.movie_id, year: '', poster_url: null };
         return `<div class="shared-row">
@@ -580,7 +580,7 @@ async function generateStoryImage(){
   ctx.fillText('MON TOP 3 SUR', W/2, 150);
   ctx.fillStyle = '#E8B84B';
   ctx.font = '110px "Bebas Neue", sans-serif';
-  ctx.fillText('MOVIEMASH', W/2, 250);
+  ctx.fillText('MOVIESMASH', W/2, 250);
   ctx.fillStyle = '#F5EDE0';
   ctx.font = '34px "JetBrains Mono", monospace';
   ctx.fillText('par ' + (pseudo || ''), W/2, 305);
@@ -645,7 +645,7 @@ async function generateStoryImage(){
   ctx.textAlign = 'center';
   ctx.fillStyle = '#948E86';
   ctx.font = '26px "JetBrains Mono", monospace';
-  ctx.fillText('Fais ton propre classement sur MovieMash', W/2, H - 90);
+  ctx.fillText('Fais ton propre classement sur MoviesMash', W/2, H - 90);
 
   // Téléchargement
   try{

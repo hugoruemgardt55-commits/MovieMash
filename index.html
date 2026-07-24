@@ -4,6 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MoviesMash</title>
+<meta name="description" content="Deux films. Un choix. Aucun compromis. Construis ton Top 10 personnel.">
+<!-- ⚠️ Remplace par l'URL réelle de ton site une fois en ligne -->
+<meta property="og:title" content="MoviesMash — Deux films. Un choix.">
+<meta property="og:description" content="Vote entre deux films et découvre ton Top 10 personnel sur MoviesMash.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://TON-SITE.vercel.app">
+<meta property="og:image" content="https://TON-SITE.vercel.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="MoviesMash — Deux films. Un choix.">
+<meta name="twitter:description" content="Vote entre deux films et découvre ton Top 10 personnel sur MoviesMash.">
+<meta name="twitter:image" content="https://TON-SITE.vercel.app/og-image.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -71,6 +84,15 @@
   form.add-form button:hover{ filter:brightness(1.08); }
   .disclaimer{ text-align:center; color:var(--muted); font-size:11.5px; margin-top:30px; line-height:1.6; }
   .empty-msg{ color:var(--muted); font-size:13px; padding:20px 0; text-align:center; }
+  .filter-bar{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:18px; }
+  .filter-bar select{ background:var(--card); border:1px solid var(--line); color:var(--cream); padding:8px 12px; border-radius:20px; font-family:'JetBrains Mono', monospace; font-size:12px; cursor:pointer; }
+  .filter-bar select:focus{ outline:2px solid var(--gold); }
+  .progress-wrap{ max-width:400px; margin: 0 auto 24px; text-align:center; }
+  .progress-track{ height:6px; background:var(--line); border-radius:4px; overflow:hidden; }
+  .progress-fill{ height:100%; background: linear-gradient(90deg, var(--teal), var(--gold)); width:0%; transition: width .3s ease; }
+  .progress-label{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); margin-top:6px; }
+  .search-input{ width:100%; background:var(--card); border:1px solid var(--line); color:var(--cream); padding:9px 12px; border-radius:4px; font-family:'Inter',sans-serif; font-size:13px; margin-bottom:14px; box-sizing:border-box; }
+  .search-input:focus{ outline:2px solid var(--gold); outline-offset:1px; }
   .shared-card{ background: var(--bg-alt); border:1px solid var(--gold); border-radius:8px; padding:30px; margin: 20px auto 34px; max-width:600px; }
   .shared-card h2{ font-family:'Bebas Neue', sans-serif; font-size:30px; color:var(--gold); margin:0 0 4px; letter-spacing:0.02em; }
   .shared-card .shared-sub{ color:var(--muted); font-size:13px; margin-bottom:18px; }
@@ -107,6 +129,16 @@
 
   <div id="mainApp" style="display:none;">
     <div class="status-line" id="statusLine">Ouverture du rideau…</div>
+
+    <div class="filter-bar" id="filterBar">
+      <select id="filterGenre"><option value="">Tous les genres</option></select>
+      <select id="filterDecade"><option value="">Toutes les décennies</option></select>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <div class="progress-label" id="progressLabel">0 / 0 films votés</div>
+    </div>
+
     <div class="arena" id="arena"></div>
 
     <section class="panel">
@@ -114,6 +146,7 @@
         <div class="panel-title">Le classement</div>
         <div class="panel-sub" id="voteCount">— votes au total</div>
       </div>
+      <input type="text" id="leaderboardSearch" placeholder="Rechercher un film dans le classement…" class="search-input">
       <div id="leaderboardWrap"><div class="empty-msg">Chargement du classement…</div></div>
     </section>
 
@@ -307,6 +340,8 @@ async function fetchMissingPosters(){
 let streaks = {}; // compteur de victoires consécutives, remis à zéro à chaque rechargement de page
 let recentlyShown = []; // file des derniers films montrés, pour éviter de les reproposer trop vite
 const RECENT_WINDOW = 40; // ne reproposer un film qu'après ~40 autres films vus (ajuste selon la taille du catalogue)
+let filterGenre = '';
+let filterDecade = '';
 
 function markShown(...ids){
   ids.forEach(id => {
@@ -318,8 +353,65 @@ function markShown(...ids){
   }
 }
 
+function decadeOf(year){
+  if(!year || year < 1900) return null;
+  return Math.floor(year / 10) * 10;
+}
+
+function matchesFilters(movie){
+  if(filterGenre && movie.genre !== filterGenre) return false;
+  if(filterDecade && String(decadeOf(movie.year)) !== filterDecade) return false;
+  return true;
+}
+
+function getFilteredIds(){
+  const filtered = Object.keys(movies).filter(id => matchesFilters(movies[id]));
+  // Si le filtre choisi est trop restrictif (moins de 2 films), on l'ignore plutôt que de bloquer le vote
+  return filtered.length >= 2 ? filtered : Object.keys(movies);
+}
+
+function populateFilters(){
+  const genreSet = new Set();
+  const decadeSet = new Set();
+  Object.values(movies).forEach(m => {
+    if(m.genre) genreSet.add(m.genre);
+    const d = decadeOf(m.year);
+    if(d) decadeSet.add(d);
+  });
+  const genreSelect = document.getElementById('filterGenre');
+  const decadeSelect = document.getElementById('filterDecade');
+  [...genreSet].sort().forEach(g => {
+    const opt = document.createElement('option');
+    opt.value = g; opt.textContent = g;
+    genreSelect.appendChild(opt);
+  });
+  [...decadeSet].sort((a,b) => b-a).forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = String(d); opt.textContent = d + 's';
+    decadeSelect.appendChild(opt);
+  });
+  genreSelect.addEventListener('change', () => {
+    filterGenre = genreSelect.value;
+    currentPair = pickPair();
+    renderArena();
+  });
+  decadeSelect.addEventListener('change', () => {
+    filterDecade = decadeSelect.value;
+    currentPair = pickPair();
+    renderArena();
+  });
+}
+
+function renderProgress(){
+  const total = Object.keys(movies).length;
+  const voted = Object.values(personalRatings).filter(r => r.votes > 0).length;
+  const pct = total > 0 ? Math.min(100, Math.round((voted/total)*100)) : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `${voted} / ${total} films votés`;
+}
+
 function pickPair(){
-  const all = Object.keys(movies);
+  const all = getFilteredIds();
   if(all.length < 2) return null;
   // On essaie d'abord d'éviter tout ce qui a été montré récemment
   let pool = all.filter(id => !recentlyShown.includes(id));
@@ -333,7 +425,7 @@ function pickPair(){
 }
 
 function pickChallenger(excludeId){
-  const all = Object.keys(movies).filter(id => id !== excludeId);
+  const all = getFilteredIds().filter(id => id !== excludeId);
   if(all.length === 0) return null;
   // Priorité aux films non montrés récemment, pour forcer la diversité plutôt que de reproposer un film déjà écarté
   let pool = all.filter(id => !recentlyShown.includes(id));
@@ -373,8 +465,30 @@ function renderArena(){
   document.getElementById('cardB').addEventListener('click', () => handleVote(idB, idA));
 }
 
+let voteInProgress = false;
+let voteTimestamps = []; // pour la limite de fréquence (protection anti-spam basique, côté client)
+const MAX_VOTES_PER_WINDOW = 15;
+const VOTE_WINDOW_MS = 10000;
+
 async function handleVote(winnerId, loserId){
   const statusLine = document.getElementById('statusLine');
+
+  // Empêche un double-clic d'enregistrer deux fois le même vote avant la fin du traitement
+  if(voteInProgress) return;
+
+  // Limite de fréquence : protège contre le spam de clics ou un script naïf.
+  // Note : c'est une protection côté client, donc elle ne bloque pas quelqu'un
+  // qui appellerait directement l'API Supabase — une vraie protection anti-triche
+  // demanderait de faire valider les votes côté serveur (voir la remarque plus bas dans le fichier).
+  const now = Date.now();
+  voteTimestamps = voteTimestamps.filter(t => now - t < VOTE_WINDOW_MS);
+  if(voteTimestamps.length >= MAX_VOTES_PER_WINDOW){
+    statusLine.textContent = "Doucement ! Laisse les films respirer un peu 🎬 (réessaie dans quelques secondes)";
+    return;
+  }
+  voteTimestamps.push(now);
+
+  voteInProgress = true;
   statusLine.textContent = 'Enregistrement du vote…';
   const winner = movies[winnerId], loser = movies[loserId];
   const K = 32;
@@ -418,16 +532,31 @@ async function handleVote(winnerId, loserId){
   renderArena();
   renderLeaderboard();
   renderPersonalTop();
+  renderProgress();
+  voteInProgress = false;
 }
+
+let leaderboardSearchTerm = '';
 
 function renderLeaderboard(){
   const wrap = document.getElementById('leaderboardWrap');
-  const list = Object.values(movies).sort((x,y) => y.rating - x.rating);
-  if(list.length === 0){ wrap.innerHTML = '<div class="empty-msg">Aucun film pour le moment.</div>'; return; }
-  const totalVotes = list.reduce((sum,m) => sum + m.votes, 0) / 2;
+  const fullList = Object.values(movies).sort((x,y) => y.rating - x.rating);
+  if(fullList.length === 0){ wrap.innerHTML = '<div class="empty-msg">Aucun film pour le moment.</div>'; return; }
+  const totalVotes = fullList.reduce((sum,m) => sum + m.votes, 0) / 2;
   document.getElementById('voteCount').textContent = `${Math.round(totalVotes)} votes au total`;
+
+  // On garde le rang réel (position dans le classement complet) même quand on filtre par recherche
+  const ranked = fullList.map((m, i) => ({ ...m, rank: i+1 }));
+  const term = leaderboardSearchTerm.trim().toLowerCase();
+  const display = term ? ranked.filter(m => m.title.toLowerCase().includes(term)) : ranked.slice(0, 50);
+
+  if(display.length === 0){
+    wrap.innerHTML = '<div class="empty-msg">Aucun film ne correspond à ta recherche.</div>';
+    return;
+  }
   wrap.innerHTML = `<table><thead><tr><th>Rang</th><th>Film</th><th style="text-align:right;">Score</th><th style="text-align:right;">Votes</th></tr></thead>
-    <tbody>${list.map((m, i) => `<tr><td class="rank">#${i+1}</td><td>${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></td><td class="rating">${m.rating}</td><td class="votes">${m.votes}</td></tr>`).join('')}</tbody></table>`;
+    <tbody>${display.map(m => `<tr><td class="rank">#${m.rank}</td><td>${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></td><td class="rating">${m.rating}</td><td class="votes">${m.votes}</td></tr>`).join('')}</tbody></table>
+    ${!term && ranked.length > 50 ? `<div class="empty-msg">Top 50 affiché — utilise la recherche pour trouver un film plus loin dans le classement.</div>` : ''}`;
 }
 
 function renderPersonalTop(){
@@ -724,11 +853,18 @@ async function startMainApp(){
   document.getElementById('mainApp').style.display = 'block';
   document.getElementById('pseudoDisplay').textContent = pseudo;
   await loadPersonalRatings();
+  populateFilters();
   currentPair = pickPair();
   document.getElementById('statusLine').textContent = '';
   renderArena();
   renderLeaderboard();
   renderPersonalTop();
+  renderProgress();
+
+  document.getElementById('leaderboardSearch').addEventListener('input', (e) => {
+    leaderboardSearchTerm = e.target.value;
+    renderLeaderboard();
+  });
 }
 </script>
 </body>

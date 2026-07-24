@@ -159,16 +159,29 @@ async function loadData(){
   const statusLine = document.getElementById('statusLine');
   const { data, error } = await supabaseClient.from('movies').select('*');
   if(error){
-    statusLine.textContent = "Le classement n'a pas pu être chargé. Vérifie ta configuration Supabase.";
+    statusLine.textContent = "ERREUR (lecture) : " + (error.message || JSON.stringify(error));
     console.error(error);
     return false;
   }
   if(!data || data.length === 0){
+    statusLine.textContent = "Table vide, remplissage en cours…";
     // table vide : on seed avec les films de départ
     const { error: seedError } = await supabaseClient.from('movies').upsert(SEED_MOVIES, { onConflict: 'id', ignoreDuplicates: true });
-    if(seedError){ console.error(seedError); }
-    const { data: seeded } = await supabaseClient.from('movies').select('*');
+    if(seedError){
+      statusLine.textContent = "ERREUR (remplissage) : " + (seedError.message || JSON.stringify(seedError));
+      console.error(seedError);
+      return false;
+    }
+    const { data: seeded, error: reloadError } = await supabaseClient.from('movies').select('*');
+    if(reloadError){
+      statusLine.textContent = "ERREUR (relecture) : " + (reloadError.message || JSON.stringify(reloadError));
+      return false;
+    }
     (seeded || []).forEach(m => movies[m.id] = m);
+    if(!seeded || seeded.length === 0){
+      statusLine.textContent = "Le remplissage n'a rien ajouté — vérifie les policies RLS dans Supabase.";
+      return false;
+    }
   } else {
     data.forEach(m => movies[m.id] = m);
   }
@@ -233,7 +246,7 @@ async function handleVote(winnerId, loserId){
 function renderLeaderboard(){
   const wrap = document.getElementById('leaderboardWrap');
   const list = Object.values(movies).sort((x,y) => y.rating - x.rating);
-  if(list.length === 0){ wrap.innerHTML = '<div class="empty-msg">Aucun film pour l\\'instant.</div>'; return; }
+  if(list.length === 0){ wrap.innerHTML = '<div class="empty-msg">Aucun film pour le moment.</div>'; return; }
   const totalVotes = list.reduce((sum,m) => sum + m.votes, 0) / 2;
   document.getElementById('voteCount').textContent = `${Math.round(totalVotes)} votes au total`;
   wrap.innerHTML = `<table><thead><tr><th>Rang</th><th>Film</th><th style="text-align:right;">Score</th><th style="text-align:right;">Votes</th></tr></thead>

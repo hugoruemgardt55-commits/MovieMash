@@ -45,6 +45,14 @@
   header{ text-align:center; padding:36px 20px 20px; }
   .eyebrow{ font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--teal); margin-bottom:6px; }
   h1{ font-family:'Bebas Neue', sans-serif; font-size:64px; letter-spacing:0.04em; margin:0; color:var(--gold); text-shadow: 0 0 24px rgba(232,184,74,0.25); }
+  @media (max-width: 480px){
+    h1{ font-size:44px; }
+    .card{ min-height:320px; padding:20px 16px; }
+    .card .title{ font-size:26px; }
+    table{ font-size:12.5px; }
+    th, td{ padding:8px 4px; }
+    .filter-bar select{ flex:1 1 45%; }
+  }
   .subtitle{ color:var(--muted); font-size:15px; margin-top:6px; }
   main{ max-width:920px; margin:0 auto; padding:30px 20px 80px; }
   .layout-grid{ display:grid; grid-template-columns: 1fr; gap:24px; align-items:start; }
@@ -57,6 +65,7 @@
   .arena{ display:flex; align-items:center; justify-content:center; gap:0; position:relative; margin-bottom:26px; flex-wrap:wrap; }
   .card{ flex:1 1 320px; max-width:360px; background:linear-gradient(160deg, var(--card), #141217); border:1px solid var(--line); border-radius:6px; padding:26px 22px; cursor:pointer; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; position:relative; min-height:380px; display:flex; flex-direction:column; justify-content:flex-end; }
   .card:hover{ transform: translateY(-6px); border-color: var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 0 1px rgba(232,184,74,0.15); }
+  .card:focus-visible{ outline: 3px solid var(--gold); outline-offset: 3px; transform: translateY(-6px); }
   .card:active{ transform: translateY(-2px) scale(0.99); }
   .card .genre-tag{ position:absolute; top:18px; left:22px; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--teal); border:1px solid var(--teal); padding:3px 8px; border-radius:20px; }
   .card .title{ font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:0.02em; line-height:1.05; color:var(--cream); text-shadow: 0 2px 8px rgba(0,0,0,0.6); }
@@ -76,6 +85,8 @@
   .vs-badge::before{ content:''; position:absolute; inset:-8px; border-radius:50%; background: conic-gradient(from 0deg, var(--gold), transparent 20%, transparent 80%, var(--gold)); animation: spin 3.5s linear infinite; z-index:-1; opacity:0.5; }
   @keyframes spin{ to{ transform: rotate(360deg); } }
   .status-line{ text-align:center; font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--muted); min-height:18px; margin-bottom:8px; }
+  .spinner{ display:inline-block; width:12px; height:12px; border:2px solid var(--line); border-top-color:var(--gold); border-radius:50%; animation: spin-loader 0.7s linear infinite; vertical-align:middle; margin-right:6px; }
+  @keyframes spin-loader{ to{ transform: rotate(360deg); } }
   .flash{ animation: flash-anim 0.5s ease; }
   @keyframes flash-anim{ 0%{ box-shadow: 0 0 0 0 rgba(232,184,74,0.5); } 100%{ box-shadow: 0 0 0 0 rgba(232,184,74,0); } }
   section.panel{ background: var(--bg-alt); border:1px solid var(--line); border-radius:6px; padding:24px; margin-top:34px; }
@@ -83,6 +94,7 @@
   .panel-title{ font-family:'Bebas Neue', sans-serif; font-size:24px; letter-spacing:0.03em; color:var(--gold); }
   .panel-sub{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); }
   table{ width:100%; border-collapse:collapse; }
+  #leaderboardWrap, #personalTopWrap{ overflow-x:auto; }
   th{ text-align:left; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); padding:8px 6px; border-bottom:1px solid var(--line); }
   td{ padding:10px 6px; border-bottom:1px solid var(--line); font-size:14px; }
   tr:last-child td{ border-bottom:none; }
@@ -128,6 +140,8 @@
 
 <main>
 
+  <div class="status-line" id="globalLoading" style="margin-top:20px;"><span class="spinner"></span> Ouverture du rideau…</div>
+
   <section class="panel" id="pseudoGate" style="display:none;">
     <div class="panel-header"><div class="panel-title">Avant de commencer</div></div>
     <p style="color:var(--muted); font-size:13.5px; margin-top:0;">Choisis un pseudo pour garder ton propre Top 10 et pouvoir le montrer à tes potes.</p>
@@ -140,7 +154,7 @@
   <div id="sharedViewWrap"></div>
 
   <div id="mainApp" style="display:none;">
-    <div class="status-line" id="statusLine">Ouverture du rideau…</div>
+    <div class="status-line" id="statusLine"><span class="spinner"></span> Ouverture du rideau…</div>
 
     <div class="filter-bar" id="filterBar">
       <select id="filterGenre"><option value="">Tous les genres</option></select>
@@ -182,7 +196,8 @@
 
     <div class="disclaimer">
       Le classement est public — chaque vote et chaque film ajouté est visible par tout le monde.<br>
-      Ce produit utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.
+      Ce produit utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.<br>
+      <a href="./legal.html" style="color:var(--muted);">Mentions légales & confidentialité</a>
     </div>
   </div>
 </main>
@@ -293,10 +308,10 @@ function slugify(str){
 function expectedScore(a, b){ return 1 / (1 + Math.pow(10, (b - a) / 400)); }
 
 async function loadData(){
-  const statusLine = document.getElementById('statusLine');
+  const statusLine = document.getElementById('globalLoading');
   const { data, error } = await supabaseClient.from('movies').select('*');
   if(error){
-    statusLine.textContent = "ERREUR (lecture) : " + (error.message || JSON.stringify(error));
+    statusLine.innerHTML = "ERREUR (lecture) : " + (error.message || JSON.stringify(error));
     console.error(error);
     return false;
   }
@@ -306,10 +321,10 @@ async function loadData(){
   // (que la table soit vide au départ, ou qu'on ait juste rajouté des titres au code)
   const missing = SEED_MOVIES.filter(m => !movies[m.id]);
   if(missing.length > 0){
-    statusLine.textContent = `Ajout de ${missing.length} nouveau(x) film(s)…`;
+    statusLine.innerHTML = `<span class="spinner"></span> Ajout de ${missing.length} nouveau(x) film(s)…`;
     const { error: seedError } = await supabaseClient.from('movies').upsert(missing, { onConflict: 'id', ignoreDuplicates: true });
     if(seedError){
-      statusLine.textContent = "ERREUR (remplissage) : " + (seedError.message || JSON.stringify(seedError));
+      statusLine.innerHTML = "ERREUR (remplissage) : " + (seedError.message || JSON.stringify(seedError));
       console.error(seedError);
       return false;
     }
@@ -317,7 +332,7 @@ async function loadData(){
   }
 
   if(Object.keys(movies).length === 0){
-    statusLine.textContent = "Aucun film n'a pu être chargé — vérifie les policies RLS dans Supabase.";
+    statusLine.innerHTML = "Aucun film n'a pu être chargé — vérifie les policies RLS dans Supabase.";
     return false;
   }
 
@@ -469,19 +484,22 @@ function renderArena(){
     ? `style="background-image: linear-gradient(180deg, rgba(11,11,13,0.15) 45%, rgba(11,11,13,0.97) 92%), url('${m.poster_url}'); background-size: cover; background-position: center top;"`
     : '';
   arena.innerHTML = `
-    <div class="card" id="cardA" data-id="${idA}" ${cardStyle(a)}>
+    <div class="card" id="cardA" data-id="${idA}" ${cardStyle(a)} tabindex="0" role="button" aria-label="Voter pour ${a.title}">
       <div class="genre-tag">${a.genre}</div><div class="year">${a.year}</div>
       <div class="title">${a.title}</div>${a.blurb ? `<div class="blurb">${a.blurb}</div>` : ''}
       ${streakBadge(idA)}
     </div>
     <div class="vs-badge">VS</div>
-    <div class="card" id="cardB" data-id="${idB}" ${cardStyle(b)}>
+    <div class="card" id="cardB" data-id="${idB}" ${cardStyle(b)} tabindex="0" role="button" aria-label="Voter pour ${b.title}">
       <div class="genre-tag">${b.genre}</div><div class="year">${b.year}</div>
       <div class="title">${b.title}</div>${b.blurb ? `<div class="blurb">${b.blurb}</div>` : ''}
       ${streakBadge(idB)}
     </div>`;
+  const onKeyActivate = (fn) => (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fn(); } };
   document.getElementById('cardA').addEventListener('click', () => handleVote(idA, idB));
+  document.getElementById('cardA').addEventListener('keydown', onKeyActivate(() => handleVote(idA, idB)));
   document.getElementById('cardB').addEventListener('click', () => handleVote(idB, idA));
+  document.getElementById('cardB').addEventListener('keydown', onKeyActivate(() => handleVote(idB, idA)));
 }
 
 let voteInProgress = false;
@@ -835,12 +853,13 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
   const ok = await loadData();
   if(!ok) return;
 
+  document.getElementById('globalLoading').style.display = 'none';
+
   const params = new URLSearchParams(window.location.search);
   const sharedId = params.get('u');
 
   if(sharedId){
     // Vue "Top d'un ami" : lecture seule, pas besoin de pseudo
-    document.getElementById('statusLine').textContent = '';
     renderSharedView(sharedId);
     return;
   }
@@ -850,7 +869,6 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
 
   if(!pseudo){
     document.getElementById('pseudoGate').style.display = 'block';
-    document.getElementById('statusLine').textContent = '';
     return; // la suite se lance après soumission du formulaire pseudo
   }
 

@@ -37,6 +37,16 @@
   .card .title{ font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:0.02em; line-height:1.05; color:var(--cream); }
   .card .year{ color:var(--muted); font-size:13px; font-family:'JetBrains Mono', monospace; margin-bottom:8px; }
   .card .blurb{ color:var(--muted); font-size:13.5px; line-height:1.4; margin-top:8px; }
+  .streak-badge{
+    position:absolute; top:18px; right:18px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    color:var(--gold);
+    background: rgba(232,184,74,0.1);
+    border:1px solid var(--gold);
+    padding:3px 9px;
+    border-radius:20px;
+  }
   .vs-badge{ width:64px; height:64px; border-radius:50%; background: radial-gradient(circle at 35% 30%, var(--velvet), #5c1729); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue', sans-serif; font-size:22px; color:var(--gold); flex-shrink:0; margin: 0 -8px; z-index:2; position:relative; box-shadow: 0 0 0 4px var(--bg); }
   .vs-badge::before{ content:''; position:absolute; inset:-8px; border-radius:50%; background: conic-gradient(from 0deg, var(--gold), transparent 20%, transparent 80%, var(--gold)); animation: spin 3.5s linear infinite; z-index:-1; opacity:0.5; }
   @keyframes spin{ to{ transform: rotate(360deg); } }
@@ -107,7 +117,13 @@
 const SUPABASE_URL = "https://rddujgdhgxkansmazcqa.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_LOztlk77N0NE3an9beeKgA_Z3EetKB0";
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false
+  }
+});
 
 const SEED_MOVIES = [
   {id:'inception', title:'Inception', year:2010, genre:'Science-fiction', blurb:"Un architecte des rêves qui finit par se perdre dans les siens.", rating:1500, votes:0},
@@ -188,6 +204,8 @@ async function loadData(){
   return true;
 }
 
+let streaks = {}; // compteur de victoires consécutives, remis à zéro à chaque rechargement de page
+
 function pickPair(){
   const ids = Object.keys(movies);
   if(ids.length < 2) return null;
@@ -198,6 +216,12 @@ function pickPair(){
   return [a, b];
 }
 
+function pickChallenger(excludeId){
+  const ids = Object.keys(movies).filter(id => id !== excludeId);
+  if(ids.length === 0) return null;
+  return ids[Math.floor(Math.random()*ids.length)];
+}
+
 function renderArena(){
   const arena = document.getElementById('arena');
   if(!currentPair){
@@ -206,15 +230,20 @@ function renderArena(){
   }
   const [idA, idB] = currentPair;
   const a = movies[idA], b = movies[idB];
+  const streakBadge = (id) => (streaks[id] >= 2)
+    ? `<div class="streak-badge">🔥 ${streaks[id]} victoires</div>`
+    : '';
   arena.innerHTML = `
     <div class="card" id="cardA" data-id="${idA}">
       <div class="genre-tag">${a.genre}</div><div class="year">${a.year}</div>
       <div class="title">${a.title}</div><div class="blurb">${a.blurb}</div>
+      ${streakBadge(idA)}
     </div>
     <div class="vs-badge">VS</div>
     <div class="card" id="cardB" data-id="${idB}">
       <div class="genre-tag">${b.genre}</div><div class="year">${b.year}</div>
       <div class="title">${b.title}</div><div class="blurb">${b.blurb}</div>
+      ${streakBadge(idB)}
     </div>`;
   document.getElementById('cardA').addEventListener('click', () => handleVote(idA, idB));
   document.getElementById('cardB').addEventListener('click', () => handleVote(idB, idA));
@@ -231,14 +260,23 @@ async function handleVote(winnerId, loserId){
   loser.rating = Math.round(loser.rating + K * (0 - expLose));
   winner.votes += 1; loser.votes += 1;
 
-  const winnerCard = document.getElementById(winnerId === currentPair[0] ? 'cardA' : 'cardB');
+  const winnerSlot = winnerId === currentPair[0] ? 0 : 1;
+  const winnerCard = document.getElementById(winnerSlot === 0 ? 'cardA' : 'cardB');
   if(winnerCard) winnerCard.classList.add('flash');
 
   const { error: e1 } = await supabaseClient.from('movies').update({rating: winner.rating, votes: winner.votes}).eq('id', winnerId);
   const { error: e2 } = await supabaseClient.from('movies').update({rating: loser.rating, votes: loser.votes}).eq('id', loserId);
-  statusLine.textContent = (e1 || e2) ? "Le vote n'a pas pu être enregistré. Réessaie." : 'Vote enregistré. Nouveau duel…';
+  statusLine.textContent = (e1 || e2) ? "Le vote n'a pas pu être enregistré. Réessaie." : 'Vote enregistré. Le champion attend son prochain défi…';
 
-  currentPair = pickPair();
+  streaks[winnerId] = (streaks[winnerId] || 0) + 1;
+  streaks[loserId] = 0;
+
+  const challengerId = pickChallenger(winnerId);
+  if(challengerId === null){
+    currentPair = null;
+  } else {
+    currentPair = winnerSlot === 0 ? [winnerId, challengerId] : [challengerId, winnerId];
+  }
   renderArena();
   renderLeaderboard();
 }

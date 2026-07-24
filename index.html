@@ -120,21 +120,20 @@
     <section class="panel">
       <div class="panel-header">
         <div class="panel-title">Mon Top 10, <span id="pseudoDisplay"></span></div>
-        <button id="shareBtn" style="background:var(--gold); color:#1a1500; border:none; padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Partager mon Top</button>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button id="storyBtn" style="background:var(--gold); color:#1a1500; border:none; padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Partager en story</button>
+          <button id="shareBtn" style="background:transparent; color:var(--teal); border:1px solid var(--teal); padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Copier le lien</button>
+        </div>
       </div>
       <div id="personalTopWrap"><div class="empty-msg">Vote pour commencer à construire ton Top 10.</div></div>
       <div class="panel-sub" id="shareStatus" style="margin-top:10px;"></div>
     </section>
 
     <section class="panel">
-      <div class="panel-header"><div class="panel-title">Ajouter un film à l'arène</div></div>
-      <form class="add-form" id="addForm">
-        <input type="text" id="inpTitle" placeholder="Titre du film" required>
-        <input type="number" id="inpYear" placeholder="Année" min="1900" max="2100" required style="flex:0 1 90px;">
-        <input type="text" id="inpGenre" placeholder="Genre" required style="flex:0 1 140px;">
-        <input type="text" id="inpBlurb" placeholder="Une phrase pour le décrire" required style="flex:2 1 220px;">
-        <button type="submit">Ajouter</button>
-      </form>
+      <div class="panel-header"><div class="panel-title">Importer des films depuis TMDB</div></div>
+      <p style="color:var(--muted); font-size:13px; margin-top:0;">Ajoute d'un coup des centaines de films populaires et acclamés, avec leurs affiches. Peut prendre 1-2 minutes. Sans risque à relancer plusieurs fois (les doublons sont ignorés).</p>
+      <button id="importBtn" style="background:var(--teal); color:var(--cream); border:none; padding:9px 18px; border-radius:4px; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif; font-size:13px;">Importer ~500 films populaires</button>
+      <div class="panel-sub" id="importStatus" style="margin-top:10px;"></div>
     </section>
 
     <div class="disclaimer">
@@ -338,13 +337,13 @@ function renderArena(){
   arena.innerHTML = `
     <div class="card" id="cardA" data-id="${idA}" ${cardStyle(a)}>
       <div class="genre-tag">${a.genre}</div><div class="year">${a.year}</div>
-      <div class="title">${a.title}</div><div class="blurb">${a.blurb}</div>
+      <div class="title">${a.title}</div>${a.blurb ? `<div class="blurb">${a.blurb}</div>` : ''}
       ${streakBadge(idA)}
     </div>
     <div class="vs-badge">VS</div>
     <div class="card" id="cardB" data-id="${idB}" ${cardStyle(b)}>
       <div class="genre-tag">${b.genre}</div><div class="year">${b.year}</div>
-      <div class="title">${b.title}</div><div class="blurb">${b.blurb}</div>
+      <div class="title">${b.title}</div>${b.blurb ? `<div class="blurb">${b.blurb}</div>` : ''}
       ${streakBadge(idB)}
     </div>`;
   document.getElementById('cardA').addEventListener('click', () => handleVote(idA, idB));
@@ -460,6 +459,186 @@ async function loadPersonalRatings(){
   (data || []).forEach(r => { personalRatings[r.movie_id] = {rating: r.rating, votes: r.votes}; });
 }
 
+function roundRect(ctx, x, y, w, h, r){
+  ctx.beginPath();
+  ctx.moveTo(x+r, y);
+  ctx.arcTo(x+w, y, x+w, y+h, r);
+  ctx.arcTo(x+w, y+h, x, y+h, r);
+  ctx.arcTo(x, y+h, x, y, r);
+  ctx.arcTo(x, y, x+w, y, r);
+  ctx.closePath();
+}
+
+function loadImageSafe(url){
+  return new Promise((resolve) => {
+    if(!url){ resolve(null); return; }
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = url;
+  });
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines){
+  const words = text.split(' ');
+  let line = '';
+  let lines = [];
+  for(const word of words){
+    const test = line ? line + ' ' + word : word;
+    if(ctx.measureText(test).width > maxWidth && line){
+      lines.push(line);
+      line = word;
+    } else {
+      line = test;
+    }
+  }
+  if(line) lines.push(line);
+  if(lines.length > maxLines){
+    lines = lines.slice(0, maxLines);
+    lines[maxLines-1] = lines[maxLines-1].replace(/\s*\S*$/, '') + '…';
+  }
+  lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
+  return lines.length;
+}
+
+async function generateStoryImage(){
+  const status = document.getElementById('shareStatus');
+  const entries = Object.entries(personalRatings)
+    .filter(([id, r]) => r.votes > 0 && movies[id])
+    .sort((a,b) => b[1].rating - a[1].rating)
+    .slice(0, 3);
+
+  if(entries.length === 0){
+    status.textContent = "Vote pour au moins un film avant de générer ta story.";
+    return;
+  }
+
+  const btn = document.getElementById('storyBtn');
+  btn.disabled = true;
+  const originalLabel = btn.textContent;
+  btn.textContent = 'Génération…';
+
+  if(document.fonts && document.fonts.ready) await document.fonts.ready;
+
+  const W = 1080, H = 1920;
+  const canvas = document.createElement('canvas');
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext('2d');
+
+  // Fond
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+  bgGrad.addColorStop(0, '#141117');
+  bgGrad.addColorStop(1, '#0B0B0D');
+  ctx.fillStyle = bgGrad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Bande perforée haut et bas (clin d'œil pellicule)
+  ctx.fillStyle = '#E8B84B';
+  for(let x = 20; x < W; x += 44){
+    ctx.beginPath(); ctx.arc(x, 24, 9, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, H-24, 9, 0, Math.PI*2); ctx.fill();
+  }
+  ctx.fillStyle = bgGrad;
+
+  // En-tête
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#3C6E68';
+  ctx.font = '28px "JetBrains Mono", monospace';
+  ctx.fillText('MON TOP 3 SUR', W/2, 150);
+  ctx.fillStyle = '#E8B84B';
+  ctx.font = '110px "Bebas Neue", sans-serif';
+  ctx.fillText('MOVIEMASH', W/2, 250);
+  ctx.fillStyle = '#F5EDE0';
+  ctx.font = '34px "JetBrains Mono", monospace';
+  ctx.fillText('par ' + (pseudo || ''), W/2, 305);
+
+  // Cartes des 3 films
+  const posterW = 260, posterH = 390;
+  const rowStartY = 420;
+  const rowGap = 460;
+
+  for(let i = 0; i < entries.length; i++){
+    const [movieId] = entries[i];
+    const movie = movies[movieId];
+    const rowY = rowStartY + i * rowGap;
+    const posterX = 150;
+    const posterY = rowY;
+
+    // Numéro de rang
+    ctx.textAlign = 'left';
+    ctx.fillStyle = '#9A2846';
+    ctx.font = '220px "Bebas Neue", sans-serif';
+    ctx.fillText(String(i+1), 20, posterY + posterH - 40);
+    ctx.strokeStyle = '#E8B84B';
+    ctx.lineWidth = 3;
+    ctx.strokeText(String(i+1), 20, posterY + posterH - 40);
+
+    // Affiche (ou repli stylisé si absente/inaccessible)
+    const img = await loadImageSafe(movie.poster_url);
+    ctx.save();
+    roundRect(ctx, posterX, posterY, posterW, posterH, 14);
+    ctx.clip();
+    if(img){
+      ctx.drawImage(img, posterX, posterY, posterW, posterH);
+    } else {
+      const g = ctx.createLinearGradient(posterX, posterY, posterX+posterW, posterY+posterH);
+      g.addColorStop(0, '#1E1B22'); g.addColorStop(1, '#3C6E68');
+      ctx.fillStyle = g;
+      ctx.fillRect(posterX, posterY, posterW, posterH);
+      ctx.fillStyle = '#F5EDE0';
+      ctx.textAlign = 'center';
+      ctx.font = '30px "Bebas Neue", sans-serif';
+      wrapText(ctx, movie.title, posterX + posterW/2, posterY + posterH/2, posterW - 30, 34, 3);
+      ctx.textAlign = 'left';
+    }
+    ctx.restore();
+    ctx.strokeStyle = 'rgba(232,184,74,0.4)';
+    ctx.lineWidth = 2;
+    roundRect(ctx, posterX, posterY, posterW, posterH, 14);
+    ctx.stroke();
+
+    // Titre + année à côté de l'affiche
+    const textX = posterX + posterW + 40;
+    const textMaxWidth = W - textX - 60;
+    ctx.fillStyle = '#F5EDE0';
+    ctx.font = '46px "Bebas Neue", sans-serif';
+    const linesUsed = wrapText(ctx, movie.title, textX, posterY + 60, textMaxWidth, 50, 3);
+    ctx.fillStyle = '#948E86';
+    ctx.font = '26px "JetBrains Mono", monospace';
+    ctx.fillText(String(movie.year || ''), textX, posterY + 60 + linesUsed * 50 + 20);
+  }
+
+  // Pied de page
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#948E86';
+  ctx.font = '26px "JetBrains Mono", monospace';
+  ctx.fillText('Fais ton propre classement sur MovieMash', W/2, H - 90);
+
+  // Téléchargement
+  try{
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    if(!blob) throw new Error('toBlob a renvoyé null');
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `moviemash-top3-${(pseudo||'moi').toLowerCase().replace(/[^a-z0-9]+/g,'-')}.png`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    status.textContent = "Image téléchargée — ouvre-la et partage-la dans ta story Instagram.";
+  }catch(e){
+    console.error(e);
+    status.textContent = "L'image n'a pas pu être générée (certaines affiches ont peut-être bloqué l'export). Réessaie.";
+  }
+
+  btn.disabled = false;
+  btn.textContent = originalLabel;
+}
+
+document.getElementById('storyBtn').addEventListener('click', generateStoryImage);
+
 document.getElementById('shareBtn').addEventListener('click', async () => {
   const shareStatus = document.getElementById('shareStatus');
   const url = `${window.location.origin}${window.location.pathname}?u=${encodeURIComponent(visitorId)}`;
@@ -471,29 +650,78 @@ document.getElementById('shareBtn').addEventListener('click', async () => {
   }
 });
 
-document.getElementById('addForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const title = document.getElementById('inpTitle').value.trim();
-  const year = parseInt(document.getElementById('inpYear').value, 10);
-  const genre = document.getElementById('inpGenre').value.trim();
-  const blurb = document.getElementById('inpBlurb').value.trim();
-  if(!title || !year || !genre || !blurb) return;
-  const id = slugify(title);
-  const newMovie = {id, title, year, genre, blurb, rating: 1500, votes: 0};
-  const { error } = await supabaseClient.from('movies').insert([newMovie]);
-  const statusLine = document.getElementById('statusLine');
-  if(error){
-    statusLine.textContent = "Le film n'a pas pu être ajouté. Réessaie.";
-    console.error(error);
-  } else {
-    movies[id] = newMovie;
-    statusLine.textContent = `"${title}" a rejoint l'arène.`;
-    if(!currentPair) currentPair = pickPair();
+async function fetchGenreMap(){
+  try{
+    const res = await fetch(`https://api.themoviedb.org/3/genre/movie/list?api_key=${TMDB_API_KEY}&language=fr-FR`);
+    const json = await res.json();
+    const map = {};
+    (json.genres || []).forEach(g => map[g.id] = g.name);
+    return map;
+  }catch(e){
+    return {};
   }
-  e.target.reset();
+}
+
+function tmdbMovieToRow(m, genreMap){
+  const year = (m.release_date && m.release_date.length >= 4) ? parseInt(m.release_date.slice(0,4), 10) : 0;
+  const genreName = (m.genre_ids && m.genre_ids.length && genreMap[m.genre_ids[0]]) ? genreMap[m.genre_ids[0]] : 'Divers';
+  return {
+    id: `tmdb-${m.id}`,
+    title: m.title || m.original_title || 'Sans titre',
+    year: year,
+    genre: genreName,
+    blurb: '',
+    poster_url: m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : null,
+    rating: 1500,
+    votes: 0
+  };
+}
+
+async function importFromTMDB(){
+  if(!TMDB_API_KEY){
+    document.getElementById('importStatus').textContent = "Il faut d'abord renseigner TMDB_API_KEY dans le code.";
+    return;
+  }
+  const btn = document.getElementById('importBtn');
+  const status = document.getElementById('importStatus');
+  btn.disabled = true;
+  btn.style.opacity = '0.6';
+
+  const genreMap = await fetchGenreMap();
+  const categories = ['popular', 'top_rated'];
+  const pagesPerCategory = 13; // ~13 pages x 20 films x 2 catégories ≈ 500 films (avec quelques doublons ignorés)
+  let imported = 0;
+
+  for(const category of categories){
+    for(let page = 1; page <= pagesPerCategory; page++){
+      status.textContent = `Import en cours : ${category === 'popular' ? 'films populaires' : 'films les mieux notés'}, page ${page}/${pagesPerCategory}…`;
+      try{
+        const res = await fetch(`https://api.themoviedb.org/3/movie/${category}?api_key=${TMDB_API_KEY}&language=fr-FR&page=${page}`);
+        const json = await res.json();
+        const rows = (json.results || []).map(m => tmdbMovieToRow(m, genreMap));
+        if(rows.length > 0){
+          const { error } = await supabaseClient.from('movies').upsert(rows, { onConflict: 'id', ignoreDuplicates: true });
+          if(error){ console.error(error); }
+          else {
+            rows.forEach(r => { if(!movies[r.id]) { movies[r.id] = r; imported++; } });
+          }
+        }
+      }catch(e){
+        console.error('Erreur import page', category, page, e);
+      }
+      await new Promise(r => setTimeout(r, 250)); // petite pause pour rester tranquille avec le taux limite de TMDB
+    }
+  }
+
+  status.textContent = `Import terminé : ${imported} nouveaux films ajoutés. Total : ${Object.keys(movies).length} films.`;
+  btn.disabled = false;
+  btn.style.opacity = '1';
+  if(!currentPair) currentPair = pickPair();
   renderArena();
   renderLeaderboard();
-});
+}
+
+document.getElementById('importBtn').addEventListener('click', importFromTMDB);
 
 (async function init(){
   // 1. Charge toujours la liste des films (nécessaire pour afficher titres/affiches, y compris en vue partagée)

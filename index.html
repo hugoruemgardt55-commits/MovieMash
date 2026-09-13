@@ -100,7 +100,7 @@
         }
 
         .card {
-            min-height: 320px;
+            min-height: 280px;
             padding: 20px 16px;
         }
 
@@ -117,8 +117,37 @@
         }
 
         .filter-bar select {
-            flex: 1 1 45%;
+            flex: 1 1 100%;
+            padding: 11px 14px;
         }
+
+        .arena {
+            flex-direction: column;
+        }
+
+        .card-slot {
+            max-width: 100%;
+            width: 100%;
+        }
+
+        .vs-badge {
+            margin: 4px 0;
+        }
+
+        .not-seen-link {
+            padding: 10px;
+            font-size: 12px;
+        }
+
+        .panel-header button, #storyBtn, #shareBtn {
+            padding: 11px 16px !important;
+            font-size: 13px !important;
+        }
+
+        .search-input, form.add-form input {
+            padding: 12px;
+            font-size: 16px;
+        }/* 16px minimum pour éviter le zoom auto sur iOS */
     }
 
     .subtitle {
@@ -1965,20 +1994,48 @@
         ctx.font = '26px "JetBrains Mono", monospace';
         ctx.fillText('Fais ton propre classement sur MovieSmash', W / 2, H - 90);
 
-        // Téléchargement
+        // Partage
         try {
             const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
             if (!blob)
                 throw new Error('toBlob a renvoyé null');
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `moviemash-top3-${(pseudo || 'moi').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            status.textContent = "Image téléchargée — ouvre-la et partage-la dans ta story Instagram.";
+            const filename = `moviemash-top3-${(pseudo || 'moi').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`;
+            const file = new File([blob], filename, {
+                type: 'image/png'
+            });
+
+            // Sur mobile (iOS/Android), on ouvre directement le menu de partage natif du téléphone
+            // (Instagram, WhatsApp, etc. en un tap) plutôt que de forcer un téléchargement manuel.
+            if (navigator.canShare && navigator.canShare({
+                files: [file]
+            })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: 'Mon Top 3 MovieSmash'
+                    });
+                    status.textContent = "C'est parti !";
+                } catch (shareErr) {
+                    if (shareErr.name !== 'AbortError') {
+                        // l'utilisateur a juste fermé le menu, pas une vraie erreur
+                        console.error(shareErr);
+                        status.textContent = "Le partage a échoué. Réessaie.";
+                    } else {
+                        status.textContent = '';
+                    }
+                }
+            } else {
+                // Repli pour ordinateur (pas de menu de partage natif) : téléchargement classique
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                status.textContent = "Image téléchargée — ouvre-la et partage-la dans ta story Instagram.";
+            }
         } catch (e) {
             console.error(e);
             status.textContent = "L'image n'a pas pu être générée (certaines affiches ont peut-être bloqué l'export). Réessaie.";

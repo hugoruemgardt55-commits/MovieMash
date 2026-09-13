@@ -1,908 +1,2069 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MovieSmash</title>
-<meta name="description" content="Deux films. Un choix. Aucun compromis. Construis ton Top 10 personnel.">
-<!-- ⚠️ Remplace par l'URL réelle de ton site une fois en ligne -->
-<meta property="og:title" content="MovieSmash — Deux films. Un choix.">
-<meta property="og:description" content="Vote entre deux films et découvre ton Top 10 personnel sur MovieSmash.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://TON-SITE.vercel.app">
-<meta property="og:image" content="https://TON-SITE.vercel.app/og-image.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="MovieSmash — Deux films. Un choix.">
-<meta name="twitter:description" content="Vote entre deux films et découvre ton Top 10 personnel sur MovieSmash.">
-<meta name="twitter:image" content="https://TON-SITE.vercel.app/og-image.png">
-<link rel="icon" type="image/png" href="data:image/png;base64,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">
-<script>
-  window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
-</script>
-<script defer src="/_vercel/insights/script.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<style>
-  :root{
-    --bg: #0B0B0D;
-    --bg-alt: #17151B;
-    --card: #1E1B22;
-    --gold: #E8B84B;
-    --velvet: #9A2846;
-    --cream: #F5EDE0;
-    --teal: #3C6E68;
-    --muted: #948E86;
-    --line: #322E36;
-  }
-  *{box-sizing:border-box;}
-  body{ margin:0; background:var(--bg); color:var(--cream); font-family:'Inter',sans-serif; min-height:100vh; }
-  @media (prefers-reduced-motion: reduce){ *{animation-duration:0.001ms !important; transition-duration:0.001ms !important;} }
-  .perf{ height:14px; background-image: radial-gradient(circle, var(--bg) 3px, transparent 3.5px); background-size: 22px 14px; background-color: var(--gold); opacity:0.85; }
-  .perf.bottom{ transform: scaleY(-1); }
-  header{ text-align:center; padding:36px 20px 20px; }
-  .eyebrow{ font-family:'JetBrains Mono', monospace; font-size:11px; letter-spacing:0.2em; text-transform:uppercase; color:var(--teal); margin-bottom:6px; }
-  h1{ font-family:'Bebas Neue', sans-serif; font-size:64px; letter-spacing:0.04em; margin:0; color:var(--gold); text-shadow: 0 0 24px rgba(232,184,74,0.25); }
-  @media (max-width: 480px){
-    h1{ font-size:44px; }
-    .card{ min-height:320px; padding:20px 16px; }
-    .card .title{ font-size:26px; }
-    table{ font-size:12.5px; }
-    th, td{ padding:8px 4px; }
-    .filter-bar select{ flex:1 1 45%; }
-  }
-  .subtitle{ color:var(--muted); font-size:15px; margin-top:6px; }
-  main{ max-width:920px; margin:0 auto; padding:30px 20px 80px; }
-  .layout-grid{ display:grid; grid-template-columns: 1fr; gap:24px; align-items:start; }
-  .sidebar section.panel{ margin-top:0; }
-  @media (min-width: 900px){
-    main{ max-width:1180px; }
-    .layout-grid{ grid-template-columns: 1fr 320px; }
-    .sidebar{ position:sticky; top:20px; }
-  }
-  .arena{ display:flex; align-items:center; justify-content:center; gap:0; position:relative; margin-bottom:26px; flex-wrap:wrap; }
-  .card{ flex:1 1 320px; max-width:360px; background:linear-gradient(160deg, var(--card), #141217); border:1px solid var(--line); border-radius:6px; padding:26px 22px; cursor:pointer; transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; position:relative; min-height:380px; display:flex; flex-direction:column; justify-content:flex-end; }
-  .card:hover{ transform: translateY(-6px); border-color: var(--gold); box-shadow: 0 10px 30px rgba(0,0,0,0.4), 0 0 0 1px rgba(232,184,74,0.15); }
-  .card:focus-visible{ outline: 3px solid var(--gold); outline-offset: 3px; transform: translateY(-6px); }
-  .card:active{ transform: translateY(-2px) scale(0.99); }
-  .card .genre-tag{ position:absolute; top:18px; left:22px; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.12em; text-transform:uppercase; color:var(--teal); border:1px solid var(--teal); padding:3px 8px; border-radius:20px; }
-  .card .title{ font-family:'Bebas Neue', sans-serif; font-size:32px; letter-spacing:0.02em; line-height:1.05; color:var(--cream); text-shadow: 0 2px 8px rgba(0,0,0,0.6); }
-  .card .year{ color:var(--muted); font-size:13px; font-family:'JetBrains Mono', monospace; margin-bottom:8px; }
-  .card .blurb{ color:var(--muted); font-size:13.5px; line-height:1.4; margin-top:8px; text-shadow: 0 2px 6px rgba(0,0,0,0.7); }
-  .streak-badge{
-    position:absolute; top:18px; right:18px;
-    font-family:'JetBrains Mono', monospace;
-    font-size:10.5px;
-    color:var(--gold);
-    background: rgba(232,184,74,0.1);
-    border:1px solid var(--gold);
-    padding:3px 9px;
-    border-radius:20px;
-  }
-  .vs-badge{ width:64px; height:64px; border-radius:50%; background: radial-gradient(circle at 35% 30%, var(--velvet), #5c1729); display:flex; align-items:center; justify-content:center; font-family:'Bebas Neue', sans-serif; font-size:22px; color:var(--gold); flex-shrink:0; margin: 0 -8px; z-index:2; position:relative; box-shadow: 0 0 0 4px var(--bg); }
-  .vs-badge::before{ content:''; position:absolute; inset:-8px; border-radius:50%; background: conic-gradient(from 0deg, var(--gold), transparent 20%, transparent 80%, var(--gold)); animation: spin 3.5s linear infinite; z-index:-1; opacity:0.5; }
-  @keyframes spin{ to{ transform: rotate(360deg); } }
-  .status-line{ text-align:center; font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--muted); min-height:18px; margin-bottom:8px; }
-  .spinner{ display:inline-block; width:12px; height:12px; border:2px solid var(--line); border-top-color:var(--gold); border-radius:50%; animation: spin-loader 0.7s linear infinite; vertical-align:middle; margin-right:6px; }
-  @keyframes spin-loader{ to{ transform: rotate(360deg); } }
-  .flash{ animation: flash-anim 0.5s ease; }
-  @keyframes flash-anim{ 0%{ box-shadow: 0 0 0 0 rgba(232,184,74,0.5); } 100%{ box-shadow: 0 0 0 0 rgba(232,184,74,0); } }
-  section.panel{ background: var(--bg-alt); border:1px solid var(--line); border-radius:6px; padding:24px; margin-top:34px; }
-  .panel-header{ display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px; flex-wrap:wrap; gap:10px; }
-  .panel-title{ font-family:'Bebas Neue', sans-serif; font-size:24px; letter-spacing:0.03em; color:var(--gold); }
-  .panel-sub{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); }
-  table{ width:100%; border-collapse:collapse; }
-  #leaderboardWrap, #personalTopWrap{ overflow-x:auto; }
-  th{ text-align:left; font-family:'JetBrains Mono', monospace; font-size:10px; letter-spacing:0.1em; text-transform:uppercase; color:var(--muted); padding:8px 6px; border-bottom:1px solid var(--line); }
-  td{ padding:10px 6px; border-bottom:1px solid var(--line); font-size:14px; }
-  tr:last-child td{ border-bottom:none; }
-  .rank{ font-family:'JetBrains Mono', monospace; color:var(--teal); width:36px; }
-  .rating{ font-family:'JetBrains Mono', monospace; color:var(--gold); text-align:right; }
-  .votes{ font-family:'JetBrains Mono', monospace; color:var(--muted); text-align:right; width:70px; }
-  form.add-form{ display:flex; flex-wrap:wrap; gap:10px; margin-top:16px; }
-  form.add-form input{ background:var(--card); border:1px solid var(--line); color:var(--cream); padding:9px 12px; border-radius:4px; font-family:'Inter',sans-serif; font-size:13px; flex:1 1 140px; }
-  form.add-form input:focus{ outline:2px solid var(--gold); outline-offset:1px; }
-  form.add-form button{ background:var(--gold); color:#1a1500; border:none; padding:9px 18px; border-radius:4px; font-weight:700; cursor:pointer; font-family:'Inter',sans-serif; font-size:13px; }
-  form.add-form button:hover{ filter:brightness(1.08); }
-  .disclaimer{ text-align:center; color:var(--muted); font-size:11.5px; margin-top:30px; line-height:1.6; }
-  .empty-msg{ color:var(--muted); font-size:13px; padding:20px 0; text-align:center; }
-  .filter-bar{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:18px; }
-  .filter-bar select{ background:var(--card); border:1px solid var(--line); color:var(--cream); padding:8px 12px; border-radius:20px; font-family:'JetBrains Mono', monospace; font-size:12px; cursor:pointer; }
-  .filter-bar select:focus{ outline:2px solid var(--gold); }
-  .progress-wrap{ max-width:400px; margin: 0 auto 24px; text-align:center; }
-  .progress-track{ height:6px; background:var(--line); border-radius:4px; overflow:hidden; }
-  .progress-fill{ height:100%; background: linear-gradient(90deg, var(--teal), var(--gold)); width:0%; transition: width .3s ease; }
-  .progress-label{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--muted); margin-top:6px; }
-  .search-input{ width:100%; background:var(--card); border:1px solid var(--line); color:var(--cream); padding:9px 12px; border-radius:4px; font-family:'Inter',sans-serif; font-size:13px; margin-bottom:14px; box-sizing:border-box; }
-  .search-input:focus{ outline:2px solid var(--gold); outline-offset:1px; }
-  .shared-card{ background: var(--bg-alt); border:1px solid var(--gold); border-radius:8px; padding:30px; margin: 20px auto 34px; max-width:600px; }
-  .shared-card h2{ font-family:'Bebas Neue', sans-serif; font-size:30px; color:var(--gold); margin:0 0 4px; letter-spacing:0.02em; }
-  .shared-card .shared-sub{ color:var(--muted); font-size:13px; margin-bottom:18px; }
-  .shared-row{ display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); }
-  .shared-row:last-child{ border-bottom:none; }
-  .shared-rank{ font-family:'Bebas Neue', sans-serif; font-size:22px; color:var(--velvet); width:34px; text-shadow:0 0 10px rgba(154,40,70,0.5); }
-  .shared-poster{ width:40px; height:60px; border-radius:3px; object-fit:cover; background:var(--card); flex-shrink:0; }
-  .shared-title{ font-size:14.5px; }
-  .cta-own{ text-align:center; margin-top:22px; }
-  .cta-own a{ display:inline-block; background:var(--gold); color:#1a1500; font-weight:700; padding:10px 22px; border-radius:4px; text-decoration:none; font-size:13.5px; }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MovieSmash</title>
+    <meta name="description" content="Deux films. Un choix. Aucun compromis. Construis ton Top 10 personnel.">
+    <!-- ⚠️ Remplace par l'URL réelle de ton site une fois en ligne -->
+    <meta property="og:title" content="MovieSmash — Deux films. Un choix.">
+    <meta property="og:description" content="Vote entre deux films et découvre ton Top 10 personnel sur MovieSmash.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://TON-SITE.vercel.app">
+    <meta property="og:image" content="https://TON-SITE.vercel.app/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MovieSmash — Deux films. Un choix.">
+    <meta name="twitter:description" content="Vote entre deux films et découvre ton Top 10 personnel sur MovieSmash.">
+    <meta name="twitter:image" content="https://TON-SITE.vercel.app/og-image.png">
+    <link rel="icon" type="image/png" href="data:image/png;base64,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">
+    <script>
+    window.va = window.va || function() {
+        (window.vaq = window.vaq || []).push(arguments);
+    };
+    </script>
+    <script defer src="/_vercel/insights/script.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+    :root {
+        --bg: #0B0B0D;
+        --bg-alt: #17151B;
+        --card: #1E1B22;
+        --gold: #E8B84B;
+        --velvet: #9A2846;
+        --cream: #F5EDE0;
+        --teal: #3C6E68;
+        --muted: #948E86;
+        --line: #322E36;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--cream);
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.001ms !important;
+            transition-duration: 0.001ms !important;
+        }
+    }
+
+    .perf {
+        height: 14px;
+        background-image: radial-gradient(circle, var(--bg) 3px, transparent 3.5px);
+        background-size: 22px 14px;
+        background-color: var(--gold);
+        opacity: 0.85;
+    }
+
+    .perf.bottom {
+        transform: scaleY(-1);
+    }
+
+    header {
+        text-align: center;
+        padding: 36px 20px 20px;
+    }
+
+    .eyebrow {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--teal);
+        margin-bottom: 6px;
+    }
+
+    h1 {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 64px;
+        letter-spacing: 0.04em;
+        margin: 0;
+        color: var(--gold);
+        text-shadow: 0 0 24px rgba(232, 184, 74, 0.25);
+    }
+
+    @media (max-width: 480px) {
+        h1 {
+            font-size: 44px;
+        }
+
+        .card {
+            min-height: 320px;
+            padding: 20px 16px;
+        }
+
+        .card .title {
+            font-size: 26px;
+        }
+
+        table {
+            font-size: 12.5px;
+        }
+
+        th, td {
+            padding: 8px 4px;
+        }
+
+        .filter-bar select {
+            flex: 1 1 45%;
+        }
+    }
+
+    .subtitle {
+        color: var(--muted);
+        font-size: 15px;
+        margin-top: 6px;
+    }
+
+    main {
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 30px 20px 80px;
+    }
+
+    .layout-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+        align-items: start;
+    }
+
+    .sidebar section.panel {
+        margin-top: 0;
+    }
+
+    @media (min-width: 900px) {
+        main {
+            max-width: 1180px;
+        }
+
+        .layout-grid {
+            grid-template-columns: 1fr 320px;
+        }
+
+        .sidebar {
+            position: sticky;
+            top: 20px;
+        }
+    }
+
+    .arena {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0;
+        position: relative;
+        margin-bottom: 26px;
+        flex-wrap: wrap;
+    }
+
+    .card {
+        width: 100%;
+        background: linear-gradient(160deg, var(--card), #141217);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 26px 22px;
+        cursor: pointer;
+        transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+        position: relative;
+        min-height: 380px;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+    }
+
+    .card-slot {
+        flex: 1 1 320px;
+        max-width: 360px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .not-seen-link {
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        cursor: pointer;
+        text-decoration: underline;
+        padding: 4px;
+    }
+
+    .not-seen-link:hover {
+        color: var(--gold);
+    }
+
+    .card:hover {
+        transform: translateY(-6px);
+        border-color: var(--gold);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(232, 184, 74, 0.15);
+    }
+
+    .card:focus-visible {
+        outline: 3px solid var(--gold);
+        outline-offset: 3px;
+        transform: translateY(-6px);
+    }
+
+    .card:active {
+        transform: translateY(-2px) scale(0.99);
+    }
+
+    .card .genre-tag {
+        position: absolute;
+        top: 18px;
+        left: 22px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--teal);
+        border: 1px solid var(--teal);
+        padding: 3px 8px;
+        border-radius: 20px;
+    }
+
+    .card .title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 32px;
+        letter-spacing: 0.02em;
+        line-height: 1.05;
+        color: var(--cream);
+        text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    }
+
+    .card .year {
+        color: var(--muted);
+        font-size: 13px;
+        font-family: 'JetBrains Mono', monospace;
+        margin-bottom: 8px;
+    }
+
+    .card .blurb {
+        color: var(--muted);
+        font-size: 13.5px;
+        line-height: 1.4;
+        margin-top: 8px;
+        text-shadow: 0 2px 6px rgba(0, 0, 0, 0.7);
+    }
+
+    .streak-badge {
+        position: absolute;
+        top: 18px;
+        right: 18px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10.5px;
+        color: var(--gold);
+        background: rgba(232, 184, 74, 0.1);
+        border: 1px solid var(--gold);
+        padding: 3px 9px;
+        border-radius: 20px;
+    }
+
+    .vs-badge {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        background: radial-gradient(circle at 35% 30%, var(--velvet), #5c1729);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 22px;
+        color: var(--gold);
+        flex-shrink: 0;
+        margin: 0 -8px;
+        z-index: 2;
+        position: relative;
+        box-shadow: 0 0 0 4px var(--bg);
+    }
+
+    .vs-badge::before {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, var(--gold), transparent 20%, transparent 80%, var(--gold));
+        animation: spin 3.5s linear infinite;
+        z-index: -1;
+        opacity: 0.5;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .status-line {
+        text-align: center;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--muted);
+        min-height: 18px;
+        margin-bottom: 8px;
+    }
+
+    .spinner {
+        display: inline-block;
+        width: 12px;
+        height: 12px;
+        border: 2px solid var(--line);
+        border-top-color: var(--gold);
+        border-radius: 50%;
+        animation: spin-loader 0.7s linear infinite;
+        vertical-align: middle;
+        margin-right: 6px;
+    }
+
+    @keyframes spin-loader {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .flash {
+        animation: flash-anim 0.5s ease;
+    }
+
+    @keyframes flash-anim {
+        0% {
+            box-shadow: 0 0 0 0 rgba(232, 184, 74, 0.5);
+        }
+
+        100% {
+            box-shadow: 0 0 0 0 rgba(232, 184, 74, 0);
+        }
+    }
+
+    section.panel {
+        background: var(--bg-alt);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 24px;
+        margin-top: 34px;
+    }
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 16px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .panel-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 24px;
+        letter-spacing: 0.03em;
+        color: var(--gold);
+    }
+
+    .panel-sub {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--muted);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    #leaderboardWrap, #personalTopWrap {
+        overflow-x: auto;
+    }
+
+    th {
+        text-align: left;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        padding: 8px 6px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    td {
+        padding: 10px 6px;
+        border-bottom: 1px solid var(--line);
+        font-size: 14px;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    .rank {
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--teal);
+        width: 36px;
+    }
+
+    .rating {
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--gold);
+        text-align: right;
+    }
+
+    .votes {
+        font-family: 'JetBrains Mono', monospace;
+        color: var(--muted);
+        text-align: right;
+        width: 70px;
+    }
+
+    form.add-form {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    form.add-form input {
+        background: var(--card);
+        border: 1px solid var(--line);
+        color: var(--cream);
+        padding: 9px 12px;
+        border-radius: 4px;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        flex: 1 1 140px;
+    }
+
+    form.add-form input:focus {
+        outline: 2px solid var(--gold);
+        outline-offset: 1px;
+    }
+
+    form.add-form button {
+        background: var(--gold);
+        color: #1a1500;
+        border: none;
+        padding: 9px 18px;
+        border-radius: 4px;
+        font-weight: 700;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+    }
+
+    form.add-form button:hover {
+        filter: brightness(1.08);
+    }
+
+    .disclaimer {
+        text-align: center;
+        color: var(--muted);
+        font-size: 11.5px;
+        margin-top: 30px;
+        line-height: 1.6;
+    }
+
+    .empty-msg {
+        color: var(--muted);
+        font-size: 13px;
+        padding: 20px 0;
+        text-align: center;
+    }
+
+    .filter-bar {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+    }
+
+    .filter-bar select {
+        background: var(--card);
+        border: 1px solid var(--line);
+        color: var(--cream);
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .filter-bar select:focus {
+        outline: 2px solid var(--gold);
+    }
+
+    .progress-wrap {
+        max-width: 400px;
+        margin: 0 auto 24px;
+        text-align: center;
+    }
+
+    .progress-track {
+        height: 6px;
+        background: var(--line);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--teal), var(--gold));
+        width: 0%;
+        transition: width .3s ease;
+    }
+
+    .progress-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px;
+        color: var(--muted);
+        margin-top: 6px;
+    }
+
+    .search-input {
+        width: 100%;
+        background: var(--card);
+        border: 1px solid var(--line);
+        color: var(--cream);
+        padding: 9px 12px;
+        border-radius: 4px;
+        font-family: 'Inter', sans-serif;
+        font-size: 13px;
+        margin-bottom: 14px;
+        box-sizing: border-box;
+    }
+
+    .search-input:focus {
+        outline: 2px solid var(--gold);
+        outline-offset: 1px;
+    }
+
+    .shared-card {
+        background: var(--bg-alt);
+        border: 1px solid var(--gold);
+        border-radius: 8px;
+        padding: 30px;
+        margin: 20px auto 34px;
+        max-width: 600px;
+    }
+
+    .shared-card h2 {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 30px;
+        color: var(--gold);
+        margin: 0 0 4px;
+        letter-spacing: 0.02em;
+    }
+
+    .shared-card .shared-sub {
+        color: var(--muted);
+        font-size: 13px;
+        margin-bottom: 18px;
+    }
+
+    .shared-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .shared-row:last-child {
+        border-bottom: none;
+    }
+
+    .shared-rank {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 22px;
+        color: var(--velvet);
+        width: 34px;
+        text-shadow: 0 0 10px rgba(154, 40, 70, 0.5);
+    }
+
+    .shared-poster {
+        width: 40px;
+        height: 60px;
+        border-radius: 3px;
+        object-fit: cover;
+        background: var(--card);
+        flex-shrink: 0;
+    }
+
+    .shared-title {
+        font-size: 14.5px;
+    }
+
+    .cta-own {
+        text-align: center;
+        margin-top: 22px;
+    }
+
+    .cta-own a {
+        display: inline-block;
+        background: var(--gold);
+        color: #1a1500;
+        font-weight: 700;
+        padding: 10px 22px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 13.5px;
+    }
+    </style>
 </head>
 <body>
 
-<div class="perf"></div>
-<header>
-  <div class="eyebrow">Un classement écrit par vos clics</div>
-  <h1>MOVIESMASH</h1>
-  <div class="subtitle">Deux films. Un choix. Aucun compromis.</div>
-</header>
+    <div class="perf"></div>
+    <header>
+        <div class="eyebrow">Un classement écrit par vos clics</div>
+        <h1>MOVIESMASH</h1>
+        <div class="subtitle">Deux films. Un choix. Aucun compromis.</div>
+    </header>
 
-<main>
+    <main>
 
-  <div class="status-line" id="globalLoading" style="margin-top:20px;"><span class="spinner"></span> Ouverture du rideau…</div>
+        <div class="status-line" id="globalLoading" style="margin-top:20px;">
+            <span class="spinner"></span>
+             Ouverture du rideau…
+        </div>
 
-  <section class="panel" id="pseudoGate" style="display:none;">
-    <div class="panel-header"><div class="panel-title">Avant de commencer</div></div>
-    <p style="color:var(--muted); font-size:13.5px; margin-top:0;">Choisis un pseudo pour garder ton propre Top 10 et pouvoir le montrer à tes potes.</p>
-    <form class="add-form" id="pseudoForm">
-      <input type="text" id="inpPseudo" placeholder="Ton pseudo" maxlength="24" required style="flex:1 1 200px;">
-      <button type="submit">C'est parti</button>
-    </form>
-  </section>
-
-  <div id="sharedViewWrap"></div>
-
-  <div id="mainApp" style="display:none;">
-    <div class="status-line" id="statusLine"><span class="spinner"></span> Ouverture du rideau…</div>
-
-    <div class="filter-bar" id="filterBar">
-      <select id="filterGenre"><option value="">Tous les genres</option></select>
-      <select id="filterDecade"><option value="">Toutes les décennies</option></select>
-    </div>
-    <div class="progress-wrap">
-      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-      <div class="progress-label" id="progressLabel">0 / 0 films votés</div>
-    </div>
-
-    <div class="layout-grid">
-      <div class="main-col">
-        <div class="arena" id="arena"></div>
-
-        <section class="panel">
-          <div class="panel-header">
-            <div class="panel-title">Le classement</div>
-            <div class="panel-sub" id="voteCount">— votes au total</div>
-          </div>
-          <input type="text" id="leaderboardSearch" placeholder="Rechercher un film dans le classement…" class="search-input">
-          <div id="leaderboardWrap"><div class="empty-msg">Chargement du classement…</div></div>
+        <section class="panel" id="pseudoGate" style="display:none;">
+            <div class="panel-header">
+                <div class="panel-title">Avant de commencer</div>
+            </div>
+            <p style="color:var(--muted); font-size:13.5px; margin-top:0;">Choisis un pseudo pour garder ton propre Top 10 et pouvoir le montrer à tes potes.</p>
+            <form class="add-form" id="pseudoForm">
+                <input type="text" id="inpPseudo" placeholder="Ton pseudo" maxlength="24" required style="flex:1 1 200px;">
+                <button type="submit">C'est parti</button>
+            </form>
         </section>
-      </div>
 
-      <aside class="sidebar">
-        <section class="panel">
-          <div class="panel-header">
-            <div class="panel-title">Mon Top 10, <span id="pseudoDisplay"></span></div>
-          </div>
-          <div id="personalTopWrap"><div class="empty-msg">Vote pour commencer à construire ton Top 10.</div></div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;">
-            <button id="storyBtn" style="background:var(--gold); color:#1a1500; border:none; padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Partager en story</button>
-            <button id="shareBtn" style="background:transparent; color:var(--teal); border:1px solid var(--teal); padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Copier le lien</button>
-          </div>
-          <div class="panel-sub" id="shareStatus" style="margin-top:10px;"></div>
-        </section>
-      </aside>
-    </div>
+        <div id="sharedViewWrap"></div>
 
-    <div class="disclaimer">
-      Le classement est public — chaque vote et chaque film ajouté est visible par tout le monde.<br>
-      Ce produit utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.<br>
-      <a href="./legal.html" style="color:var(--muted);">Mentions légales & confidentialité</a>
-    </div>
-  </div>
-</main>
-<div class="perf bottom"></div>
+        <div id="mainApp" style="display:none;">
+            <div class="status-line" id="statusLine">
+                <span class="spinner"></span>
+                 Ouverture du rideau…
+            </div>
 
-<script>
-// ⚠️ REMPLACE ces deux valeurs par celles de ton projet Supabase
-// (Supabase > Project Settings > API)
-const SUPABASE_URL = "https://rddujgdhgxkansmazcqa.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_LOztlk77N0NE3an9beeKgA_Z3EetKB0";
+            <div class="filter-bar" id="filterBar">
+                <select id="filterGenre">
+                    <option value="">Tous les genres</option>
+                </select>
+                <select id="filterDecade">
+                    <option value="">Toutes les décennies</option>
+                </select>
+            </div>
+            <div class="progress-wrap">
+                <div class="progress-track">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-label" id="progressLabel">0 / 0 films votés</div>
+            </div>
 
-// ⚠️ Clé gratuite TMDB pour récupérer les affiches (themoviedb.org > compte > paramètres > API)
-// Laisse vide ("") si tu ne veux pas encore d'affiches — l'app fonctionne très bien sans.
-const TMDB_API_KEY = "e5833edea3bfa10c62388a2bc2adfbf3";
+            <div class="layout-grid">
+                <div class="main-col">
+                    <div class="arena" id="arena"></div>
 
-const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession: false,
-    autoRefreshToken: false,
-    detectSessionInUrl: false
-  }
-});
+                    <section class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Le classement</div>
+                            <div class="panel-sub" id="voteCount">— votes au total</div>
+                        </div>
+                        <input type="text" id="leaderboardSearch" placeholder="Rechercher un film dans le classement…" class="search-input">
+                        <div id="leaderboardWrap">
+                            <div class="empty-msg">Chargement du classement…</div>
+                        </div>
+                    </section>
+                </div>
 
-const SEED_MOVIES = [
-  {id:'inception', title:'Inception', year:2010, genre:'Science-fiction', blurb:"Un architecte des rêves qui finit par se perdre dans les siens.", rating:1500, votes:0},
-  {id:'parrain', title:'Le Parrain', year:1972, genre:'Crime', blurb:"Une famille qui confond loyauté et pouvoir, génération après génération.", rating:1500, votes:0},
-  {id:'parasite', title:'Parasite', year:2019, genre:'Thriller social', blurb:"Deux familles, un seul escalier, et tout ce qu'il révèle.", rating:1500, votes:0},
-  {id:'pulpfiction', title:'Pulp Fiction', year:1994, genre:'Crime', blurb:"Des destins qui se croisent sans jamais suivre l'ordre attendu.", rating:1500, votes:0},
-  {id:'chihiro', title:'Le Voyage de Chihiro', year:2001, genre:'Animation', blurb:"Une fillette qui doit se souvenir de son prénom pour rentrer chez elle.", rating:1500, votes:0},
-  {id:'darkknight', title:'The Dark Knight', year:2008, genre:'Action', blurb:"Un justicier face à un chaos qu'aucune règle ne peut contenir.", rating:1500, votes:0},
-  {id:'lalaland', title:'La La Land', year:2016, genre:'Comédie musicale', blurb:"Deux rêves qui avancent ensemble, jusqu'à devoir choisir un chemin.", rating:1500, votes:0},
-  {id:'whiplash', title:'Whiplash', year:2014, genre:'Drame', blurb:"Un métronome qui devient une arme entre un élève et son professeur.", rating:1500, votes:0},
-  {id:'interstellar', title:'Interstellar', year:2014, genre:'Science-fiction', blurb:"Un père qui traverse le temps pour tenir une promesse.", rating:1500, votes:0},
-  {id:'budapest', title:'The Grand Budapest Hotel', year:2014, genre:'Comédie', blurb:"Un concierge et son groom, gardiens d'un monde déjà disparu.", rating:1500, votes:0},
-  {id:'getout', title:'Get Out', year:2017, genre:'Horreur', blurb:"Un week-end chez les beaux-parents qui tourne mal, très vite.", rating:1500, votes:0},
-  {id:'madmax', title:'Mad Max: Fury Road', year:2015, genre:'Action', blurb:"Une course-poursuite de deux heures à travers un désert sans loi.", rating:1500, votes:0},
-  {id:'her', title:'Her', year:2013, genre:'Science-fiction', blurb:"Un homme seul qui tombe amoureux d'une voix dans son oreille.", rating:1500, votes:0},
-  {id:'eeaao', title:'Everything Everywhere All at Once', year:2022, genre:'Science-fiction', blurb:"Une mère qui doit sauver le multivers pour sauver sa fille.", rating:1500, votes:0},
-  {id:'matrix', title:'Matrix', year:1999, genre:'Science-fiction', blurb:"Une pilule rouge, une pilule bleue, et plus rien d'autre à choisir.", rating:1500, votes:0},
-  {id:'casablanca', title:'Casablanca', year:1942, genre:'Romance', blurb:"Un bar, une guerre, et un amour qu'il faut sacrifier pour survivre.", rating:1500, votes:0},
-  {id:'fightclub', title:'Fight Club', year:1999, genre:'Drame', blurb:"Un homme qui perd le sommeil, puis un peu plus que ça.", rating:1500, votes:0},
-  {id:'amelie', title:'Amélie Poulain', year:2001, genre:'Comédie', blurb:"Une serveuse qui répare la vie des autres avant d'oser réparer la sienne.", rating:1500, votes:0},
-  {id:'nocountry', title:'No Country for Old Men', year:2007, genre:'Thriller', blurb:"Une valise pleine d'argent, et un homme qu'on ne peut pas négocier.", rating:1500, votes:0},
-  {id:'evades', title:'Les Évadés', year:1994, genre:'Drame', blurb:"Une amitié construite pierre par pierre, pendant vingt ans de prison.", rating:1500, votes:0},
-  {id:'br2049', title:'Blade Runner 2049', year:2017, genre:'Science-fiction', blurb:"Un enquêteur artificiel qui cherche ce qui le rendrait réel.", rating:1500, votes:0},
-  {id:'portrait', title:'Portrait de la jeune fille en feu', year:2019, genre:'Romance', blurb:"Une peintre et son modèle, et le peu de temps qu'il leur reste.", rating:1500, votes:0},
-  {id:'knivesout', title:'À couteaux tirés', year:2019, genre:'Policier', blurb:"Un testament, une famille entière de suspects, et un détective très patient.", rating:1500, votes:0},
-  {id:'dune', title:'Dune', year:2021, genre:'Science-fiction', blurb:"Un désert, une prophétie, et un héritier qui n'en a pas demandé tant.", rating:1500, votes:0},
-  {id:'oldboy', title:'Oldboy', year:2003, genre:'Thriller', blurb:"Quinze ans enfermé sans raison, et cinq jours pour comprendre pourquoi.", rating:1500, votes:0},
-  {id:'citedieu', title:'La Cité de Dieu', year:2002, genre:'Drame', blurb:"Grandir dans une favela où l'enfance ne dure jamais longtemps.", rating:1500, votes:0},
-  {id:'coco', title:'Coco', year:2017, genre:'Animation', blurb:"Un petit garçon qui traverse la mort pour retrouver sa musique.", rating:1500, votes:0},
-  {id:'spiderverse', title:'Spider-Man: New Generation', year:2018, genre:'Animation', blurb:"Plusieurs versions du même héros, et une seule ville à sauver ensemble.", rating:1500, votes:0},
-  {id:'nomadland', title:'Nomadland', year:2020, genre:'Drame', blurb:"Une femme qui refait sa vie sur la route, un camping-car à la fois.", rating:1500, votes:0},
-  {id:'socialnetwork', title:'The Social Network', year:2010, genre:'Drame', blurb:"Un site créé par dépit qui finit par redéfinir l'amitié elle-même.", rating:1500, votes:0},
-  {id:'childrenofmen', title:"Les Fils de l'homme", year:2006, genre:'Science-fiction', blurb:"Un monde qui n'a plus vu naître un enfant depuis dix-huit ans.", rating:1500, votes:0},
-  {id:'lotr', title:'Le Seigneur des Anneaux', year:2001, genre:'Fantastique', blurb:"Un anneau à détruire, et neuf compagnons pour l'accompagner jusqu'au bout.", rating:1500, votes:0},
-  {id:'alien', title:'Alien', year:1979, genre:'Horreur', blurb:"Un vaisseau silencieux, et quelque chose à bord qui ne l'est pas.", rating:1500, votes:0},
-  {id:'gladiator', title:'Gladiator', year:2000, genre:'Historique', blurb:"Un général trahi qui redevient esclave, puis légende de l'arène.", rating:1500, votes:0},
-  {id:'departed', title:'Les Infiltrés', year:2006, genre:'Policier', blurb:"Deux taupes, deux camps, et personne qui sait vraiment qui trahit qui.", rating:1500, votes:0},
-  {id:'titanic', title:'Titanic', year:1997, genre:'Romance', blurb:"Un amour de trois jours, et un paquebot qui n'a pas eu le temps d'arriver.", rating:1500, votes:0},
-  {id:'roilion', title:'Le Roi Lion', year:1994, genre:'Animation', blurb:"Un jeune prince exilé qui doit reprendre la place qui lui revient.", rating:1500, votes:0},
-  {id:'forrestgump', title:'Forrest Gump', year:1994, genre:'Drame', blurb:"Un homme simple qui traverse par hasard toute une époque.", rating:1500, votes:0},
-  {id:'retourfutur', title:'Retour vers le futur', year:1985, genre:'Science-fiction', blurb:"Un ado propulsé dans le passé qui manque d'effacer sa propre existence.", rating:1500, votes:0},
-  {id:'starwars', title:'Star Wars : Un nouvel espoir', year:1977, genre:'Science-fiction', blurb:"Un fermier orphelin qui découvre qu'il a un rôle à jouer dans la galaxie.", rating:1500, votes:0},
-  {id:'et', title:"E.T. l'extra-terrestre", year:1982, genre:'Fantastique', blurb:"Un enfant qui cache dans son placard la plus grande amitié de sa vie.", rating:1500, votes:0},
-  {id:'jurassicpark', title:'Jurassic Park', year:1993, genre:'Aventure', blurb:"Un parc d'attractions où les clients ne sont plus tout à fait en haut de la chaîne alimentaire.", rating:1500, votes:0},
-  {id:'silenceagneaux', title:'Le Silence des agneaux', year:1991, genre:'Thriller', blurb:"Une jeune enquêtrice qui doit négocier avec l'esprit qu'elle redoute le plus.", rating:1500, votes:0},
-  {id:'requiem', title:'Requiem for a Dream', year:2000, genre:'Drame', blurb:"Quatre existences qui s'effondrent chacune à leur rythme, sans retour possible.", rating:1500, votes:0},
-  {id:'americanhistoryx', title:'American History X', year:1998, genre:'Drame', blurb:"Un grand frère qui tente de désamorcer la haine qu'il a lui-même transmise.", rating:1500, votes:0},
-  {id:'leprestige', title:'Le Prestige', year:2006, genre:'Thriller', blurb:"Deux magiciens prêts à tout sacrifier pour garder le dernier secret.", rating:1500, votes:0},
-  {id:'memento', title:'Memento', year:2000, genre:'Thriller', blurb:"Un homme sans mémoire qui doit se faire confiance à lui-même, dix minutes à la fois.", rating:1500, votes:0},
-  {id:'djangounchained', title:'Django Unchained', year:2012, genre:'Western', blurb:"Un homme affranchi qui remonte tout le Sud pour retrouver celle qu'il aime.", rating:1500, votes:0},
-  {id:'killbill', title:'Kill Bill Vol. 1', year:2003, genre:'Action', blurb:"Une liste de noms, une épée, et rien d'autre à faire que la vider.", rating:1500, votes:0},
-  {id:'joker', title:'Joker', year:2019, genre:'Drame', blurb:"Un homme que la ville a fini par façonner en exactement ce qu'elle craignait.", rating:1500, votes:0},
-  {id:'1917', title:'1917', year:2019, genre:'Guerre', blurb:"Deux soldats qui n'ont que quelques heures pour traverser les lignes ennemies.", rating:1500, votes:0},
-  {id:'ratatouille', title:'Ratatouille', year:2007, genre:'Animation', blurb:"Un rat qui rêve de cuisine dans une ville qui ne veut pas de lui aux fourneaux.", rating:1500, votes:0},
-  {id:'walle', title:'WALL-E', year:2008, genre:'Animation', blurb:"Un petit robot solitaire qui range une planète entière en attendant quelqu'un.", rating:1500, votes:0},
-  {id:'insideout', title:'Vice-Versa', year:2015, genre:'Animation', blurb:"Cinq émotions aux commandes d'une enfant qui déménage et ne va pas bien.", rating:1500, votes:0},
-  {id:'rocky', title:'Rocky', year:1976, genre:'Sport', blurb:"Un boxeur inconnu à qui on offre, une fois, le combat de sa vie.", rating:1500, votes:0},
-  {id:'snatch', title:'Snatch, tu braques ou tu raques', year:2000, genre:'Comédie noire', blurb:"Un diamant volé, et beaucoup trop de monde qui veut mettre la main dessus.", rating:1500, votes:0},
-  {id:'prisoners', title:'Prisoners', year:2013, genre:'Thriller', blurb:"Un père qui décide de mener l'enquête à sa manière, sans attendre la police.", rating:1500, votes:0},
-  {id:'trumanshow', title:'The Truman Show', year:1998, genre:'Comédie dramatique', blurb:"Un homme qui ignore que sa vie entière est un plateau de télévision.", rating:1500, votes:0},
-  {id:'eternalsunshine', title:'Eternal Sunshine of the Spotless Mind', year:2004, genre:'Romance', blurb:"Un homme qui choisit d'effacer un amour, puis regrette chaque souvenir supprimé.", rating:1500, votes:0},
-  {id:'labyrinthepan', title:'Le Labyrinthe de Pan', year:2006, genre:'Fantastique', blurb:"Une fillette qui préfère un monde souterrain à la guerre qui l'entoure.", rating:1500, votes:0},
-  {id:'avengersendgame', title:'Avengers: Endgame', year:2019, genre:'Action', blurb:"Une équipe de héros qui n'a qu'une dernière chance de réparer l'irréparable.", rating:1500, votes:0},
-  {id:'lesTempsModernes', title:'Les Temps modernes', year:1936, genre:'Comédie', blurb:"Un ouvrier avalé par une machine qu'il n'a jamais vraiment su suivre.", rating:1500, votes:0},
-  {id:'unnight', title:'Léon', year:1994, genre:'Action', blurb:"Un tueur solitaire qui accepte, malgré lui, de veiller sur une enfant.", rating:1500, votes:0}
-];
+                <aside class="sidebar">
+                    <section class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">
+                                Mon Top 10, 
+                                <span id="pseudoDisplay"></span>
+                            </div>
+                        </div>
+                        <div id="personalTopWrap">
+                            <div class="empty-msg">Vote pour commencer à construire ton Top 10.</div>
+                        </div>
+                        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;">
+                            <button id="storyBtn" style="background:var(--gold); color:#1a1500; border:none; padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Partager en story</button>
+                            <button id="shareBtn" style="background:transparent; color:var(--teal); border:1px solid var(--teal); padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Copier le lien</button>
+                        </div>
+                        <div class="panel-sub" id="shareStatus" style="margin-top:10px;"></div>
+                    </section>
+                </aside>
+            </div>
 
-let movies = {};
-let currentPair = null;
-let personalRatings = {}; // { movieId: {rating, votes} } pour le visiteur courant
-let visitorId = null;
-let pseudo = null;
+            <div class="disclaimer">
 
-function getOrCreateVisitorId(){
-  let id = localStorage.getItem('moviemash_visitor_id');
-  if(!id){
-    id = (crypto.randomUUID ? crypto.randomUUID() : 'v-' + Date.now() + '-' + Math.random().toString(36).slice(2));
-    localStorage.setItem('moviemash_visitor_id', id);
-  }
-  return id;
-}
+                      Le classement est public — chaque vote et chaque film ajouté est visible par tout le monde.
+                <br>
 
-function slugify(str){
-  return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'') + '-' + Math.random().toString(36).slice(2,6);
-}
-function expectedScore(a, b){ return 1 / (1 + Math.pow(10, (b - a) / 400)); }
+                      Ce produit utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.
+                <br>
+                <a href="./legal.html" style="color:var(--muted);">Mentions légales & confidentialité</a>
+            </div>
+        </div>
+    </main>
+    <div class="perf bottom"></div>
 
-async function loadData(){
-  const statusLine = document.getElementById('globalLoading');
-  const { data, error } = await supabaseClient.from('movies').select('*');
-  if(error){
-    statusLine.innerHTML = "ERREUR (lecture) : " + (error.message || JSON.stringify(error));
-    console.error(error);
-    return false;
-  }
-  (data || []).forEach(m => movies[m.id] = m);
+    <script>
+    // ⚠️ REMPLACE ces deux valeurs par celles de ton projet Supabase
+    // (Supabase > Project Settings > API)
+    const SUPABASE_URL = "https://rddujgdhgxkansmazcqa.supabase.co";
+    const SUPABASE_ANON_KEY = "sb_publishable_LOztlk77N0NE3an9beeKgA_Z3EetKB0";
 
-  // Ajoute les films de la liste qui ne sont pas encore dans la base
-  // (que la table soit vide au départ, ou qu'on ait juste rajouté des titres au code)
-  const missing = SEED_MOVIES.filter(m => !movies[m.id]);
-  if(missing.length > 0){
-    statusLine.innerHTML = `<span class="spinner"></span> Ajout de ${missing.length} nouveau(x) film(s)…`;
-    const { error: seedError } = await supabaseClient.from('movies').upsert(missing, { onConflict: 'id', ignoreDuplicates: true });
-    if(seedError){
-      statusLine.innerHTML = "ERREUR (remplissage) : " + (seedError.message || JSON.stringify(seedError));
-      console.error(seedError);
-      return false;
+    // ⚠️ Clé gratuite TMDB pour récupérer les affiches (themoviedb.org > compte > paramètres > API)
+    // Laisse vide ("") si tu ne veux pas encore d'affiches — l'app fonctionne très bien sans.
+    const TMDB_API_KEY = "e5833edea3bfa10c62388a2bc2adfbf3";
+
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+        auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            detectSessionInUrl: false
+        }
+    });
+
+    const SEED_MOVIES = [
+    {
+        id: 'inception',
+        title: 'Inception',
+        year: 2010,
+        genre: 'Science-fiction',
+        blurb: "Un architecte des rêves qui finit par se perdre dans les siens.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'parrain',
+        title: 'Le Parrain',
+        year: 1972,
+        genre: 'Crime',
+        blurb: "Une famille qui confond loyauté et pouvoir, génération après génération.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'parasite',
+        title: 'Parasite',
+        year: 2019,
+        genre: 'Thriller social',
+        blurb: "Deux familles, un seul escalier, et tout ce qu'il révèle.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'pulpfiction',
+        title: 'Pulp Fiction',
+        year: 1994,
+        genre: 'Crime',
+        blurb: "Des destins qui se croisent sans jamais suivre l'ordre attendu.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'chihiro',
+        title: 'Le Voyage de Chihiro',
+        year: 2001,
+        genre: 'Animation',
+        blurb: "Une fillette qui doit se souvenir de son prénom pour rentrer chez elle.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'darkknight',
+        title: 'The Dark Knight',
+        year: 2008,
+        genre: 'Action',
+        blurb: "Un justicier face à un chaos qu'aucune règle ne peut contenir.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'lalaland',
+        title: 'La La Land',
+        year: 2016,
+        genre: 'Comédie musicale',
+        blurb: "Deux rêves qui avancent ensemble, jusqu'à devoir choisir un chemin.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'whiplash',
+        title: 'Whiplash',
+        year: 2014,
+        genre: 'Drame',
+        blurb: "Un métronome qui devient une arme entre un élève et son professeur.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'interstellar',
+        title: 'Interstellar',
+        year: 2014,
+        genre: 'Science-fiction',
+        blurb: "Un père qui traverse le temps pour tenir une promesse.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'budapest',
+        title: 'The Grand Budapest Hotel',
+        year: 2014,
+        genre: 'Comédie',
+        blurb: "Un concierge et son groom, gardiens d'un monde déjà disparu.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'getout',
+        title: 'Get Out',
+        year: 2017,
+        genre: 'Horreur',
+        blurb: "Un week-end chez les beaux-parents qui tourne mal, très vite.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'madmax',
+        title: 'Mad Max: Fury Road',
+        year: 2015,
+        genre: 'Action',
+        blurb: "Une course-poursuite de deux heures à travers un désert sans loi.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'her',
+        title: 'Her',
+        year: 2013,
+        genre: 'Science-fiction',
+        blurb: "Un homme seul qui tombe amoureux d'une voix dans son oreille.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'eeaao',
+        title: 'Everything Everywhere All at Once',
+        year: 2022,
+        genre: 'Science-fiction',
+        blurb: "Une mère qui doit sauver le multivers pour sauver sa fille.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'matrix',
+        title: 'Matrix',
+        year: 1999,
+        genre: 'Science-fiction',
+        blurb: "Une pilule rouge, une pilule bleue, et plus rien d'autre à choisir.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'casablanca',
+        title: 'Casablanca',
+        year: 1942,
+        genre: 'Romance',
+        blurb: "Un bar, une guerre, et un amour qu'il faut sacrifier pour survivre.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'fightclub',
+        title: 'Fight Club',
+        year: 1999,
+        genre: 'Drame',
+        blurb: "Un homme qui perd le sommeil, puis un peu plus que ça.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'amelie',
+        title: 'Amélie Poulain',
+        year: 2001,
+        genre: 'Comédie',
+        blurb: "Une serveuse qui répare la vie des autres avant d'oser réparer la sienne.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'nocountry',
+        title: 'No Country for Old Men',
+        year: 2007,
+        genre: 'Thriller',
+        blurb: "Une valise pleine d'argent, et un homme qu'on ne peut pas négocier.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'evades',
+        title: 'Les Évadés',
+        year: 1994,
+        genre: 'Drame',
+        blurb: "Une amitié construite pierre par pierre, pendant vingt ans de prison.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'br2049',
+        title: 'Blade Runner 2049',
+        year: 2017,
+        genre: 'Science-fiction',
+        blurb: "Un enquêteur artificiel qui cherche ce qui le rendrait réel.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'portrait',
+        title: 'Portrait de la jeune fille en feu',
+        year: 2019,
+        genre: 'Romance',
+        blurb: "Une peintre et son modèle, et le peu de temps qu'il leur reste.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'knivesout',
+        title: 'À couteaux tirés',
+        year: 2019,
+        genre: 'Policier',
+        blurb: "Un testament, une famille entière de suspects, et un détective très patient.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'dune',
+        title: 'Dune',
+        year: 2021,
+        genre: 'Science-fiction',
+        blurb: "Un désert, une prophétie, et un héritier qui n'en a pas demandé tant.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'oldboy',
+        title: 'Oldboy',
+        year: 2003,
+        genre: 'Thriller',
+        blurb: "Quinze ans enfermé sans raison, et cinq jours pour comprendre pourquoi.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'citedieu',
+        title: 'La Cité de Dieu',
+        year: 2002,
+        genre: 'Drame',
+        blurb: "Grandir dans une favela où l'enfance ne dure jamais longtemps.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'coco',
+        title: 'Coco',
+        year: 2017,
+        genre: 'Animation',
+        blurb: "Un petit garçon qui traverse la mort pour retrouver sa musique.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'spiderverse',
+        title: 'Spider-Man: New Generation',
+        year: 2018,
+        genre: 'Animation',
+        blurb: "Plusieurs versions du même héros, et une seule ville à sauver ensemble.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'nomadland',
+        title: 'Nomadland',
+        year: 2020,
+        genre: 'Drame',
+        blurb: "Une femme qui refait sa vie sur la route, un camping-car à la fois.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'socialnetwork',
+        title: 'The Social Network',
+        year: 2010,
+        genre: 'Drame',
+        blurb: "Un site créé par dépit qui finit par redéfinir l'amitié elle-même.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'childrenofmen',
+        title: "Les Fils de l'homme",
+        year: 2006,
+        genre: 'Science-fiction',
+        blurb: "Un monde qui n'a plus vu naître un enfant depuis dix-huit ans.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'lotr',
+        title: 'Le Seigneur des Anneaux',
+        year: 2001,
+        genre: 'Fantastique',
+        blurb: "Un anneau à détruire, et neuf compagnons pour l'accompagner jusqu'au bout.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'alien',
+        title: 'Alien',
+        year: 1979,
+        genre: 'Horreur',
+        blurb: "Un vaisseau silencieux, et quelque chose à bord qui ne l'est pas.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'gladiator',
+        title: 'Gladiator',
+        year: 2000,
+        genre: 'Historique',
+        blurb: "Un général trahi qui redevient esclave, puis légende de l'arène.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'departed',
+        title: 'Les Infiltrés',
+        year: 2006,
+        genre: 'Policier',
+        blurb: "Deux taupes, deux camps, et personne qui sait vraiment qui trahit qui.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'titanic',
+        title: 'Titanic',
+        year: 1997,
+        genre: 'Romance',
+        blurb: "Un amour de trois jours, et un paquebot qui n'a pas eu le temps d'arriver.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'roilion',
+        title: 'Le Roi Lion',
+        year: 1994,
+        genre: 'Animation',
+        blurb: "Un jeune prince exilé qui doit reprendre la place qui lui revient.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'forrestgump',
+        title: 'Forrest Gump',
+        year: 1994,
+        genre: 'Drame',
+        blurb: "Un homme simple qui traverse par hasard toute une époque.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'retourfutur',
+        title: 'Retour vers le futur',
+        year: 1985,
+        genre: 'Science-fiction',
+        blurb: "Un ado propulsé dans le passé qui manque d'effacer sa propre existence.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'starwars',
+        title: 'Star Wars : Un nouvel espoir',
+        year: 1977,
+        genre: 'Science-fiction',
+        blurb: "Un fermier orphelin qui découvre qu'il a un rôle à jouer dans la galaxie.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'et',
+        title: "E.T. l'extra-terrestre",
+        year: 1982,
+        genre: 'Fantastique',
+        blurb: "Un enfant qui cache dans son placard la plus grande amitié de sa vie.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'jurassicpark',
+        title: 'Jurassic Park',
+        year: 1993,
+        genre: 'Aventure',
+        blurb: "Un parc d'attractions où les clients ne sont plus tout à fait en haut de la chaîne alimentaire.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'silenceagneaux',
+        title: 'Le Silence des agneaux',
+        year: 1991,
+        genre: 'Thriller',
+        blurb: "Une jeune enquêtrice qui doit négocier avec l'esprit qu'elle redoute le plus.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'requiem',
+        title: 'Requiem for a Dream',
+        year: 2000,
+        genre: 'Drame',
+        blurb: "Quatre existences qui s'effondrent chacune à leur rythme, sans retour possible.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'americanhistoryx',
+        title: 'American History X',
+        year: 1998,
+        genre: 'Drame',
+        blurb: "Un grand frère qui tente de désamorcer la haine qu'il a lui-même transmise.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'leprestige',
+        title: 'Le Prestige',
+        year: 2006,
+        genre: 'Thriller',
+        blurb: "Deux magiciens prêts à tout sacrifier pour garder le dernier secret.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'memento',
+        title: 'Memento',
+        year: 2000,
+        genre: 'Thriller',
+        blurb: "Un homme sans mémoire qui doit se faire confiance à lui-même, dix minutes à la fois.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'djangounchained',
+        title: 'Django Unchained',
+        year: 2012,
+        genre: 'Western',
+        blurb: "Un homme affranchi qui remonte tout le Sud pour retrouver celle qu'il aime.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'killbill',
+        title: 'Kill Bill Vol. 1',
+        year: 2003,
+        genre: 'Action',
+        blurb: "Une liste de noms, une épée, et rien d'autre à faire que la vider.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'joker',
+        title: 'Joker',
+        year: 2019,
+        genre: 'Drame',
+        blurb: "Un homme que la ville a fini par façonner en exactement ce qu'elle craignait.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: '1917',
+        title: '1917',
+        year: 2019,
+        genre: 'Guerre',
+        blurb: "Deux soldats qui n'ont que quelques heures pour traverser les lignes ennemies.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'ratatouille',
+        title: 'Ratatouille',
+        year: 2007,
+        genre: 'Animation',
+        blurb: "Un rat qui rêve de cuisine dans une ville qui ne veut pas de lui aux fourneaux.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'walle',
+        title: 'WALL-E',
+        year: 2008,
+        genre: 'Animation',
+        blurb: "Un petit robot solitaire qui range une planète entière en attendant quelqu'un.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'insideout',
+        title: 'Vice-Versa',
+        year: 2015,
+        genre: 'Animation',
+        blurb: "Cinq émotions aux commandes d'une enfant qui déménage et ne va pas bien.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'rocky',
+        title: 'Rocky',
+        year: 1976,
+        genre: 'Sport',
+        blurb: "Un boxeur inconnu à qui on offre, une fois, le combat de sa vie.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'snatch',
+        title: 'Snatch, tu braques ou tu raques',
+        year: 2000,
+        genre: 'Comédie noire',
+        blurb: "Un diamant volé, et beaucoup trop de monde qui veut mettre la main dessus.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'prisoners',
+        title: 'Prisoners',
+        year: 2013,
+        genre: 'Thriller',
+        blurb: "Un père qui décide de mener l'enquête à sa manière, sans attendre la police.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'trumanshow',
+        title: 'The Truman Show',
+        year: 1998,
+        genre: 'Comédie dramatique',
+        blurb: "Un homme qui ignore que sa vie entière est un plateau de télévision.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'eternalsunshine',
+        title: 'Eternal Sunshine of the Spotless Mind',
+        year: 2004,
+        genre: 'Romance',
+        blurb: "Un homme qui choisit d'effacer un amour, puis regrette chaque souvenir supprimé.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'labyrinthepan',
+        title: 'Le Labyrinthe de Pan',
+        year: 2006,
+        genre: 'Fantastique',
+        blurb: "Une fillette qui préfère un monde souterrain à la guerre qui l'entoure.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'avengersendgame',
+        title: 'Avengers: Endgame',
+        year: 2019,
+        genre: 'Action',
+        blurb: "Une équipe de héros qui n'a qu'une dernière chance de réparer l'irréparable.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'lesTempsModernes',
+        title: 'Les Temps modernes',
+        year: 1936,
+        genre: 'Comédie',
+        blurb: "Un ouvrier avalé par une machine qu'il n'a jamais vraiment su suivre.",
+        rating: 1500,
+        votes: 0
+    },
+    {
+        id: 'unnight',
+        title: 'Léon',
+        year: 1994,
+        genre: 'Action',
+        blurb: "Un tueur solitaire qui accepte, malgré lui, de veiller sur une enfant.",
+        rating: 1500,
+        votes: 0
     }
-    missing.forEach(m => movies[m.id] = m);
-  }
+    ];
 
-  if(Object.keys(movies).length === 0){
-    statusLine.innerHTML = "Aucun film n'a pu être chargé — vérifie les policies RLS dans Supabase.";
-    return false;
-  }
+    let movies = {};
+    let currentPair = null;
+    let personalRatings = {}; // { movieId: {rating, votes} } pour le visiteur courant
+    let visitorId = null;
+    let pseudo = null;
 
-  // Récupère les affiches manquantes en tâche de fond (n'empêche pas de commencer à voter)
-  if(TMDB_API_KEY) fetchMissingPosters();
-
-  return true;
-}
-
-function isTmdbBearerToken(key){
-  return key.split('.').length === 3 && key.length > 100;
-}
-
-async function fetchMissingPosters(){
-  const toFetch = Object.values(movies).filter(m => !m.poster_url);
-  const useBearer = isTmdbBearerToken(TMDB_API_KEY);
-  for(const movie of toFetch){
-    try{
-      const url = useBearer
-        ? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movie.title)}&year=${movie.year}&language=fr-FR`
-        : `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(movie.title)}&year=${movie.year}&language=fr-FR`;
-      const opts = useBearer ? { headers: { Authorization: `Bearer ${TMDB_API_KEY}` } } : {};
-      const res = await fetch(url, opts);
-      const json = await res.json();
-      const result = (json.results && json.results[0]) || null;
-      if(result && result.poster_path){
-        const posterUrl = `https://image.tmdb.org/t/p/w500${result.poster_path}`;
-        movies[movie.id].poster_url = posterUrl;
-        await supabaseClient.from('movies').update({poster_url: posterUrl}).eq('id', movie.id);
-        // Réaffiche si le film concerné est visible dans le duel en cours
-        if(currentPair && currentPair.includes(movie.id)){ renderArena(); }
-      }
-    }catch(e){
-      console.error('Affiche introuvable pour', movie.title, e);
+    function getOrCreateVisitorId() {
+        let id = localStorage.getItem('moviemash_visitor_id');
+        if (!id) {
+            id = (crypto.randomUUID ? crypto.randomUUID() : 'v-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+            localStorage.setItem('moviemash_visitor_id', id);
+        }
+        return id;
     }
-  }
-}
 
-let streaks = {}; // compteur de victoires consécutives, remis à zéro à chaque rechargement de page
-let recentlyShown = []; // file des derniers films montrés, pour éviter de les reproposer trop vite
-const RECENT_WINDOW = 40; // ne reproposer un film qu'après ~40 autres films vus (ajuste selon la taille du catalogue)
-let filterGenre = '';
-let filterDecade = '';
-
-function markShown(...ids){
-  ids.forEach(id => {
-    recentlyShown = recentlyShown.filter(x => x !== id); // évite les doublons dans la file
-    recentlyShown.push(id);
-  });
-  if(recentlyShown.length > RECENT_WINDOW){
-    recentlyShown = recentlyShown.slice(recentlyShown.length - RECENT_WINDOW);
-  }
-}
-
-function decadeOf(year){
-  if(!year || year < 1900) return null;
-  return Math.floor(year / 10) * 10;
-}
-
-function matchesFilters(movie){
-  if(filterGenre && movie.genre !== filterGenre) return false;
-  if(filterDecade && String(decadeOf(movie.year)) !== filterDecade) return false;
-  return true;
-}
-
-function getFilteredIds(){
-  const filtered = Object.keys(movies).filter(id => matchesFilters(movies[id]));
-  // Si le filtre choisi est trop restrictif (moins de 2 films), on l'ignore plutôt que de bloquer le vote
-  return filtered.length >= 2 ? filtered : Object.keys(movies);
-}
-
-function populateFilters(){
-  const genreSet = new Set();
-  const decadeSet = new Set();
-  Object.values(movies).forEach(m => {
-    if(m.genre) genreSet.add(m.genre);
-    const d = decadeOf(m.year);
-    if(d) decadeSet.add(d);
-  });
-  const genreSelect = document.getElementById('filterGenre');
-  const decadeSelect = document.getElementById('filterDecade');
-  [...genreSet].sort().forEach(g => {
-    const opt = document.createElement('option');
-    opt.value = g; opt.textContent = g;
-    genreSelect.appendChild(opt);
-  });
-  [...decadeSet].sort((a,b) => b-a).forEach(d => {
-    const opt = document.createElement('option');
-    opt.value = String(d); opt.textContent = d + 's';
-    decadeSelect.appendChild(opt);
-  });
-  genreSelect.addEventListener('change', () => {
-    filterGenre = genreSelect.value;
-    currentPair = pickPair();
-    renderArena();
-  });
-  decadeSelect.addEventListener('change', () => {
-    filterDecade = decadeSelect.value;
-    currentPair = pickPair();
-    renderArena();
-  });
-}
-
-function renderProgress(){
-  const total = Object.keys(movies).length;
-  const voted = Object.values(personalRatings).filter(r => r.votes > 0).length;
-  const pct = total > 0 ? Math.min(100, Math.round((voted/total)*100)) : 0;
-  document.getElementById('progressFill').style.width = pct + '%';
-  document.getElementById('progressLabel').textContent = `${voted} / ${total} films votés`;
-}
-
-function pickPair(){
-  const all = getFilteredIds();
-  if(all.length < 2) return null;
-  // On essaie d'abord d'éviter tout ce qui a été montré récemment
-  let pool = all.filter(id => !recentlyShown.includes(id));
-  if(pool.length < 2) pool = all; // si le catalogue est petit, on relâche la contrainte
-  let a = pool[Math.floor(Math.random()*pool.length)];
-  let bPool = pool.filter(id => id !== a);
-  if(bPool.length === 0) bPool = all.filter(id => id !== a);
-  let b = bPool[Math.floor(Math.random()*bPool.length)];
-  markShown(a, b);
-  return [a, b];
-}
-
-function pickChallenger(excludeId){
-  const all = getFilteredIds().filter(id => id !== excludeId);
-  if(all.length === 0) return null;
-  // Priorité aux films non montrés récemment, pour forcer la diversité plutôt que de reproposer un film déjà écarté
-  let pool = all.filter(id => !recentlyShown.includes(id));
-  if(pool.length === 0) pool = all; // si tout le catalogue a été vu récemment, on relâche la contrainte
-  const challenger = pool[Math.floor(Math.random()*pool.length)];
-  markShown(challenger);
-  return challenger;
-}
-
-function renderArena(){
-  const arena = document.getElementById('arena');
-  if(!currentPair){
-    arena.innerHTML = '<div class="empty-msg">Ajoute au moins deux films pour commencer à voter.</div>';
-    return;
-  }
-  const [idA, idB] = currentPair;
-  const a = movies[idA], b = movies[idB];
-  const streakBadge = (id) => (streaks[id] >= 2)
-    ? `<div class="streak-badge">🔥 ${streaks[id]} victoires</div>`
-    : '';
-  const cardStyle = (m) => m.poster_url
-    ? `style="background-image: linear-gradient(180deg, rgba(11,11,13,0.15) 45%, rgba(11,11,13,0.97) 92%), url('${m.poster_url}'); background-size: cover; background-position: center top;"`
-    : '';
-  arena.innerHTML = `
-    <div class="card" id="cardA" data-id="${idA}" ${cardStyle(a)} tabindex="0" role="button" aria-label="Voter pour ${a.title}">
-      <div class="genre-tag">${a.genre}</div><div class="year">${a.year}</div>
-      <div class="title">${a.title}</div>${a.blurb ? `<div class="blurb">${a.blurb}</div>` : ''}
-      ${streakBadge(idA)}
-    </div>
-    <div class="vs-badge">VS</div>
-    <div class="card" id="cardB" data-id="${idB}" ${cardStyle(b)} tabindex="0" role="button" aria-label="Voter pour ${b.title}">
-      <div class="genre-tag">${b.genre}</div><div class="year">${b.year}</div>
-      <div class="title">${b.title}</div>${b.blurb ? `<div class="blurb">${b.blurb}</div>` : ''}
-      ${streakBadge(idB)}
-    </div>`;
-  const onKeyActivate = (fn) => (e) => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); fn(); } };
-  document.getElementById('cardA').addEventListener('click', () => handleVote(idA, idB));
-  document.getElementById('cardA').addEventListener('keydown', onKeyActivate(() => handleVote(idA, idB)));
-  document.getElementById('cardB').addEventListener('click', () => handleVote(idB, idA));
-  document.getElementById('cardB').addEventListener('keydown', onKeyActivate(() => handleVote(idB, idA)));
-}
-
-let voteInProgress = false;
-let voteTimestamps = []; // pour la limite de fréquence (protection anti-spam basique, côté client)
-const MAX_VOTES_PER_WINDOW = 15;
-const VOTE_WINDOW_MS = 10000;
-
-async function handleVote(winnerId, loserId){
-  const statusLine = document.getElementById('statusLine');
-
-  // Empêche un double-clic d'enregistrer deux fois le même vote avant la fin du traitement
-  if(voteInProgress) return;
-
-  // Limite de fréquence : protège contre le spam de clics ou un script naïf.
-  // Note : c'est une protection côté client, donc elle ne bloque pas quelqu'un
-  // qui appellerait directement l'API Supabase — une vraie protection anti-triche
-  // demanderait de faire valider les votes côté serveur (voir la remarque plus bas dans le fichier).
-  const now = Date.now();
-  voteTimestamps = voteTimestamps.filter(t => now - t < VOTE_WINDOW_MS);
-  if(voteTimestamps.length >= MAX_VOTES_PER_WINDOW){
-    statusLine.textContent = "Doucement ! Laisse les films respirer un peu 🎬 (réessaie dans quelques secondes)";
-    return;
-  }
-  voteTimestamps.push(now);
-
-  voteInProgress = true;
-  statusLine.textContent = 'Enregistrement du vote…';
-  const winner = movies[winnerId], loser = movies[loserId];
-  const K = 32;
-  const expWin = expectedScore(winner.rating, loser.rating);
-  const expLose = expectedScore(loser.rating, winner.rating);
-  winner.rating = Math.round(winner.rating + K * (1 - expWin));
-  loser.rating = Math.round(loser.rating + K * (0 - expLose));
-  winner.votes += 1; loser.votes += 1;
-
-  // Classement personnel du visiteur (séparé du classement global)
-  if(!personalRatings[winnerId]) personalRatings[winnerId] = {rating:1500, votes:0};
-  if(!personalRatings[loserId]) personalRatings[loserId] = {rating:1500, votes:0};
-  const pWinner = personalRatings[winnerId], pLoser = personalRatings[loserId];
-  const pExpWin = expectedScore(pWinner.rating, pLoser.rating);
-  const pExpLose = expectedScore(pLoser.rating, pWinner.rating);
-  pWinner.rating = Math.round(pWinner.rating + K * (1 - pExpWin));
-  pLoser.rating = Math.round(pLoser.rating + K * (0 - pExpLose));
-  pWinner.votes += 1; pLoser.votes += 1;
-
-  const winnerSlot = winnerId === currentPair[0] ? 0 : 1;
-  const winnerCard = document.getElementById(winnerSlot === 0 ? 'cardA' : 'cardB');
-  if(winnerCard) winnerCard.classList.add('flash');
-
-  const { error: e1 } = await supabaseClient.from('movies').update({rating: winner.rating, votes: winner.votes}).eq('id', winnerId);
-  const { error: e2 } = await supabaseClient.from('movies').update({rating: loser.rating, votes: loser.votes}).eq('id', loserId);
-  await supabaseClient.from('personal_ratings').upsert([
-    {visitor_id: visitorId, movie_id: winnerId, rating: pWinner.rating, votes: pWinner.votes},
-    {visitor_id: visitorId, movie_id: loserId, rating: pLoser.rating, votes: pLoser.votes}
-  ], { onConflict: 'visitor_id,movie_id' });
-  statusLine.textContent = (e1 || e2) ? "Le vote n'a pas pu être enregistré. Réessaie." : 'Vote enregistré. Le champion attend son prochain défi…';
-
-  streaks[winnerId] = (streaks[winnerId] || 0) + 1;
-  streaks[loserId] = 0;
-
-  const challengerId = pickChallenger(winnerId);
-  if(challengerId === null){
-    currentPair = null;
-  } else {
-    currentPair = winnerSlot === 0 ? [winnerId, challengerId] : [challengerId, winnerId];
-  }
-  renderArena();
-  renderLeaderboard();
-  renderPersonalTop();
-  renderProgress();
-  voteInProgress = false;
-}
-
-let leaderboardSearchTerm = '';
-
-function renderLeaderboard(){
-  const wrap = document.getElementById('leaderboardWrap');
-  const fullList = Object.values(movies).sort((x,y) => y.rating - x.rating);
-  if(fullList.length === 0){ wrap.innerHTML = '<div class="empty-msg">Aucun film pour le moment.</div>'; return; }
-  const totalVotes = fullList.reduce((sum,m) => sum + m.votes, 0) / 2;
-  document.getElementById('voteCount').textContent = `${Math.round(totalVotes)} votes au total`;
-
-  // On garde le rang réel (position dans le classement complet) même quand on filtre par recherche
-  const ranked = fullList.map((m, i) => ({ ...m, rank: i+1 }));
-  const term = leaderboardSearchTerm.trim().toLowerCase();
-  const display = term ? ranked.filter(m => m.title.toLowerCase().includes(term)) : ranked.slice(0, 50);
-
-  if(display.length === 0){
-    wrap.innerHTML = '<div class="empty-msg">Aucun film ne correspond à ta recherche.</div>';
-    return;
-  }
-  wrap.innerHTML = `<table><thead><tr><th>Rang</th><th>Film</th><th style="text-align:right;">Score</th><th style="text-align:right;">Votes</th></tr></thead>
-    <tbody>${display.map(m => `<tr><td class="rank">#${m.rank}</td><td>${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></td><td class="rating">${m.rating}</td><td class="votes">${m.votes}</td></tr>`).join('')}</tbody></table>
-    ${!term && ranked.length > 50 ? `<div class="empty-msg">Top 50 affiché — utilise la recherche pour trouver un film plus loin dans le classement.</div>` : ''}`;
-}
-
-function renderPersonalTop(){
-  const wrap = document.getElementById('personalTopWrap');
-  const entries = Object.entries(personalRatings)
-    .filter(([id, r]) => r.votes > 0 && movies[id])
-    .sort((a,b) => b[1].rating - a[1].rating)
-    .slice(0, 10);
-  if(entries.length === 0){
-    wrap.innerHTML = '<div class="empty-msg">Vote pour commencer à construire ton Top 10.</div>';
-    return;
-  }
-  wrap.innerHTML = `<table><thead><tr><th>Rang</th><th>Film</th><th style="text-align:right;">Score</th></tr></thead>
-    <tbody>${entries.map(([id, r], i) => `<tr><td class="rank">#${i+1}</td><td>${movies[id].title} <span style="color:var(--muted); font-size:12px;">(${movies[id].year})</span></td><td class="rating">${r.rating}</td></tr>`).join('')}</tbody></table>`;
-}
-
-async function renderSharedView(sharedVisitorId){
-  const wrap = document.getElementById('sharedViewWrap');
-  wrap.innerHTML = '<div class="empty-msg">Chargement du Top partagé…</div>';
-  const { data: profile } = await supabaseClient.from('profiles').select('*').eq('id', sharedVisitorId).maybeSingle();
-  const { data: ratings, error } = await supabaseClient.from('personal_ratings').select('*').eq('visitor_id', sharedVisitorId);
-  if(error || !ratings || ratings.length === 0){
-    wrap.innerHTML = `
-      <div class="shared-card">
-        <h2>Top introuvable</h2>
-        <div class="shared-sub">Ce classement n'existe pas ou n'a pas encore de votes.</div>
-        <div class="cta-own"><a href="${window.location.pathname}">Voter et créer mon propre Top 10</a></div>
-      </div>`;
-    return;
-  }
-  const top = ratings.sort((a,b) => b.rating - a.rating).slice(0, 10);
-  const name = profile ? profile.pseudo : 'Quelqu\u2019un';
-  wrap.innerHTML = `
-    <div class="shared-card">
-      <h2>Le Top ${top.length} de ${name}</h2>
-      <div class="shared-sub">Classement personnel construit par ses votes sur MovieSmash</div>
-      ${top.map((r, i) => {
-        const m = movies[r.movie_id] || { title: r.movie_id, year: '', poster_url: null };
-        return `<div class="shared-row">
-          <div class="shared-rank">#${i+1}</div>
-          ${m.poster_url ? `<img class="shared-poster" src="${m.poster_url}" alt="">` : ''}
-          <div class="shared-title">${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></div>
-        </div>`;
-      }).join('')}
-      <div class="cta-own"><a href="${window.location.pathname}">Voter et créer mon propre Top 10</a></div>
-    </div>`;
-}
-
-async function loadPersonalRatings(){
-  const { data } = await supabaseClient.from('personal_ratings').select('*').eq('visitor_id', visitorId);
-  personalRatings = {};
-  (data || []).forEach(r => { personalRatings[r.movie_id] = {rating: r.rating, votes: r.votes}; });
-}
-
-function roundRect(ctx, x, y, w, h, r){
-  ctx.beginPath();
-  ctx.moveTo(x+r, y);
-  ctx.arcTo(x+w, y, x+w, y+h, r);
-  ctx.arcTo(x+w, y+h, x, y+h, r);
-  ctx.arcTo(x, y+h, x, y, r);
-  ctx.arcTo(x, y, x+w, y, r);
-  ctx.closePath();
-}
-
-function toCanvasSafeUrl(url){
-  // Le serveur d'images de TMDB n'autorise pas la lecture des pixels par un <canvas>
-  // (restriction CORS). On passe par un proxy public gratuit qui ajoute l'autorisation
-  // nécessaire, uniquement pour la génération de l'image de story.
-  if(!url) return null;
-  const stripped = url.replace(/^https?:\/\//, '');
-  return `https://images.weserv.nl/?url=${encodeURIComponent(stripped)}`;
-}
-
-function loadImageSafe(url){
-  return new Promise((resolve) => {
-    if(!url){ resolve(null); return; }
-    const img = new Image();
-    img.crossOrigin = 'anonymous';
-    img.onload = () => resolve(img);
-    img.onerror = () => resolve(null);
-    img.src = toCanvasSafeUrl(url);
-  });
-}
-
-function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines){
-  const words = text.split(' ');
-  let line = '';
-  let lines = [];
-  for(const word of words){
-    const test = line ? line + ' ' + word : word;
-    if(ctx.measureText(test).width > maxWidth && line){
-      lines.push(line);
-      line = word;
-    } else {
-      line = test;
+    function slugify(str) {
+        return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') + '-' + Math.random().toString(36).slice(2, 6);
     }
-  }
-  if(line) lines.push(line);
-  if(lines.length > maxLines){
-    lines = lines.slice(0, maxLines);
-    lines[maxLines-1] = lines[maxLines-1].replace(/\s*\S*$/, '') + '…';
-  }
-  lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
-  return lines.length;
-}
-
-async function generateStoryImage(){
-  const status = document.getElementById('shareStatus');
-  const entries = Object.entries(personalRatings)
-    .filter(([id, r]) => r.votes > 0 && movies[id])
-    .sort((a,b) => b[1].rating - a[1].rating)
-    .slice(0, 3);
-
-  if(entries.length === 0){
-    status.textContent = "Vote pour au moins un film avant de générer ta story.";
-    return;
-  }
-
-  const btn = document.getElementById('storyBtn');
-  btn.disabled = true;
-  const originalLabel = btn.textContent;
-  btn.textContent = 'Génération…';
-
-  if(document.fonts && document.fonts.ready) await document.fonts.ready;
-
-  const W = 1080, H = 1920;
-  const canvas = document.createElement('canvas');
-  canvas.width = W; canvas.height = H;
-  const ctx = canvas.getContext('2d');
-
-  // Fond
-  const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
-  bgGrad.addColorStop(0, '#141117');
-  bgGrad.addColorStop(1, '#0B0B0D');
-  ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, W, H);
-
-  // Bande perforée haut et bas (clin d'œil pellicule)
-  ctx.fillStyle = '#E8B84B';
-  for(let x = 20; x < W; x += 44){
-    ctx.beginPath(); ctx.arc(x, 24, 9, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.arc(x, H-24, 9, 0, Math.PI*2); ctx.fill();
-  }
-  ctx.fillStyle = bgGrad;
-
-  // En-tête
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#3C6E68';
-  ctx.font = '28px "JetBrains Mono", monospace';
-  ctx.fillText('MON TOP 3 SUR', W/2, 150);
-  ctx.fillStyle = '#E8B84B';
-  ctx.font = '110px "Bebas Neue", sans-serif';
-  ctx.fillText('MOVIESMASH', W/2, 250);
-  ctx.fillStyle = '#F5EDE0';
-  ctx.font = '34px "JetBrains Mono", monospace';
-  ctx.fillText('par ' + (pseudo || ''), W/2, 305);
-
-  // Cartes des 3 films
-  const posterW = 260, posterH = 390;
-  const rowStartY = 420;
-  const rowGap = 460;
-
-  for(let i = 0; i < entries.length; i++){
-    const [movieId] = entries[i];
-    const movie = movies[movieId];
-    const rowY = rowStartY + i * rowGap;
-    const posterX = 150;
-    const posterY = rowY;
-
-    // Numéro de rang
-    ctx.textAlign = 'left';
-    ctx.fillStyle = '#9A2846';
-    ctx.font = '220px "Bebas Neue", sans-serif';
-    ctx.fillText(String(i+1), 20, posterY + posterH - 40);
-    ctx.strokeStyle = '#E8B84B';
-    ctx.lineWidth = 3;
-    ctx.strokeText(String(i+1), 20, posterY + posterH - 40);
-
-    // Affiche (ou repli stylisé si absente/inaccessible)
-    const img = await loadImageSafe(movie.poster_url);
-    ctx.save();
-    roundRect(ctx, posterX, posterY, posterW, posterH, 14);
-    ctx.clip();
-    if(img){
-      ctx.drawImage(img, posterX, posterY, posterW, posterH);
-    } else {
-      const g = ctx.createLinearGradient(posterX, posterY, posterX+posterW, posterY+posterH);
-      g.addColorStop(0, '#1E1B22'); g.addColorStop(1, '#3C6E68');
-      ctx.fillStyle = g;
-      ctx.fillRect(posterX, posterY, posterW, posterH);
-      ctx.fillStyle = '#F5EDE0';
-      ctx.textAlign = 'center';
-      ctx.font = '30px "Bebas Neue", sans-serif';
-      wrapText(ctx, movie.title, posterX + posterW/2, posterY + posterH/2, posterW - 30, 34, 3);
-      ctx.textAlign = 'left';
+    function expectedScore(a, b) {
+        return 1 / (1 + Math.pow(10, (b - a) / 400));
     }
-    ctx.restore();
-    ctx.strokeStyle = 'rgba(232,184,74,0.4)';
-    ctx.lineWidth = 2;
-    roundRect(ctx, posterX, posterY, posterW, posterH, 14);
-    ctx.stroke();
 
-    // Titre + année à côté de l'affiche
-    const textX = posterX + posterW + 40;
-    const textMaxWidth = W - textX - 60;
-    ctx.fillStyle = '#F5EDE0';
-    ctx.font = '46px "Bebas Neue", sans-serif';
-    const linesUsed = wrapText(ctx, movie.title, textX, posterY + 60, textMaxWidth, 50, 3);
-    ctx.fillStyle = '#948E86';
-    ctx.font = '26px "JetBrains Mono", monospace';
-    ctx.fillText(String(movie.year || ''), textX, posterY + 60 + linesUsed * 50 + 20);
-  }
+    async function loadData() {
+        const statusLine = document.getElementById('globalLoading');
+        const {data, error} = await supabaseClient.from('movies').select('*');
+        if (error) {
+            statusLine.innerHTML = "ERREUR (lecture) : " + (error.message || JSON.stringify(error));
+            console.error(error);
+            return false;
+        }
+        (data || []).forEach(m => movies[m.id] = m);
 
-  // Pied de page
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#948E86';
-  ctx.font = '26px "JetBrains Mono", monospace';
-  ctx.fillText('Fais ton propre classement sur MovieSmash', W/2, H - 90);
+        // Ajoute les films de la liste qui ne sont pas encore dans la base
+        // (que la table soit vide au départ, ou qu'on ait juste rajouté des titres au code)
+        const missing = SEED_MOVIES.filter(m => !movies[m.id]);
+        if (missing.length > 0) {
+            statusLine.innerHTML = `<span class="spinner"></span> Ajout de ${missing.length} nouveau(x) film(s)…`;
+            const {error: seedError} = await supabaseClient.from('movies').upsert(missing, {
+                onConflict: 'id',
+                ignoreDuplicates: true
+            });
+            if (seedError) {
+                statusLine.innerHTML = "ERREUR (remplissage) : " + (seedError.message || JSON.stringify(seedError));
+                console.error(seedError);
+                return false;
+            }
+            missing.forEach(m => movies[m.id] = m);
+        }
 
-  // Téléchargement
-  try{
-    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
-    if(!blob) throw new Error('toBlob a renvoyé null');
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `moviemash-top3-${(pseudo||'moi').toLowerCase().replace(/[^a-z0-9]+/g,'-')}.png`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    status.textContent = "Image téléchargée — ouvre-la et partage-la dans ta story Instagram.";
-  }catch(e){
-    console.error(e);
-    status.textContent = "L'image n'a pas pu être générée (certaines affiches ont peut-être bloqué l'export). Réessaie.";
-  }
+        if (Object.keys(movies).length === 0) {
+            statusLine.innerHTML = "Aucun film n'a pu être chargé — vérifie les policies RLS dans Supabase.";
+            return false;
+        }
 
-  btn.disabled = false;
-  btn.textContent = originalLabel;
-}
+        // Récupère les affiches manquantes en tâche de fond (n'empêche pas de commencer à voter)
+        if (TMDB_API_KEY)
+            fetchMissingPosters();
 
-document.getElementById('storyBtn').addEventListener('click', generateStoryImage);
+        return true;
+    }
 
-document.getElementById('shareBtn').addEventListener('click', async () => {
-  const shareStatus = document.getElementById('shareStatus');
-  const url = `${window.location.origin}${window.location.pathname}?u=${encodeURIComponent(visitorId)}`;
-  try{
-    await navigator.clipboard.writeText(url);
-    shareStatus.textContent = 'Lien copié : ' + url;
-  }catch(e){
-    shareStatus.textContent = 'Voici ton lien à copier : ' + url;
-  }
-});
+    function isTmdbBearerToken(key) {
+        return key.split('.').length === 3 && key.length > 100;
+    }
 
-(async function init(){
-  // 1. Charge toujours la liste des films (nécessaire pour afficher titres/affiches, y compris en vue partagée)
-  const ok = await loadData();
-  if(!ok) return;
+    async function fetchMissingPosters() {
+        const toFetch = Object.values(movies).filter(m => !m.poster_url);
+        const useBearer = isTmdbBearerToken(TMDB_API_KEY);
+        for (const movie of toFetch) {
+            try {
+                const url = useBearer
+                ? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movie.title)}&year=${movie.year}&language=fr-FR`
+                : `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(movie.title)}&year=${movie.year}&language=fr-FR`;
+                const opts = useBearer ? {
+                    headers: {
+                        Authorization: `Bearer ${TMDB_API_KEY}`
+                    }
+                } : {};
+                const res = await fetch(url, opts);
+                const json = await res.json();
+                const result = (json.results && json.results[0]) || null;
+                if (result && result.poster_path) {
+                    const posterUrl = `https://image.tmdb.org/t/p/w500${result.poster_path}`;
+                    movies[movie.id].poster_url = posterUrl;
+                    await supabaseClient.from('movies').update({
+                        poster_url: posterUrl
+                    }).eq('id', movie.id);
+                    // Réaffiche si le film concerné est visible dans le duel en cours
+                    if (currentPair && currentPair.includes(movie.id)) {
+                        renderArena();
+                    }
+                }
+            } catch (e) {
+                console.error('Affiche introuvable pour', movie.title, e);
+            }
+        }
+    }
 
-  document.getElementById('globalLoading').style.display = 'none';
+    let streaks = {}; // compteur de victoires consécutives, remis à zéro à chaque rechargement de page
+    let recentlyShown = []; // file des derniers films montrés, pour éviter de les reproposer trop vite
+    const RECENT_WINDOW = 40; // ne reproposer un film qu'après ~40 autres films vus (ajuste selon la taille du catalogue)
+    let filterGenre = '';
+    let filterDecade = '';
+    let skippedIds = new Set(); // films marqués "je n'ai pas vu" par ce visiteur — exclus définitivement pour lui
 
-  const params = new URLSearchParams(window.location.search);
-  const sharedId = params.get('u');
+    function markShown(...ids) {
+        ids.forEach(id => {
+            recentlyShown = recentlyShown.filter(x => x !== id); // évite les doublons dans la file
+            recentlyShown.push(id);
+        });
+        if (recentlyShown.length > RECENT_WINDOW) {
+            recentlyShown = recentlyShown.slice(recentlyShown.length - RECENT_WINDOW);
+        }
+    }
 
-  if(sharedId){
-    // Vue "Top d'un ami" : lecture seule, pas besoin de pseudo
-    renderSharedView(sharedId);
-    return;
-  }
+    function decadeOf(year) {
+        if (!year || year < 1900)
+            return null;
+        return Math.floor(year / 10) * 10;
+    }
 
-  visitorId = getOrCreateVisitorId();
-  pseudo = localStorage.getItem('moviemash_pseudo');
+    function matchesFilters(movie) {
+        if (filterGenre && movie.genre !== filterGenre)
+            return false;
+        if (filterDecade && String(decadeOf(movie.year)) !== filterDecade)
+            return false;
+        return true;
+    }
 
-  if(!pseudo){
-    document.getElementById('pseudoGate').style.display = 'block';
-    return; // la suite se lance après soumission du formulaire pseudo
-  }
+    function getFilteredIds() {
+        const filtered = Object.keys(movies).filter(id => matchesFilters(movies[id]) && !skippedIds.has(id));
+        // Si le filtre choisi est trop restrictif (moins de 2 films), on relâche d'abord le filtre genre/décennie,
+        // mais on ne réintroduit jamais les films marqués "non vus"
+        if (filtered.length >= 2)
+            return filtered;
+        const withoutSkipped = Object.keys(movies).filter(id => !skippedIds.has(id));
+        return withoutSkipped.length >= 2 ? withoutSkipped : Object.keys(movies);
+    }
 
-  await startMainApp();
-})();
+    async function loadSkippedMovies() {
+        const {data} = await supabaseClient.from('visitor_skips').select('movie_id').eq('visitor_id', visitorId);
+        skippedIds = new Set((data || []).map(r => r.movie_id));
+    }
 
-document.getElementById('pseudoForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const value = document.getElementById('inpPseudo').value.trim();
-  if(!value) return;
-  pseudo = value;
-  localStorage.setItem('moviemash_pseudo', pseudo);
-  await supabaseClient.from('profiles').upsert([{id: visitorId, pseudo: pseudo}], { onConflict: 'id' });
-  document.getElementById('pseudoGate').style.display = 'none';
-  await startMainApp();
-});
+    async function markAsUnseen(movieId) {
+        skippedIds.add(movieId);
+        await supabaseClient.from('visitor_skips').upsert([{
+            visitor_id: visitorId,
+            movie_id: movieId
+        }], {
+            onConflict: 'visitor_id,movie_id'
+        });
+    }
 
-async function startMainApp(){
-  document.getElementById('mainApp').style.display = 'block';
-  document.getElementById('pseudoDisplay').textContent = pseudo;
-  await loadPersonalRatings();
-  populateFilters();
-  currentPair = pickPair();
-  document.getElementById('statusLine').textContent = '';
-  renderArena();
-  renderLeaderboard();
-  renderPersonalTop();
-  renderProgress();
+    function populateFilters() {
+        const genreSet = new Set();
+        const decadeSet = new Set();
+        Object.values(movies).forEach(m => {
+            if (m.genre)
+                genreSet.add(m.genre);
+            const d = decadeOf(m.year);
+            if (d)
+                decadeSet.add(d);
+        });
+        const genreSelect = document.getElementById('filterGenre');
+        const decadeSelect = document.getElementById('filterDecade');
+        [...genreSet].sort().forEach(g => {
+            const opt = document.createElement('option');
+            opt.value = g;
+            opt.textContent = g;
+            genreSelect.appendChild(opt);
+        });
+        [...decadeSet].sort((a, b) => b - a).forEach(d => {
+            const opt = document.createElement('option');
+            opt.value = String(d);
+            opt.textContent = d + 's';
+            decadeSelect.appendChild(opt);
+        });
+        genreSelect.addEventListener('change', () => {
+            filterGenre = genreSelect.value;
+            currentPair = pickPair();
+            renderArena();
+        });
+        decadeSelect.addEventListener('change', () => {
+            filterDecade = decadeSelect.value;
+            currentPair = pickPair();
+            renderArena();
+        });
+    }
 
-  document.getElementById('leaderboardSearch').addEventListener('input', (e) => {
-    leaderboardSearchTerm = e.target.value;
-    renderLeaderboard();
-  });
-}
-</script>
+    function renderProgress() {
+        const total = Object.keys(movies).length;
+        const voted = Object.values(personalRatings).filter(r => r.votes > 0).length;
+        const pct = total > 0 ? Math.min(100, Math.round((voted / total) * 100)) : 0;
+        document.getElementById('progressFill').style.width = pct + '%';
+        document.getElementById('progressLabel').textContent = `${voted} / ${total} films votés`;
+    }
+
+    function pickPair() {
+        const all = getFilteredIds();
+        if (all.length < 2)
+            return null;
+        // On essaie d'abord d'éviter tout ce qui a été montré récemment
+        let pool = all.filter(id => !recentlyShown.includes(id));
+        if (pool.length < 2)
+            pool = all; // si le catalogue est petit, on relâche la contrainte
+        let a = pool[Math.floor(Math.random() * pool.length)];
+        let bPool = pool.filter(id => id !== a);
+        if (bPool.length === 0)
+            bPool = all.filter(id => id !== a);
+        let b = bPool[Math.floor(Math.random() * bPool.length)];
+        markShown(a, b);
+        return [a, b];
+    }
+
+    function pickChallenger(excludeId) {
+        const all = getFilteredIds().filter(id => id !== excludeId);
+        if (all.length === 0)
+            return null;
+        // Priorité aux films non montrés récemment, pour forcer la diversité plutôt que de reproposer un film déjà écarté
+        let pool = all.filter(id => !recentlyShown.includes(id));
+        if (pool.length === 0)
+            pool = all; // si tout le catalogue a été vu récemment, on relâche la contrainte
+        const challenger = pool[Math.floor(Math.random() * pool.length)];
+        markShown(challenger);
+        return challenger;
+    }
+
+    function renderArena() {
+        const arena = document.getElementById('arena');
+        if (!currentPair) {
+            arena.innerHTML = '<div class="empty-msg">Ajoute au moins deux films pour commencer à voter.</div>';
+            return;
+        }
+        const [idA, idB] = currentPair;
+        const a = movies[idA],
+            b = movies[idB];
+        const streakBadge = (id) => (streaks[id] >= 2)
+        ? `<div class="streak-badge">🔥 ${streaks[id]} victoires</div>`
+        : '';
+        const cardStyle = (m) => m.poster_url
+        ? `style="background-image: linear-gradient(180deg, rgba(11,11,13,0.15) 45%, rgba(11,11,13,0.97) 92%), url('${m.poster_url}'); background-size: cover; background-position: center top;"`
+        : '';
+        arena.innerHTML = `
+            <div class="card-slot">
+              <div class="card" id="cardA" data-id="${idA}" ${cardStyle(a)} tabindex="0" role="button" aria-label="Voter pour ${a.title}">
+                <div class="genre-tag">${a.genre}</div><div class="year">${a.year}</div>
+                <div class="title">${a.title}</div>${a.blurb ? `<div class="blurb">${a.blurb}</div>` : ''}
+                ${streakBadge(idA)}
+              </div>
+              <button class="not-seen-link" id="notSeenA">Je n'ai pas vu ce film</button>
+            </div>
+            <div class="vs-badge">VS</div>
+            <div class="card-slot">
+              <div class="card" id="cardB" data-id="${idB}" ${cardStyle(b)} tabindex="0" role="button" aria-label="Voter pour ${b.title}">
+                <div class="genre-tag">${b.genre}</div><div class="year">${b.year}</div>
+                <div class="title">${b.title}</div>${b.blurb ? `<div class="blurb">${b.blurb}</div>` : ''}
+                ${streakBadge(idB)}
+              </div>
+              <button class="not-seen-link" id="notSeenB">Je n'ai pas vu ce film</button>
+            </div>`;
+        const onKeyActivate = (fn) => (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fn();
+            }
+        };
+        document.getElementById('cardA').addEventListener('click', () => handleVote(idA, idB));
+        document.getElementById('cardA').addEventListener('keydown', onKeyActivate(() => handleVote(idA, idB)));
+        document.getElementById('cardB').addEventListener('click', () => handleVote(idB, idA));
+        document.getElementById('cardB').addEventListener('keydown', onKeyActivate(() => handleVote(idB, idA)));
+        document.getElementById('notSeenA').addEventListener('click', () => handleNotSeen(idA, idB, 0));
+        document.getElementById('notSeenB').addEventListener('click', () => handleNotSeen(idB, idA, 1));
+    }
+
+    async function handleNotSeen(unseenId, otherId, unseenSlot) {
+        await markAsUnseen(unseenId);
+        // On ne touche à aucun score, ni global ni personnel : seul le film "non vu" est remplacé
+        const replacement = pickChallenger(otherId);
+        if (replacement === null) {
+            currentPair = null;
+        } else {
+            currentPair = unseenSlot === 0 ? [replacement, otherId] : [otherId, replacement];
+        }
+        renderArena();
+        renderProgress();
+    }
+
+    let voteInProgress = false;
+    let voteTimestamps = []; // pour la limite de fréquence (protection anti-spam basique, côté client)
+    const MAX_VOTES_PER_WINDOW = 15;
+    const VOTE_WINDOW_MS = 10000;
+
+    async function handleVote(winnerId, loserId) {
+        const statusLine = document.getElementById('statusLine');
+
+        // Empêche un double-clic d'enregistrer deux fois le même vote avant la fin du traitement
+        if (voteInProgress)
+            return;
+
+        // Limite de fréquence : protège contre le spam de clics ou un script naïf.
+        // Note : c'est une protection côté client, donc elle ne bloque pas quelqu'un
+        // qui appellerait directement l'API Supabase — une vraie protection anti-triche
+        // demanderait de faire valider les votes côté serveur (voir la remarque plus bas dans le fichier).
+        const now = Date.now();
+        voteTimestamps = voteTimestamps.filter(t => now - t < VOTE_WINDOW_MS);
+        if (voteTimestamps.length >= MAX_VOTES_PER_WINDOW) {
+            statusLine.textContent = "Doucement ! Laisse les films respirer un peu 🎬 (réessaie dans quelques secondes)";
+            return;
+        }
+        voteTimestamps.push(now);
+
+        voteInProgress = true;
+        statusLine.textContent = 'Enregistrement du vote…';
+        const winner = movies[winnerId],
+            loser = movies[loserId];
+        const K = 32;
+        const expWin = expectedScore(winner.rating, loser.rating);
+        const expLose = expectedScore(loser.rating, winner.rating);
+        winner.rating = Math.round(winner.rating + K * (1 - expWin));
+        loser.rating = Math.round(loser.rating + K * (0 - expLose));
+        winner.votes += 1;
+        loser.votes += 1;
+
+        // Classement personnel du visiteur (séparé du classement global)
+        if (!personalRatings[winnerId])
+            personalRatings[winnerId] = {
+                rating: 1500,
+                votes: 0
+            };
+        if (!personalRatings[loserId])
+            personalRatings[loserId] = {
+                rating: 1500,
+                votes: 0
+            };
+        const pWinner = personalRatings[winnerId],
+            pLoser = personalRatings[loserId];
+        const pExpWin = expectedScore(pWinner.rating, pLoser.rating);
+        const pExpLose = expectedScore(pLoser.rating, pWinner.rating);
+        pWinner.rating = Math.round(pWinner.rating + K * (1 - pExpWin));
+        pLoser.rating = Math.round(pLoser.rating + K * (0 - pExpLose));
+        pWinner.votes += 1;
+        pLoser.votes += 1;
+
+        const winnerSlot = winnerId === currentPair[0] ? 0 : 1;
+        const winnerCard = document.getElementById(winnerSlot === 0 ? 'cardA' : 'cardB');
+        if (winnerCard)
+            winnerCard.classList.add('flash');
+
+        const {error: e1} = await supabaseClient.from('movies').update({
+            rating: winner.rating,
+            votes: winner.votes
+        }).eq('id', winnerId);
+        const {error: e2} = await supabaseClient.from('movies').update({
+            rating: loser.rating,
+            votes: loser.votes
+        }).eq('id', loserId);
+        await supabaseClient.from('personal_ratings').upsert([
+        {
+            visitor_id: visitorId,
+            movie_id: winnerId,
+            rating: pWinner.rating,
+            votes: pWinner.votes
+        },
+        {
+            visitor_id: visitorId,
+            movie_id: loserId,
+            rating: pLoser.rating,
+            votes: pLoser.votes
+        }
+        ], {
+            onConflict: 'visitor_id,movie_id'
+        });
+        statusLine.textContent = (e1 || e2) ? "Le vote n'a pas pu être enregistré. Réessaie." : 'Vote enregistré. Le champion attend son prochain défi…';
+
+        streaks[winnerId] = (streaks[winnerId] || 0) + 1;
+        streaks[loserId] = 0;
+
+        const challengerId = pickChallenger(winnerId);
+        if (challengerId === null) {
+            currentPair = null;
+        } else {
+            currentPair = winnerSlot === 0 ? [winnerId, challengerId] : [challengerId, winnerId];
+        }
+        renderArena();
+        renderLeaderboard();
+        renderPersonalTop();
+        renderProgress();
+        voteInProgress = false;
+    }
+
+    let leaderboardSearchTerm = '';
+
+    function renderLeaderboard() {
+        const wrap = document.getElementById('leaderboardWrap');
+        const fullList = Object.values(movies).sort((x, y) => y.rating - x.rating);
+        if (fullList.length === 0) {
+            wrap.innerHTML = '<div class="empty-msg">Aucun film pour le moment.</div>';
+            return;
+        }
+        const totalVotes = fullList.reduce((sum, m) => sum + m.votes, 0) / 2;
+        document.getElementById('voteCount').textContent = `${Math.round(totalVotes)} votes au total`;
+
+        // On garde le rang réel (position dans le classement complet) même quand on filtre par recherche
+        const ranked = fullList.map((m, i) => ({
+            ...m,
+            rank: i + 1
+        }));
+        const term = leaderboardSearchTerm.trim().toLowerCase();
+        const display = term ? ranked.filter(m => m.title.toLowerCase().includes(term)) : ranked.slice(0, 50);
+
+        if (display.length === 0) {
+            wrap.innerHTML = '<div class="empty-msg">Aucun film ne correspond à ta recherche.</div>';
+            return;
+        }
+        wrap.innerHTML = `<table><thead><tr><th>Rang</th><th>Film</th><th style="text-align:right;">Score</th><th style="text-align:right;">Votes</th></tr></thead>
+            <tbody>${display.map(m => `<tr><td class="rank">#${m.rank}</td><td>${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></td><td class="rating">${m.rating}</td><td class="votes">${m.votes}</td></tr>`).join('')}</tbody></table>
+            ${!term && ranked.length > 50 ? `<div class="empty-msg">Top 50 affiché — utilise la recherche pour trouver un film plus loin dans le classement.</div>` : ''}`;
+    }
+
+    function renderPersonalTop() {
+        const wrap = document.getElementById('personalTopWrap');
+        const entries = Object.entries(personalRatings)
+        .filter(([id, r]) => r.votes > 0 && movies[id])
+        .sort((a, b) => b[1].rating - a[1].rating)
+        .slice(0, 10);
+        if (entries.length === 0) {
+            wrap.innerHTML = '<div class="empty-msg">Vote pour commencer à construire ton Top 10.</div>';
+            return;
+        }
+        wrap.innerHTML = `<table><thead><tr><th>Rang</th><th>Film</th><th style="text-align:right;">Score</th></tr></thead>
+            <tbody>${entries.map(([id, r], i) => `<tr><td class="rank">#${i + 1}</td><td>${movies[id].title} <span style="color:var(--muted); font-size:12px;">(${movies[id].year})</span></td><td class="rating">${r.rating}</td></tr>`).join('')}</tbody></table>`;
+    }
+
+    async function renderSharedView(sharedVisitorId) {
+        const wrap = document.getElementById('sharedViewWrap');
+        wrap.innerHTML = '<div class="empty-msg">Chargement du Top partagé…</div>';
+        const {data: profile} = await supabaseClient.from('profiles').select('*').eq('id', sharedVisitorId).maybeSingle();
+        const {data: ratings, error} = await supabaseClient.from('personal_ratings').select('*').eq('visitor_id', sharedVisitorId);
+        if (error || !ratings || ratings.length === 0) {
+            wrap.innerHTML = `
+                  <div class="shared-card">
+                    <h2>Top introuvable</h2>
+                    <div class="shared-sub">Ce classement n'existe pas ou n'a pas encore de votes.</div>
+                    <div class="cta-own"><a href="${window.location.pathname}">Voter et créer mon propre Top 10</a></div>
+                  </div>`;
+            return;
+        }
+        const top = ratings.sort((a, b) => b.rating - a.rating).slice(0, 10);
+        const name = profile ? profile.pseudo : 'Quelqu\u2019un';
+        wrap.innerHTML = `
+            <div class="shared-card">
+              <h2>Le Top ${top.length} de ${name}</h2>
+              <div class="shared-sub">Classement personnel construit par ses votes sur MovieSmash</div>
+              ${top.map((r, i) => {const m = movies[r.movie_id] || {title: r.movie_id,year: '',poster_url: null};return `<div class="shared-row">
+                      <div class="shared-rank">#${i + 1}</div>
+                      ${m.poster_url ? `<img class="shared-poster" src="${m.poster_url}" alt="">` : ''}
+                      <div class="shared-title">${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></div>
+                    </div>`;}).join('')}
+              <div class="cta-own"><a href="${window.location.pathname}">Voter et créer mon propre Top 10</a></div>
+            </div>`;
+    }
+
+    async function loadPersonalRatings() {
+        const {data} = await supabaseClient.from('personal_ratings').select('*').eq('visitor_id', visitorId);
+        personalRatings = {};
+        (data || []).forEach(r => {
+            personalRatings[r.movie_id] = {
+                rating: r.rating,
+                votes: r.votes
+            };
+        });
+    }
+
+    function roundRect(ctx, x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+    }
+
+    function toCanvasSafeUrl(url) {
+        // Le serveur d'images de TMDB n'autorise pas la lecture des pixels par un <canvas>
+        // (restriction CORS). On passe par un proxy public gratuit qui ajoute l'autorisation
+        // nécessaire, uniquement pour la génération de l'image de story.
+        if (!url)
+            return null;
+        const stripped = url.replace(/^https?:\/\//, '');
+        return `https://images.weserv.nl/?url=${encodeURIComponent(stripped)}`;
+    }
+
+    function loadImageSafe(url) {
+        return new Promise((resolve) => {
+            if (!url) {
+                resolve(null);
+                return;
+            }
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = () => resolve(img);
+            img.onerror = () => resolve(null);
+            img.src = toCanvasSafeUrl(url);
+        });
+    }
+
+    function wrapText(ctx, text, x, y, maxWidth, lineHeight, maxLines) {
+        const words = text.split(' ');
+        let line = '';
+        let lines = [];
+        for (const word of words) {
+            const test = line ? line + ' ' + word : word;
+            if (ctx.measureText(test).width > maxWidth && line) {
+                lines.push(line);
+                line = word;
+            } else {
+                line = test;
+            }
+        }
+        if (line)
+            lines.push(line);
+        if (lines.length > maxLines) {
+            lines = lines.slice(0, maxLines);
+            lines[maxLines - 1] = lines[maxLines - 1].replace(/\s*\S*$/, '') + '…';
+        }
+        lines.forEach((l, i) => ctx.fillText(l, x, y + i * lineHeight));
+        return lines.length;
+    }
+
+    async function generateStoryImage() {
+        const status = document.getElementById('shareStatus');
+        const entries = Object.entries(personalRatings)
+        .filter(([id, r]) => r.votes > 0 && movies[id])
+        .sort((a, b) => b[1].rating - a[1].rating)
+        .slice(0, 3);
+
+        if (entries.length === 0) {
+            status.textContent = "Vote pour au moins un film avant de générer ta story.";
+            return;
+        }
+
+        const btn = document.getElementById('storyBtn');
+        btn.disabled = true;
+        const originalLabel = btn.textContent;
+        btn.textContent = 'Génération…';
+
+        if (document.fonts && document.fonts.ready)
+            await document.fonts.ready;
+
+        const W = 1080,
+            H = 1920;
+        const canvas = document.createElement('canvas');
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext('2d');
+
+        // Fond
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+        bgGrad.addColorStop(0, '#141117');
+        bgGrad.addColorStop(1, '#0B0B0D');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        // Bande perforée haut et bas (clin d'œil pellicule)
+        ctx.fillStyle = '#E8B84B';
+        for (let x = 20; x < W; x += 44) {
+            ctx.beginPath();
+            ctx.arc(x, 24, 9, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x, H - 24, 9, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.fillStyle = bgGrad;
+
+        // En-tête
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#3C6E68';
+        ctx.font = '28px "JetBrains Mono", monospace';
+        ctx.fillText('MON TOP 3 SUR', W / 2, 150);
+        ctx.fillStyle = '#E8B84B';
+        ctx.font = '110px "Bebas Neue", sans-serif';
+        ctx.fillText('MOVIESMASH', W / 2, 250);
+        ctx.fillStyle = '#F5EDE0';
+        ctx.font = '34px "JetBrains Mono", monospace';
+        ctx.fillText('par ' + (pseudo || ''), W / 2, 305);
+
+        // Cartes des 3 films
+        const posterW = 260,
+            posterH = 390;
+        const rowStartY = 420;
+        const rowGap = 460;
+
+        for (let i = 0; i < entries.length; i++) {
+            const [movieId] = entries[i];
+            const movie = movies[movieId];
+            const rowY = rowStartY + i * rowGap;
+            const posterX = 150;
+            const posterY = rowY;
+
+            // Numéro de rang
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#9A2846';
+            ctx.font = '220px "Bebas Neue", sans-serif';
+            ctx.fillText(String(i + 1), 20, posterY + posterH - 40);
+            ctx.strokeStyle = '#E8B84B';
+            ctx.lineWidth = 3;
+            ctx.strokeText(String(i + 1), 20, posterY + posterH - 40);
+
+            // Affiche (ou repli stylisé si absente/inaccessible)
+            const img = await loadImageSafe(movie.poster_url);
+            ctx.save();
+            roundRect(ctx, posterX, posterY, posterW, posterH, 14);
+            ctx.clip();
+            if (img) {
+                ctx.drawImage(img, posterX, posterY, posterW, posterH);
+            } else {
+                const g = ctx.createLinearGradient(posterX, posterY, posterX + posterW, posterY + posterH);
+                g.addColorStop(0, '#1E1B22');
+                g.addColorStop(1, '#3C6E68');
+                ctx.fillStyle = g;
+                ctx.fillRect(posterX, posterY, posterW, posterH);
+                ctx.fillStyle = '#F5EDE0';
+                ctx.textAlign = 'center';
+                ctx.font = '30px "Bebas Neue", sans-serif';
+                wrapText(ctx, movie.title, posterX + posterW / 2, posterY + posterH / 2, posterW - 30, 34, 3);
+                ctx.textAlign = 'left';
+            }
+            ctx.restore();
+            ctx.strokeStyle = 'rgba(232,184,74,0.4)';
+            ctx.lineWidth = 2;
+            roundRect(ctx, posterX, posterY, posterW, posterH, 14);
+            ctx.stroke();
+
+            // Titre + année à côté de l'affiche
+            const textX = posterX + posterW + 40;
+            const textMaxWidth = W - textX - 60;
+            ctx.fillStyle = '#F5EDE0';
+            ctx.font = '46px "Bebas Neue", sans-serif';
+            const linesUsed = wrapText(ctx, movie.title, textX, posterY + 60, textMaxWidth, 50, 3);
+            ctx.fillStyle = '#948E86';
+            ctx.font = '26px "JetBrains Mono", monospace';
+            ctx.fillText(String(movie.year || ''), textX, posterY + 60 + linesUsed * 50 + 20);
+        }
+
+        // Pied de page
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#948E86';
+        ctx.font = '26px "JetBrains Mono", monospace';
+        ctx.fillText('Fais ton propre classement sur MovieSmash', W / 2, H - 90);
+
+        // Téléchargement
+        try {
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+            if (!blob)
+                throw new Error('toBlob a renvoyé null');
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `moviemash-top3-${(pseudo || 'moi').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            status.textContent = "Image téléchargée — ouvre-la et partage-la dans ta story Instagram.";
+        } catch (e) {
+            console.error(e);
+            status.textContent = "L'image n'a pas pu être générée (certaines affiches ont peut-être bloqué l'export). Réessaie.";
+        }
+
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+    }
+
+    document.getElementById('storyBtn').addEventListener('click', generateStoryImage);
+
+    document.getElementById('shareBtn').addEventListener('click', async () => {
+        const shareStatus = document.getElementById('shareStatus');
+        const url = `${window.location.origin}${window.location.pathname}?u=${encodeURIComponent(visitorId)}`;
+        try {
+            await navigator.clipboard.writeText(url);
+            shareStatus.textContent = 'Lien copié : ' + url;
+        } catch (e) {
+            shareStatus.textContent = 'Voici ton lien à copier : ' + url;
+        }
+    });
+
+    (async function init() {
+        // 1. Charge toujours la liste des films (nécessaire pour afficher titres/affiches, y compris en vue partagée)
+        const ok = await loadData();
+        if (!ok)
+            return;
+
+        document.getElementById('globalLoading').style.display = 'none';
+
+        const params = new URLSearchParams(window.location.search);
+        const sharedId = params.get('u');
+
+        if (sharedId) {
+            // Vue "Top d'un ami" : lecture seule, pas besoin de pseudo
+            renderSharedView(sharedId);
+            return;
+        }
+
+        visitorId = getOrCreateVisitorId();
+        pseudo = localStorage.getItem('moviemash_pseudo');
+
+        if (!pseudo) {
+            document.getElementById('pseudoGate').style.display = 'block';
+            return; // la suite se lance après soumission du formulaire pseudo
+        }
+
+        await startMainApp();
+    })();
+
+    document.getElementById('pseudoForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const value = document.getElementById('inpPseudo').value.trim();
+        if (!value)
+            return;
+        pseudo = value;
+        localStorage.setItem('moviemash_pseudo', pseudo);
+        await supabaseClient.from('profiles').upsert([{
+            id: visitorId,
+            pseudo: pseudo
+        }], {
+            onConflict: 'id'
+        });
+        document.getElementById('pseudoGate').style.display = 'none';
+        await startMainApp();
+    });
+
+    async function startMainApp() {
+        document.getElementById('mainApp').style.display = 'block';
+        document.getElementById('pseudoDisplay').textContent = pseudo;
+        await loadPersonalRatings();
+        await loadSkippedMovies();
+        populateFilters();
+        currentPair = pickPair();
+        document.getElementById('statusLine').textContent = '';
+        renderArena();
+        renderLeaderboard();
+        renderPersonalTop();
+        renderProgress();
+
+        document.getElementById('leaderboardSearch').addEventListener('input', (e) => {
+            leaderboardSearchTerm = e.target.value;
+            renderLeaderboard();
+        });
+    }
+    </script>
 </body>
 </html>

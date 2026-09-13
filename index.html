@@ -1528,48 +1528,7 @@
             return false;
         }
 
-        // Récupère les affiches manquantes en tâche de fond (n'empêche pas de commencer à voter)
-        if (TMDB_API_KEY)
-            fetchMissingPosters();
-
         return true;
-    }
-
-    function isTmdbBearerToken(key) {
-        return key.split('.').length === 3 && key.length > 100;
-    }
-
-    async function fetchMissingPosters() {
-        const toFetch = Object.values(movies).filter(m => !m.poster_url);
-        const useBearer = isTmdbBearerToken(TMDB_API_KEY);
-        for (const movie of toFetch) {
-            try {
-                const url = useBearer
-                ? `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movie.title)}&year=${movie.year}&language=fr-FR`
-                : `https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(movie.title)}&year=${movie.year}&language=fr-FR`;
-                const opts = useBearer ? {
-                    headers: {
-                        Authorization: `Bearer ${TMDB_API_KEY}`
-                    }
-                } : {};
-                const res = await fetch(url, opts);
-                const json = await res.json();
-                const result = (json.results && json.results[0]) || null;
-                if (result && result.poster_path) {
-                    const posterUrl = `https://image.tmdb.org/t/p/w500${result.poster_path}`;
-                    movies[movie.id].poster_url = posterUrl;
-                    await supabaseClient.from('movies').update({
-                        poster_url: posterUrl
-                    }).eq('id', movie.id);
-                    // Réaffiche si le film concerné est visible dans le duel en cours
-                    if (currentPair && currentPair.includes(movie.id)) {
-                        renderArena();
-                    }
-                }
-            } catch (e) {
-                console.error('Affiche introuvable pour', movie.title, e);
-            }
-        }
     }
 
     let streaks = {}; // compteur de victoires consécutives, remis à zéro à chaque rechargement de page
@@ -1871,15 +1830,16 @@
         pWinner.votes += 1;
         pLoser.votes += 1;
 
-        await supabaseClient.from('movies').update({
+        await Promise.all([
+        supabaseClient.from('movies').update({
             rating: winner.rating,
             votes: winner.votes
-        }).eq('id', winnerId);
-        await supabaseClient.from('movies').update({
+        }).eq('id', winnerId),
+        supabaseClient.from('movies').update({
             rating: loser.rating,
             votes: loser.votes
-        }).eq('id', loserId);
-        await supabaseClient.from('personal_ratings').upsert([
+        }).eq('id', loserId),
+        supabaseClient.from('personal_ratings').upsert([
         {
             visitor_id: visitorId,
             movie_id: winnerId,
@@ -1894,14 +1854,15 @@
         }
         ], {
             onConflict: 'visitor_id,movie_id'
-        });
-        await supabaseClient.from('daily_duel_votes').upsert([{
+        }),
+        supabaseClient.from('daily_duel_votes').upsert([{
             visitor_id: visitorId,
             day_index: duel.dayIndex,
             choice
         }], {
             onConflict: 'visitor_id,day_index'
-        });
+        })
+        ]);
 
         await renderDailyResults(duel, choice);
         renderLeaderboard();
@@ -2050,15 +2011,16 @@
         if (winnerCard)
             winnerCard.classList.add('flash');
 
-        const {error: e1} = await supabaseClient.from('movies').update({
+        const [{error: e1}, {error: e2}] = await Promise.all([
+        supabaseClient.from('movies').update({
             rating: winner.rating,
             votes: winner.votes
-        }).eq('id', winnerId);
-        const {error: e2} = await supabaseClient.from('movies').update({
+        }).eq('id', winnerId),
+        supabaseClient.from('movies').update({
             rating: loser.rating,
             votes: loser.votes
-        }).eq('id', loserId);
-        await supabaseClient.from('personal_ratings').upsert([
+        }).eq('id', loserId),
+        supabaseClient.from('personal_ratings').upsert([
         {
             visitor_id: visitorId,
             movie_id: winnerId,
@@ -2073,7 +2035,8 @@
         }
         ], {
             onConflict: 'visitor_id,movie_id'
-        });
+        })
+        ]);
         statusLine.textContent = (e1 || e2) ? "Le vote s'est perdu en coulisses. Réessaie." : 'Vote validé. Le champion reste sur le ring, prêt à en découdre.';
 
         streaks[winnerId] = (streaks[winnerId] || 0) + 1;

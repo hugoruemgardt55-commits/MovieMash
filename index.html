@@ -623,7 +623,7 @@
 
     <div class="perf"></div>
     <header>
-        <div class="eyebrow">Un classement écrit par vos clics</div>
+        <div class="eyebrow">Ici, le meilleur goût gagne</div>
         <h1>MOVIESMASH</h1>
         <div class="subtitle">Deux films. Un choix. Aucun compromis.</div>
     </header>
@@ -637,12 +637,12 @@
 
         <section class="panel" id="pseudoGate" style="display:none;">
             <div class="panel-header">
-                <div class="panel-title">Avant de commencer</div>
+                <div class="panel-title">Ton nom en haut de l'affiche</div>
             </div>
-            <p style="color:var(--muted); font-size:13.5px; margin-top:0;">Choisis un pseudo pour garder ton propre Top 10 et pouvoir le montrer à tes potes.</p>
+            <p style="color:var(--muted); font-size:13.5px; margin-top:0;">Un pseudo, et ton Top 10 se construit tout seul — prêt à clouer le bec à tes potes.</p>
             <form class="add-form" id="pseudoForm">
                 <input type="text" id="inpPseudo" placeholder="Ton pseudo" maxlength="24" required style="flex:1 1 200px;">
-                <button type="submit">C'est parti</button>
+                <button type="submit">En scène</button>
             </form>
         </section>
 
@@ -658,7 +658,7 @@
                 <div class="progress-track">
                     <div class="progress-fill" id="progressFill"></div>
                 </div>
-                <div class="progress-label" id="progressLabel">0 / 0 films votés</div>
+                <div class="progress-label" id="progressLabel">0 / 0 films jugés</div>
             </div>
 
             <div class="arena" id="arena"></div>
@@ -671,10 +671,10 @@
                     </div>
                 </div>
                 <div id="personalTopWrap">
-                    <div class="empty-msg">Vote pour commencer à construire ton Top 10.</div>
+                    <div class="empty-msg">Ton Top 10 est encore une salle vide. Vote pour la remplir.</div>
                 </div>
                 <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;">
-                    <button id="storyBtn" style="background:var(--gold); color:#1a1500; border:none; padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Partager en story</button>
+                    <button id="storyBtn" style="background:var(--gold); color:#1a1500; border:none; padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Balance ta story</button>
                     <button id="shareBtn" style="background:transparent; color:var(--teal); border:1px solid var(--teal); padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Copier le lien</button>
                 </div>
                 <div class="panel-sub" id="shareStatus" style="margin-top:10px;"></div>
@@ -1430,7 +1430,7 @@
         const voted = Object.values(personalRatings).filter(r => r.votes > 0).length;
         const pct = total > 0 ? Math.min(100, Math.round((voted / total) * 100)) : 0;
         document.getElementById('progressFill').style.width = pct + '%';
-        document.getElementById('progressLabel').textContent = `${voted} / ${total} films votés`;
+        document.getElementById('progressLabel').textContent = `${voted} / ${total} films jugés`;
     }
 
     function pickPair() {
@@ -1466,7 +1466,7 @@
     function renderArena() {
         const arena = document.getElementById('arena');
         if (!currentPair) {
-            arena.innerHTML = '<div class="empty-msg">Ajoute au moins deux films pour commencer à voter.</div>';
+            arena.innerHTML = '<div class="empty-msg">Pas assez de films en salle pour un duel. Reviens plus tard.</div>';
             return;
         }
         const [idA, idB] = currentPair;
@@ -1548,7 +1548,7 @@
         voteTimestamps.push(now);
 
         voteInProgress = true;
-        statusLine.textContent = 'Enregistrement du vote…';
+        statusLine.textContent = 'Le jury délibère…';
         const winner = movies[winnerId],
             loser = movies[loserId];
         const K = 32;
@@ -1608,7 +1608,7 @@
         ], {
             onConflict: 'visitor_id,movie_id'
         });
-        statusLine.textContent = (e1 || e2) ? "Le vote n'a pas pu être enregistré. Réessaie." : 'Vote enregistré. Le champion attend son prochain défi…';
+        statusLine.textContent = (e1 || e2) ? "Le vote s'est perdu en coulisses. Réessaie." : 'Vote validé. Le champion reste sur le ring, prêt à en découdre.';
 
         streaks[winnerId] = (streaks[winnerId] || 0) + 1;
         streaks[loserId] = 0;
@@ -1632,7 +1632,7 @@
         const wrap = document.getElementById('leaderboardWrap');
         const fullList = Object.values(movies).sort((x, y) => y.rating - x.rating);
         if (fullList.length === 0) {
-            wrap.innerHTML = '<div class="empty-msg">Aucun film pour le moment.</div>';
+            wrap.innerHTML = '<div class="empty-msg">Le clap n\'a pas encore été donné.</div>';
             return;
         }
         const totalVotes = fullList.reduce((sum, m) => sum + m.votes, 0) / 2;
@@ -1647,12 +1647,12 @@
         const display = term ? ranked.filter(m => m.title.toLowerCase().includes(term)) : ranked.slice(0, 10);
 
         if (display.length === 0) {
-            wrap.innerHTML = '<div class="empty-msg">Aucun film ne correspond à ta recherche.</div>';
+            wrap.innerHTML = '<div class="empty-msg">Aucun film ne matche ta recherche — change de mot-clé.</div>';
             return;
         }
         wrap.innerHTML = `<table><thead><tr><th>Rang</th><th>Film</th><th style="text-align:right;">Score</th><th style="text-align:right;">Votes</th></tr></thead>
             <tbody>${display.map(m => `<tr><td class="rank">#${m.rank}</td><td>${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></td><td class="rating">${m.rating}</td><td class="votes">${m.votes}</td></tr>`).join('')}</tbody></table>
-            ${!term && ranked.length > 10 ? `<div class="empty-msg">Top 10 affiché — utilise la recherche pour trouver un film plus loin dans le classement.</div>` : ''}`;
+            ${!term && ranked.length > 10 ? `<div class="empty-msg">Voilà le Top 10 — pour aller plus loin dans le classement, direction la recherche.</div>` : ''}`;
     }
 
     function renderPersonalTop() {
@@ -1662,7 +1662,7 @@
         .sort((a, b) => b[1].rating - a[1].rating)
         .slice(0, 10);
         if (entries.length === 0) {
-            wrap.innerHTML = '<div class="empty-msg">Vote pour commencer à construire ton Top 10.</div>';
+            wrap.innerHTML = '<div class="empty-msg">Ton Top 10 est encore une salle vide. Vote pour la remplir.</div>';
             return;
         }
         wrap.innerHTML = `<table><thead><tr><th>Rang</th><th>Film</th><th style="text-align:right;">Score</th></tr></thead>
@@ -1677,9 +1677,9 @@
         if (error || !ratings || ratings.length === 0) {
             wrap.innerHTML = `
                   <div class="shared-card">
-                    <h2>Top introuvable</h2>
-                    <div class="shared-sub">Ce classement n'existe pas ou n'a pas encore de votes.</div>
-                    <div class="cta-own"><a href="${window.location.pathname}">Voter et créer mon propre Top 10</a></div>
+                    <h2>Introuvable au générique</h2>
+                    <div class="shared-sub">Ce Top n'existe pas, ou son auteur n'a pas encore voté.</div>
+                    <div class="cta-own"><a href="${window.location.pathname}">Voter et prouver que j'ai meilleur goût</a></div>
                   </div>`;
             return;
         }
@@ -1688,13 +1688,13 @@
         wrap.innerHTML = `
             <div class="shared-card">
               <h2>Le Top ${top.length} de ${name}</h2>
-              <div class="shared-sub">Classement personnel construit par ses votes sur MovieSmash</div>
+              <div class="shared-sub">Construit vote après vote sur MovieSmash</div>
               ${top.map((r, i) => {const m = movies[r.movie_id] || {title: r.movie_id,year: '',poster_url: null};return `<div class="shared-row">
                       <div class="shared-rank">#${i + 1}</div>
                       ${m.poster_url ? `<img class="shared-poster" src="${m.poster_url}" alt="">` : ''}
                       <div class="shared-title">${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></div>
                     </div>`;}).join('')}
-              <div class="cta-own"><a href="${window.location.pathname}">Voter et créer mon propre Top 10</a></div>
+              <div class="cta-own"><a href="${window.location.pathname}">Voter et prouver que j'ai meilleur goût</a></div>
             </div>`;
     }
 
@@ -1774,7 +1774,7 @@
         .slice(0, 3);
 
         if (entries.length === 0) {
-            status.textContent = "Vote pour au moins un film avant de générer ta story.";
+            status.textContent = "Pas de story sans au moins un vote — lance-toi !";
             return;
         }
 
@@ -1886,7 +1886,7 @@
         ctx.textAlign = 'center';
         ctx.fillStyle = '#948E86';
         ctx.font = '26px "JetBrains Mono", monospace';
-        ctx.fillText('Fais ton propre classement sur MovieSmash', W / 2, H - 90);
+        ctx.fillText('Toi aussi, prouve que t\'as raison sur MovieSmash', W / 2, H - 90);
 
         // Partage
         try {
@@ -1913,7 +1913,7 @@
                     if (shareErr.name !== 'AbortError') {
                         // l'utilisateur a juste fermé le menu, pas une vraie erreur
                         console.error(shareErr);
-                        status.textContent = "Le partage a échoué. Réessaie.";
+                        status.textContent = "Le partage a capoté. Réessaie.";
                     } else {
                         status.textContent = '';
                     }
@@ -1928,11 +1928,11 @@
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-                status.textContent = "Image téléchargée — ouvre-la et partage-la dans ta story Instagram.";
+                status.textContent = "Récupérée ! Direction ta story Instagram.";
             }
         } catch (e) {
             console.error(e);
-            status.textContent = "L'image n'a pas pu être générée (certaines affiches ont peut-être bloqué l'export). Réessaie.";
+            status.textContent = "Ta story a fait un caprice (certaines affiches ont bloqué l'export). Réessaie.";
         }
 
         btn.disabled = false;

@@ -94,91 +94,6 @@
         text-shadow: 0 0 24px rgba(232, 184, 74, 0.25);
     }
 
-    @media (max-width: 480px) {
-        main {
-            padding-left: 12px;
-            padding-right: 12px;
-        }
-
-        h1 {
-            font-size: 40px;
-        }
-
-        .arena {
-            gap: 0;
-            align-items: stretch;
-        }
-
-        .card-slot {
-            flex: 1 1 0;
-            max-width: none;
-            min-width: 0;
-        }
-
-        .card {
-            min-height: 220px;
-            padding: 12px 8px;
-        }
-
-        .card .title {
-            font-size: 15px;
-            line-height: 1.1;
-        }
-
-        .card .genre-tag {
-            font-size: 8px;
-            padding: 2px 6px;
-            top: 10px;
-            left: 10px;
-        }
-
-        .card .year {
-            font-size: 9px;
-            margin-bottom: 2px;
-        }
-
-        .card .blurb {
-            display: none;
-        }
-
-        .vs-badge {
-            width: 38px;
-            height: 38px;
-            font-size: 13px;
-            margin: 0 -4px;
-        }
-
-        table {
-            font-size: 12.5px;
-        }
-
-        th, td {
-            padding: 8px 4px;
-        }
-
-        .not-seen-link {
-            padding: 9px 6px;
-            font-size: 10.5px;
-        }
-
-        .streak-badge {
-            top: 8px;
-            right: 8px;
-            font-size: 8.5px;
-            padding: 2px 6px;
-        }
-
-        .panel-header button, #storyBtn, #shareBtn {
-            padding: 11px 16px !important;
-            font-size: 13px !important;
-        }
-
-        .search-input, form.add-form input {
-            padding: 12px;
-            font-size: 16px;
-        }/* 16px minimum pour éviter le zoom auto sur iOS */
-    }
-
     .subtitle {
         color: var(--muted);
         font-size: 15px;
@@ -286,20 +201,6 @@
 
     .card:active {
         transform: translateY(-2px) scale(0.99);
-    }
-
-    .card .genre-tag {
-        position: absolute;
-        top: 18px;
-        left: 22px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 10px;
-        letter-spacing: 0.12em;
-        text-transform: uppercase;
-        color: var(--teal);
-        border: 1px solid var(--teal);
-        padding: 3px 8px;
-        border-radius: 20px;
     }
 
     .card .title {
@@ -663,6 +564,84 @@
         border-radius: 4px;
         text-decoration: none;
         font-size: 13.5px;
+    }
+
+    @media (max-width: 480px) {
+        main {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
+        h1 {
+            font-size: 40px;
+        }
+
+        .arena {
+            gap: 0;
+            align-items: stretch;
+        }
+
+        .card-slot {
+            flex: 1 1 0;
+            max-width: none;
+            min-width: 0;
+        }
+
+        .card {
+            min-height: 220px;
+            padding: 12px 8px;
+        }
+
+        .card .title {
+            font-size: 15px;
+            line-height: 1.1;
+        }
+
+        .card .year {
+            font-size: 9px;
+            margin-bottom: 2px;
+        }
+
+        .card .blurb {
+            display: none;
+        }
+
+        .vs-badge {
+            width: 38px;
+            height: 38px;
+            font-size: 13px;
+            margin: 0 -4px;
+        }
+
+        table {
+            font-size: 12.5px;
+        }
+
+        th, td {
+            padding: 8px 4px;
+        }
+
+        .not-seen-link {
+            padding: 9px 6px;
+            font-size: 10.5px;
+        }
+
+        .streak-badge {
+            top: 8px;
+            right: 8px;
+            font-size: 8.5px;
+            padding: 2px 6px;
+        }
+
+        .panel-header button, #storyBtn, #shareBtn {
+            padding: 11px 16px !important;
+            font-size: 13px !important;
+        }
+
+        .search-input, form.add-form input {
+            padding: 12px;
+            font-size: 16px;
+        }/* 16px minimum pour éviter le zoom auto sur iOS */
     }
     </style>
 </head>
@@ -1534,7 +1513,7 @@
         arena.innerHTML = `
             <div class="card-slot">
               <div class="card" id="cardA" data-id="${idA}" ${cardStyle(a)} tabindex="0" role="button" aria-label="Voter pour ${a.title}">
-                <div class="genre-tag">${a.genre}</div><div class="year">${a.year}</div>
+                <div class="year">${a.year}</div>
                 <div class="title">${a.title}</div>${a.blurb ? `<div class="blurb">${a.blurb}</div>` : ''}
                 ${streakBadge(idA)}
               </div>
@@ -1543,7 +1522,7 @@
             <div class="vs-badge">VS</div>
             <div class="card-slot">
               <div class="card" id="cardB" data-id="${idB}" ${cardStyle(b)} tabindex="0" role="button" aria-label="Voter pour ${b.title}">
-                <div class="genre-tag">${b.genre}</div><div class="year">${b.year}</div>
+                <div class="year">${b.year}</div>
                 <div class="title">${b.title}</div>${b.blurb ? `<div class="blurb">${b.blurb}</div>` : ''}
                 ${streakBadge(idB)}
               </div>

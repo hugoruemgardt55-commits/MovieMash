@@ -95,17 +95,57 @@
     }
 
     @media (max-width: 480px) {
+        main {
+            padding-left: 12px;
+            padding-right: 12px;
+        }
+
         h1 {
-            font-size: 44px;
+            font-size: 40px;
+        }
+
+        .arena {
+            gap: 0;
+            align-items: stretch;
+        }
+
+        .card-slot {
+            flex: 1 1 0;
+            max-width: none;
+            min-width: 0;
         }
 
         .card {
-            min-height: 280px;
-            padding: 20px 16px;
+            min-height: 220px;
+            padding: 12px 8px;
         }
 
         .card .title {
-            font-size: 26px;
+            font-size: 15px;
+            line-height: 1.1;
+        }
+
+        .card .genre-tag {
+            font-size: 8px;
+            padding: 2px 6px;
+            top: 10px;
+            left: 10px;
+        }
+
+        .card .year {
+            font-size: 9px;
+            margin-bottom: 2px;
+        }
+
+        .card .blurb {
+            display: none;
+        }
+
+        .vs-badge {
+            width: 38px;
+            height: 38px;
+            font-size: 13px;
+            margin: 0 -4px;
         }
 
         table {
@@ -116,27 +156,16 @@
             padding: 8px 4px;
         }
 
-        .filter-bar select {
-            flex: 1 1 100%;
-            padding: 11px 14px;
-        }
-
-        .arena {
-            flex-direction: column;
-        }
-
-        .card-slot {
-            max-width: 100%;
-            width: 100%;
-        }
-
-        .vs-badge {
-            margin: 4px 0;
-        }
-
         .not-seen-link {
-            padding: 10px;
-            font-size: 12px;
+            padding: 9px 6px;
+            font-size: 10.5px;
+        }
+
+        .streak-badge {
+            top: 8px;
+            right: 8px;
+            font-size: 8.5px;
+            padding: 2px 6px;
         }
 
         .panel-header button, #storyBtn, #shareBtn {
@@ -223,18 +252,24 @@
     }
 
     .not-seen-link {
-        background: none;
-        border: none;
+        background: var(--card);
+        border: 1px solid var(--line);
         color: var(--muted);
         font-family: 'JetBrains Mono', monospace;
-        font-size: 11px;
+        font-size: 11.5px;
         cursor: pointer;
-        text-decoration: underline;
-        padding: 4px;
+        padding: 8px 14px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: border-color .15s ease, color .15s ease, background .15s ease;
     }
 
-    .not-seen-link:hover {
+    .not-seen-link:hover, .not-seen-link:focus-visible {
+        border-color: var(--gold);
         color: var(--gold);
+        background: rgba(232, 184, 74, 0.08);
     }
 
     .card:hover {
@@ -513,29 +548,6 @@
         text-align: center;
     }
 
-    .filter-bar {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        flex-wrap: wrap;
-        margin-bottom: 18px;
-    }
-
-    .filter-bar select {
-        background: var(--card);
-        border: 1px solid var(--line);
-        color: var(--cream);
-        padding: 8px 12px;
-        border-radius: 20px;
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 12px;
-        cursor: pointer;
-    }
-
-    .filter-bar select:focus {
-        outline: 2px solid var(--gold);
-    }
-
     .progress-wrap {
         max-width: 400px;
         margin: 0 auto 24px;
@@ -689,14 +701,6 @@
                  Ouverture du rideau…
             </div>
 
-            <div class="filter-bar" id="filterBar">
-                <select id="filterGenre">
-                    <option value="">Tous les genres</option>
-                </select>
-                <select id="filterDecade">
-                    <option value="">Toutes les décennies</option>
-                </select>
-            </div>
             <div class="progress-wrap">
                 <div class="progress-track">
                     <div class="progress-fill" id="progressFill"></div>
@@ -1442,8 +1446,6 @@
     let streaks = {}; // compteur de victoires consécutives, remis à zéro à chaque rechargement de page
     let recentlyShown = []; // file des derniers films montrés, pour éviter de les reproposer trop vite
     const RECENT_WINDOW = 40; // ne reproposer un film qu'après ~40 autres films vus (ajuste selon la taille du catalogue)
-    let filterGenre = '';
-    let filterDecade = '';
     let skippedIds = new Set(); // films marqués "je n'ai pas vu" par ce visiteur — exclus définitivement pour lui
 
     function markShown(...ids) {
@@ -1456,26 +1458,7 @@
         }
     }
 
-    function decadeOf(year) {
-        if (!year || year < 1900)
-            return null;
-        return Math.floor(year / 10) * 10;
-    }
-
-    function matchesFilters(movie) {
-        if (filterGenre && movie.genre !== filterGenre)
-            return false;
-        if (filterDecade && String(decadeOf(movie.year)) !== filterDecade)
-            return false;
-        return true;
-    }
-
     function getFilteredIds() {
-        const filtered = Object.keys(movies).filter(id => matchesFilters(movies[id]) && !skippedIds.has(id));
-        // Si le filtre choisi est trop restrictif (moins de 2 films), on relâche d'abord le filtre genre/décennie,
-        // mais on ne réintroduit jamais les films marqués "non vus"
-        if (filtered.length >= 2)
-            return filtered;
         const withoutSkipped = Object.keys(movies).filter(id => !skippedIds.has(id));
         return withoutSkipped.length >= 2 ? withoutSkipped : Object.keys(movies);
     }
@@ -1492,42 +1475,6 @@
             movie_id: movieId
         }], {
             onConflict: 'visitor_id,movie_id'
-        });
-    }
-
-    function populateFilters() {
-        const genreSet = new Set();
-        const decadeSet = new Set();
-        Object.values(movies).forEach(m => {
-            if (m.genre)
-                genreSet.add(m.genre);
-            const d = decadeOf(m.year);
-            if (d)
-                decadeSet.add(d);
-        });
-        const genreSelect = document.getElementById('filterGenre');
-        const decadeSelect = document.getElementById('filterDecade');
-        [...genreSet].sort().forEach(g => {
-            const opt = document.createElement('option');
-            opt.value = g;
-            opt.textContent = g;
-            genreSelect.appendChild(opt);
-        });
-        [...decadeSet].sort((a, b) => b - a).forEach(d => {
-            const opt = document.createElement('option');
-            opt.value = String(d);
-            opt.textContent = d + 's';
-            decadeSelect.appendChild(opt);
-        });
-        genreSelect.addEventListener('change', () => {
-            filterGenre = genreSelect.value;
-            currentPair = pickPair();
-            renderArena();
-        });
-        decadeSelect.addEventListener('change', () => {
-            filterDecade = decadeSelect.value;
-            currentPair = pickPair();
-            renderArena();
         });
     }
 
@@ -1591,7 +1538,7 @@
                 <div class="title">${a.title}</div>${a.blurb ? `<div class="blurb">${a.blurb}</div>` : ''}
                 ${streakBadge(idA)}
               </div>
-              <button class="not-seen-link" id="notSeenA">Je n'ai pas vu ce film</button>
+              <button class="not-seen-link" id="notSeenA" aria-label="Je n'ai pas vu ${a.title}"><span aria-hidden="true">🙈</span> Pas vu</button>
             </div>
             <div class="vs-badge">VS</div>
             <div class="card-slot">
@@ -1600,7 +1547,7 @@
                 <div class="title">${b.title}</div>${b.blurb ? `<div class="blurb">${b.blurb}</div>` : ''}
                 ${streakBadge(idB)}
               </div>
-              <button class="not-seen-link" id="notSeenB">Je n'ai pas vu ce film</button>
+              <button class="not-seen-link" id="notSeenB" aria-label="Je n'ai pas vu ${b.title}"><span aria-hidden="true">🙈</span> Pas vu</button>
             </div>`;
         const onKeyActivate = (fn) => (e) => {
             if (e.key === 'Enter' || e.key === ' ') {
@@ -2108,7 +2055,6 @@
         document.getElementById('pseudoDisplay').textContent = pseudo;
         await loadPersonalRatings();
         await loadSkippedMovies();
-        populateFilters();
         currentPair = pickPair();
         document.getElementById('statusLine').textContent = '';
         renderArena();

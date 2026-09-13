@@ -423,6 +423,92 @@
         text-align: center;
     }
 
+    .tab-bar {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+
+    .tab-btn {
+        background: transparent;
+        border: 1px solid var(--line);
+        color: var(--muted);
+        padding: 9px 18px;
+        border-radius: 20px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        cursor: pointer;
+        transition: all .15s ease;
+    }
+
+    .tab-btn.active {
+        background: var(--gold);
+        border-color: var(--gold);
+        color: #1a1500;
+        font-weight: 700;
+    }
+
+    .tab-btn:not(.active):hover {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .daily-theme {
+        text-align: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 28px;
+        color: var(--gold);
+        letter-spacing: 0.02em;
+        margin-bottom: 4px;
+    }
+
+    .daily-sub {
+        text-align: center;
+        color: var(--muted);
+        font-size: 12.5px;
+        margin-bottom: 22px;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .daily-result-row {
+        margin-bottom: 14px;
+    }
+
+    .daily-result-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 13px;
+        margin-bottom: 5px;
+    }
+
+    .daily-result-track {
+        height: 22px;
+        background: var(--card);
+        border-radius: 5px;
+        overflow: hidden;
+        border: 1px solid var(--line);
+    }
+
+    .daily-result-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--teal), var(--gold));
+        display: flex;
+        align-items: center;
+    }
+
+    .daily-result-fill.chosen {
+        box-shadow: inset 0 0 0 2px var(--gold);
+    }
+
+    .daily-come-back {
+        text-align: center;
+        color: var(--muted);
+        font-size: 12.5px;
+        margin-top: 18px;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
     .progress-wrap {
         max-width: 400px;
         margin: 0 auto 24px;
@@ -623,7 +709,7 @@
 
     <div class="perf"></div>
     <header>
-        <div class="eyebrow">Ici, le meilleur goût gagne</div>
+        <div class="eyebrow">Le classement se construit un duel à la fois</div>
         <h1>MOVIESMASH</h1>
         <div class="subtitle">Deux films. Un choix. Aucun compromis.</div>
     </header>
@@ -661,7 +747,17 @@
                 <div class="progress-label" id="progressLabel">0 / 0 films jugés</div>
             </div>
 
-            <div class="arena" id="arena"></div>
+            <div class="tab-bar">
+                <button class="tab-btn active" id="tabFree" type="button">Vote libre</button>
+                <button class="tab-btn" id="tabDaily" type="button">La Séance du jour</button>
+            </div>
+
+            <div id="freeTabContent">
+                <div class="arena" id="arena"></div>
+            </div>
+            <div id="dailyTabContent" style="display:none;">
+                <div id="dailyDuelWrap"></div>
+            </div>
 
             <section class="panel">
                 <div class="panel-header">
@@ -1522,6 +1618,245 @@
         renderArena();
         renderProgress();
     }
+
+    // ---------- La Séance du jour ----------
+    // Des duels thématiques, identiques pour tout le monde, qui changent chaque jour.
+    // Les films sont retrouvés par mot-clé dans le titre plutôt que par ID exact,
+    // pour rester fiable même si le catalogue est réimporté avec des films différents.
+    const DAILY_DUELS = [
+    {
+        theme: 'Duel de thrillers',
+        a: 'Seven',
+        b: 'Shutter Island'
+    },
+    {
+        theme: 'Duel de super-héros',
+        a: 'Spider-Man',
+        b: 'Flash'
+    },
+    {
+        theme: 'DC en duel',
+        a: 'Batman',
+        b: 'Superman'
+    },
+    {
+        theme: "Nuit d'horreur",
+        a: 'Conjuring',
+        b: 'Paranormal Activity'
+    },
+    {
+        theme: 'Fantastique culte',
+        a: 'Seigneur des Anneaux',
+        b: 'Harry Potter'
+    },
+    {
+        theme: 'Science-fiction culte',
+        a: 'Matrix',
+        b: 'Inception'
+    },
+    {
+        theme: 'Le meilleur Nolan',
+        a: 'Dark Knight',
+        b: 'Interstellar'
+    },
+    {
+        theme: 'Animation qui fait pleurer',
+        a: 'Coco',
+        b: 'WALL'
+    }
+    ];
+
+    function normalizeTitle(str) {
+        return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function findMovieByKeyword(keyword, excludeId) {
+        const needle = normalizeTitle(keyword);
+        const match = Object.values(movies).find(m => m.id !== excludeId && normalizeTitle(m.title).includes(needle));
+        return match ? match.id : null;
+    }
+
+    function getTodayDuel() {
+        const dayIndex = Math.floor(Date.now() / 86400000);
+        // On part du duel du jour et on tourne dans la liste si les films ne sont pas dans le catalogue actuel
+        for (let i = 0; i < DAILY_DUELS.length; i++) {
+            const candidate = DAILY_DUELS[(dayIndex + i) % DAILY_DUELS.length];
+            const idA = findMovieByKeyword(candidate.a);
+            const idB = findMovieByKeyword(candidate.b, idA);
+            if (idA && idB) {
+                return {
+                    dayIndex,
+                    theme: candidate.theme,
+                    idA,
+                    idB
+                };
+            }
+        }
+        return null;
+    }
+
+    let todayDuel = null;
+
+    async function renderDailyDuel() {
+        const wrap = document.getElementById('dailyDuelWrap');
+        todayDuel = getTodayDuel();
+        if (!todayDuel) {
+            wrap.innerHTML = '<div class="empty-msg">Pas de séance aujourd\'hui — reviens demain.</div>';
+            return;
+        }
+        const {data: existingVote} = await supabaseClient.from('daily_duel_votes').select('choice').eq('visitor_id', visitorId).eq('day_index', todayDuel.dayIndex).maybeSingle();
+        if (existingVote) {
+            await renderDailyResults(todayDuel, existingVote.choice);
+        } else {
+            renderDailyPrompt(todayDuel);
+        }
+    }
+
+    function renderDailyPrompt(duel) {
+        const wrap = document.getElementById('dailyDuelWrap');
+        const a = movies[duel.idA],
+            b = movies[duel.idB];
+        const cardStyle = (m) => m.poster_url
+        ? `style="background-image: linear-gradient(180deg, rgba(11,11,13,0.15) 45%, rgba(11,11,13,0.97) 92%), url('${m.poster_url}'); background-size: cover; background-position: center top;"`
+        : '';
+        wrap.innerHTML = `
+            <div class="daily-theme">${duel.theme}</div>
+            <div class="daily-sub">La séance de tout le monde aujourd'hui — un seul vote possible</div>
+            <div class="arena">
+              <div class="card-slot">
+                <div class="card" id="dailyCardA" ${cardStyle(a)} tabindex="0" role="button" aria-label="Voter pour ${a.title}">
+                  <div class="year">${a.year}</div>
+                  <div class="title">${a.title}</div>
+                </div>
+              </div>
+              <div class="vs-badge">VS</div>
+              <div class="card-slot">
+                <div class="card" id="dailyCardB" ${cardStyle(b)} tabindex="0" role="button" aria-label="Voter pour ${b.title}">
+                  <div class="year">${b.year}</div>
+                  <div class="title">${b.title}</div>
+                </div>
+              </div>
+            </div>`;
+        const onKeyActivate = (fn) => (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fn();
+            }
+        };
+        document.getElementById('dailyCardA').addEventListener('click', () => handleDailyVote('a', duel));
+        document.getElementById('dailyCardA').addEventListener('keydown', onKeyActivate(() => handleDailyVote('a', duel)));
+        document.getElementById('dailyCardB').addEventListener('click', () => handleDailyVote('b', duel));
+        document.getElementById('dailyCardB').addEventListener('keydown', onKeyActivate(() => handleDailyVote('b', duel)));
+    }
+
+    async function handleDailyVote(choice, duel) {
+        const winnerId = choice === 'a' ? duel.idA : duel.idB;
+        const loserId = choice === 'a' ? duel.idB : duel.idA;
+        const winner = movies[winnerId],
+            loser = movies[loserId];
+        const K = 32;
+        const expWin = expectedScore(winner.rating, loser.rating);
+        const expLose = expectedScore(loser.rating, winner.rating);
+        winner.rating = Math.round(winner.rating + K * (1 - expWin));
+        loser.rating = Math.round(loser.rating + K * (0 - expLose));
+        winner.votes += 1;
+        loser.votes += 1;
+
+        if (!personalRatings[winnerId])
+            personalRatings[winnerId] = {
+                rating: 1500,
+                votes: 0
+            };
+        if (!personalRatings[loserId])
+            personalRatings[loserId] = {
+                rating: 1500,
+                votes: 0
+            };
+        const pWinner = personalRatings[winnerId],
+            pLoser = personalRatings[loserId];
+        const pExpWin = expectedScore(pWinner.rating, pLoser.rating);
+        const pExpLose = expectedScore(pLoser.rating, pWinner.rating);
+        pWinner.rating = Math.round(pWinner.rating + K * (1 - pExpWin));
+        pLoser.rating = Math.round(pLoser.rating + K * (0 - pExpLose));
+        pWinner.votes += 1;
+        pLoser.votes += 1;
+
+        await supabaseClient.from('movies').update({
+            rating: winner.rating,
+            votes: winner.votes
+        }).eq('id', winnerId);
+        await supabaseClient.from('movies').update({
+            rating: loser.rating,
+            votes: loser.votes
+        }).eq('id', loserId);
+        await supabaseClient.from('personal_ratings').upsert([
+        {
+            visitor_id: visitorId,
+            movie_id: winnerId,
+            rating: pWinner.rating,
+            votes: pWinner.votes
+        },
+        {
+            visitor_id: visitorId,
+            movie_id: loserId,
+            rating: pLoser.rating,
+            votes: pLoser.votes
+        }
+        ], {
+            onConflict: 'visitor_id,movie_id'
+        });
+        await supabaseClient.from('daily_duel_votes').upsert([{
+            visitor_id: visitorId,
+            day_index: duel.dayIndex,
+            choice
+        }], {
+            onConflict: 'visitor_id,day_index'
+        });
+
+        await renderDailyResults(duel, choice);
+        renderLeaderboard();
+        renderPersonalTop();
+        renderProgress();
+    }
+
+    async function renderDailyResults(duel, myChoice) {
+        const wrap = document.getElementById('dailyDuelWrap');
+        const {data} = await supabaseClient.from('daily_duel_votes').select('choice').eq('day_index', duel.dayIndex);
+        const votes = data || [];
+        const countA = votes.filter(v => v.choice === 'a').length;
+        const countB = votes.filter(v => v.choice === 'b').length;
+        const total = countA + countB || 1;
+        const pctA = Math.round((countA / total) * 100);
+        const pctB = 100 - pctA;
+        const a = movies[duel.idA],
+            b = movies[duel.idB];
+        wrap.innerHTML = `
+            <div class="daily-theme">${duel.theme}</div>
+            <div class="daily-sub">Voilà ce que tout le monde a choisi aujourd'hui</div>
+            <div class="daily-result-row">
+              <div class="daily-result-label"><span>${a.title}${myChoice === 'a' ? ' — ton choix' : ''}</span><span>${pctA}%</span></div>
+              <div class="daily-result-track"><div class="daily-result-fill ${myChoice === 'a' ? 'chosen' : ''}" style="width:${pctA}%;"></div></div>
+            </div>
+            <div class="daily-result-row">
+              <div class="daily-result-label"><span>${b.title}${myChoice === 'b' ? ' — ton choix' : ''}</span><span>${pctB}%</span></div>
+              <div class="daily-result-track"><div class="daily-result-fill ${myChoice === 'b' ? 'chosen' : ''}" style="width:${pctB}%;"></div></div>
+            </div>
+            <div class="daily-come-back">${total} vote${total > 1 ? 's' : ''} aujourd'hui — reviens demain pour la prochaine séance.</div>`;
+    }
+
+    document.getElementById('tabFree').addEventListener('click', () => {
+        document.getElementById('tabFree').classList.add('active');
+        document.getElementById('tabDaily').classList.remove('active');
+        document.getElementById('freeTabContent').style.display = 'block';
+        document.getElementById('dailyTabContent').style.display = 'none';
+    });
+    document.getElementById('tabDaily').addEventListener('click', () => {
+        document.getElementById('tabDaily').classList.add('active');
+        document.getElementById('tabFree').classList.remove('active');
+        document.getElementById('freeTabContent').style.display = 'none';
+        document.getElementById('dailyTabContent').style.display = 'block';
+        renderDailyDuel();
+    });
 
     let voteInProgress = false;
     let voteTimestamps = []; // pour la limite de fréquence (protection anti-spam basique, côté client)

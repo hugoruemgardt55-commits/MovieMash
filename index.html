@@ -1975,7 +1975,6 @@
         voteTimestamps.push(now);
 
         voteInProgress = true;
-        statusLine.textContent = 'Le jury délibère…';
         const winner = movies[winnerId],
             loser = movies[loserId];
         const K = 32;
@@ -2007,11 +2006,32 @@
         pLoser.votes += 1;
 
         const winnerSlot = winnerId === currentPair[0] ? 0 : 1;
-        const winnerCard = document.getElementById(winnerSlot === 0 ? 'cardA' : 'cardB');
-        if (winnerCard)
-            winnerCard.classList.add('flash');
 
-        const [{error: e1}, {error: e2}] = await Promise.all([
+        streaks[winnerId] = (streaks[winnerId] || 0) + 1;
+        streaks[loserId] = 0;
+
+        // Affichage immédiat du duel suivant : on ne bloque plus l'interface
+        // en attendant que le serveur confirme l'enregistrement.
+        const challengerId = pickChallenger(winnerId);
+        if (challengerId === null) {
+            currentPair = null;
+        } else {
+            currentPair = winnerSlot === 0 ? [winnerId, challengerId] : [challengerId, winnerId];
+        }
+        statusLine.textContent = 'Vote pris en compte. Enregistrement discret en coulisses…';
+        renderArena();
+        renderLeaderboard();
+        renderPersonalTop();
+        renderProgress();
+        voteInProgress = false;
+        if (challengerId !== null) {
+            const championCard = document.getElementById(winnerSlot === 0 ? 'cardA' : 'cardB');
+            if (championCard)
+                championCard.classList.add('flash');
+        }
+
+        // Écriture réseau en arrière-plan, sans bloquer l'utilisateur qui peut déjà voter sur le duel suivant
+        Promise.all([
         supabaseClient.from('movies').update({
             rating: winner.rating,
             votes: winner.votes
@@ -2036,23 +2056,14 @@
         ], {
             onConflict: 'visitor_id,movie_id'
         })
-        ]);
-        statusLine.textContent = (e1 || e2) ? "Le vote s'est perdu en coulisses. Réessaie." : 'Vote validé. Le champion reste sur le ring, prêt à en découdre.';
-
-        streaks[winnerId] = (streaks[winnerId] || 0) + 1;
-        streaks[loserId] = 0;
-
-        const challengerId = pickChallenger(winnerId);
-        if (challengerId === null) {
-            currentPair = null;
-        } else {
-            currentPair = winnerSlot === 0 ? [winnerId, challengerId] : [challengerId, winnerId];
-        }
-        renderArena();
-        renderLeaderboard();
-        renderPersonalTop();
-        renderProgress();
-        voteInProgress = false;
+        ]).then(([{error: e1}, {error: e2}]) => {
+            if (e1 || e2) {
+                console.error('Erreur en enregistrant le vote :', e1 || e2);
+                statusLine.textContent = "Un vote ne s'est pas enregistré correctement en coulisses. Si ça se reproduit souvent, dis-le-nous.";
+            }
+        }).catch(err => {
+            console.error('Erreur en enregistrant le vote :', err);
+        });
     }
 
     let leaderboardSearchTerm = '';

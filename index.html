@@ -1599,12 +1599,16 @@
 
     async function markAsUnseen(movieId) {
         skippedIds.add(movieId);
-        await supabaseClient.from('visitor_skips').upsert([{
+        const {error} = await supabaseClient.from('visitor_skips').upsert([{
             visitor_id: visitorId,
             movie_id: movieId
         }], {
             onConflict: 'visitor_id,movie_id'
         });
+        if (error) {
+            console.error('Erreur en marquant le film comme non vu :', error);
+            document.getElementById('statusLine').textContent = "Le \"pas vu\" n'a pas pu être enregistré durablement (il ne reviendra pas aujourd'hui, mais pourrait revenir plus tard). Réessaie si ça persiste.";
+        }
     }
 
     function renderProgress() {
@@ -1758,7 +1762,7 @@
 
     function findMovieByKeyword(keyword, excludeId) {
         const needle = normalizeTitle(keyword);
-        const match = Object.values(movies).find(m => m.id !== excludeId && normalizeTitle(m.title).includes(needle));
+        const match = Object.values(movies).find(m => m.id !== excludeId && !skippedIds.has(m.id) && normalizeTitle(m.title).includes(needle));
         return match ? match.id : null;
     }
 

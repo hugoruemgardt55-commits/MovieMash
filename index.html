@@ -282,17 +282,56 @@
     }
 
     .flash {
-        animation: flash-anim 0.5s ease;
+        animation: winner-pulse 0.5s ease;
     }
 
-    @keyframes flash-anim {
+    @keyframes winner-pulse {
         0% {
-            box-shadow: 0 0 0 0 rgba(232, 184, 74, 0.5);
+            box-shadow: 0 0 0 0 rgba(232, 184, 74, 0.6);
+            transform: scale(1);
+        }
+
+        35% {
+            box-shadow: 0 0 26px 4px rgba(232, 184, 74, 0.5);
+            transform: scale(1.035);
         }
 
         100% {
             box-shadow: 0 0 0 0 rgba(232, 184, 74, 0);
+            transform: scale(1);
         }
+    }
+
+    @keyframes card-enter-left {
+        from {
+            opacity: 0;
+            transform: translateX(-26px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+    }
+
+    @keyframes card-enter-right {
+        from {
+            opacity: 0;
+            transform: translateX(26px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+    }
+
+    .card-enter-left {
+        animation: card-enter-left .35s cubic-bezier(.2, .8, .3, 1);
+    }
+
+    .card-enter-right {
+        animation: card-enter-right .35s cubic-bezier(.2, .8, .3, 1);
     }
 
     section.panel {
@@ -533,6 +572,7 @@
         background: linear-gradient(90deg, var(--teal), var(--gold));
         display: flex;
         align-items: center;
+        transition: width 1.1s cubic-bezier(.16, .84, .44, 1);
     }
 
     .daily-result-fill.chosen {
@@ -868,9 +908,31 @@
         position: fixed;
         z-index: 999;
         pointer-events: none;
-        opacity: 0.9;
-        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        opacity: 0.92;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.55);
         border-radius: 8px;
+    }
+
+    @keyframes slot-bounce-anim {
+        0% {
+            transform: scale(0.85);
+        }
+
+        55% {
+            transform: scale(1.08);
+        }
+
+        80% {
+            transform: scale(0.97);
+        }
+
+        100% {
+            transform: scale(1);
+        }
+    }
+
+    .slot-bounce {
+        animation: slot-bounce-anim .4s cubic-bezier(.34, 1.56, .64, 1);
     }
 
     body.tier-dragging {
@@ -1285,10 +1347,8 @@
 
             <div class="tab-bar">
                 <button class="tab-btn active" id="tabFree" type="button">
-                    <svg viewBox="0 0 20 20" width="15" height="15" fill="none" style="vertical-align:-3px; margin-right:4px;">
-                        <circle cx="10" cy="10" r="8.5" fill="currentColor" opacity="0.15"/>
-                        <circle cx="10" cy="10" r="8.5" stroke="currentColor" stroke-width="1.3"/>
-                        <text x="10" y="13.5" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="8" fill="currentColor">VS</text>
+                    <svg viewBox="0 0 24 16" width="19" height="13" fill="none" style="vertical-align:-2px; margin-right:4px;">
+                        <text x="12" y="13" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="15" font-weight="700" fill="currentColor" letter-spacing="0.5">VS</text>
                     </svg>
                     Vote libre
                 </button>
@@ -1868,6 +1928,8 @@
         clone.style.height = rect.height + 'px';
         clone.style.left = rect.left + 'px';
         clone.style.top = rect.top + 'px';
+        clone.style.transformOrigin = 'center';
+        clone.style.transition = 'transform .18s ease-out';
         document.body.appendChild(clone);
         tile.style.visibility = 'hidden';
 
@@ -1878,7 +1940,8 @@
             sourceEl: tile,
             clone,
             offsetX: e.clientX - rect.left,
-            offsetY: e.clientY - rect.top
+            offsetY: e.clientY - rect.top,
+            lastX: e.clientX
         };
 
         window.addEventListener('pointermove', onTierDragMove);
@@ -1890,6 +1953,11 @@
             return;
         tierDrag.clone.style.left = (e.clientX - tierDrag.offsetX) + 'px';
         tierDrag.clone.style.top = (e.clientY - tierDrag.offsetY) + 'px';
+        // Incline légèrement la carte selon la vitesse horizontale, comme si on la tenait en main
+        const deltaX = e.clientX - tierDrag.lastX;
+        tierDrag.lastX = e.clientX;
+        const tilt = Math.max(-9, Math.min(9, deltaX * 1.4));
+        tierDrag.clone.style.transform = `rotate(${tilt}deg) scale(1.06)`;
         document.querySelectorAll('.tier-slot.drag-over').forEach(el => el.classList.remove('drag-over'));
         const target = document.elementFromPoint(e.clientX, e.clientY);
         const slot = target && target.closest('.tier-slot');
@@ -1905,14 +1973,18 @@
         const poolEl = target && target.closest('.tier-pool');
 
         const {movieId, fromType, fromIndex} = tierDrag;
+        let landedIndex = null;
+        let swappedIndex = null;
 
         if (slotEl) {
             const targetIndex = parseInt(slotEl.dataset.slotIndex, 10);
             const occupant = categorySlots[targetIndex];
+            landedIndex = targetIndex;
             if (fromType === 'slot') {
                 if (targetIndex !== fromIndex) {
                     categorySlots[targetIndex] = movieId;
                     categorySlots[fromIndex] = occupant; // swap (peut être null)
+                    swappedIndex = fromIndex;
                 }
             } else {
                 // depuis le pool
@@ -1937,6 +2009,19 @@
         tierDrag = null;
 
         renderCategoryEditView();
+
+        // Petit rebond élastique sur la ou les cases qui viennent de changer
+        [landedIndex, swappedIndex].forEach(idx => {
+            if (idx === null)
+                return;
+            const el = document.querySelector(`.tier-slot[data-slot-index="${idx}"]`);
+            if (el) {
+                el.classList.remove('slot-bounce');
+                void el.offsetWidth;
+                el.classList.add('slot-bounce');
+            }
+        });
+
         saveCategoryState();
     }
 
@@ -1978,7 +2063,7 @@
 
 
 
-    function renderArena() {
+    function renderArena(enterSlot) {
         const arena = document.getElementById('arena');
         if (!currentPair) {
             arena.innerHTML = '<div class="empty-msg">Pas assez de films en salle pour un duel. Reviens plus tard.</div>';
@@ -1987,6 +2072,8 @@
         const [idA, idB] = currentPair;
         const a = movies[idA],
             b = movies[idB];
+        const enterClassA = (enterSlot === undefined || enterSlot === 0) ? 'card-enter-left' : '';
+        const enterClassB = (enterSlot === undefined || enterSlot === 1) ? 'card-enter-right' : '';
         const streakBadge = (id) => (streaks[id] >= 2)
         ? `<div class="streak-badge"><svg viewBox="0 0 20 20" width="12" height="12" fill="currentColor" style="vertical-align:-1px; margin-right:3px;"><path d="M10 1.5c1 3-2 4-2 7a3 3 0 106 0c0-1-1-1.5-1-2.5 1.5 1 2.5 3 2.5 5A5.5 5.5 0 1110 4.5C10 3 9.5 2.3 10 1.5z"/></svg>${streaks[id]} victoires</div>`
         : '';
@@ -1995,7 +2082,7 @@
         : '';
         arena.innerHTML = `
             <div class="card-slot">
-              <div class="card" id="cardA" data-id="${idA}" ${cardStyle(a)} tabindex="0" role="button" aria-label="Voter pour ${a.title}">
+              <div class="card ${enterClassA}" id="cardA" data-id="${idA}" ${cardStyle(a)} tabindex="0" role="button" aria-label="Voter pour ${a.title}">
                 <div class="year">${a.year}</div>
                 <div class="title">${a.title}</div>${a.blurb ? `<div class="blurb">${a.blurb}</div>` : ''}
                 ${streakBadge(idA)}
@@ -2004,7 +2091,7 @@
             </div>
             <div class="vs-badge">VS</div>
             <div class="card-slot">
-              <div class="card" id="cardB" data-id="${idB}" ${cardStyle(b)} tabindex="0" role="button" aria-label="Voter pour ${b.title}">
+              <div class="card ${enterClassB}" id="cardB" data-id="${idB}" ${cardStyle(b)} tabindex="0" role="button" aria-label="Voter pour ${b.title}">
                 <div class="year">${b.year}</div>
                 <div class="title">${b.title}</div>${b.blurb ? `<div class="blurb">${b.blurb}</div>` : ''}
                 ${streakBadge(idB)}
@@ -2034,7 +2121,7 @@
         } else {
             currentPair = unseenSlot === 0 ? [replacement, otherId] : [otherId, replacement];
         }
-        renderArena();
+        renderArena(unseenSlot);
         renderProgress();
     }
 
@@ -2255,15 +2342,46 @@
             <div class="daily-theme">${duel.theme}</div>
             <div class="daily-sub">Voilà ce que tout le monde a choisi aujourd'hui</div>
             <div class="daily-result-row">
-              <div class="daily-result-label"><span>${a.title}${myChoice === 'a' ? ' — ton choix' : ''}</span><span>${pctA}%</span></div>
-              <div class="daily-result-track"><div class="daily-result-fill ${myChoice === 'a' ? 'chosen' : ''}" style="width:${pctA}%;"></div></div>
+              <div class="daily-result-label"><span>${a.title}${myChoice === 'a' ? ' — ton choix' : ''}</span><span id="dailyPctA">0%</span></div>
+              <div class="daily-result-track"><div class="daily-result-fill ${myChoice === 'a' ? 'chosen' : ''}" id="dailyFillA" style="width:0%;"></div></div>
             </div>
             <div class="daily-result-row">
-              <div class="daily-result-label"><span>${b.title}${myChoice === 'b' ? ' — ton choix' : ''}</span><span>${pctB}%</span></div>
-              <div class="daily-result-track"><div class="daily-result-fill ${myChoice === 'b' ? 'chosen' : ''}" style="width:${pctB}%;"></div></div>
+              <div class="daily-result-label"><span>${b.title}${myChoice === 'b' ? ' — ton choix' : ''}</span><span id="dailyPctB">0%</span></div>
+              <div class="daily-result-track"><div class="daily-result-fill ${myChoice === 'b' ? 'chosen' : ''}" id="dailyFillB" style="width:0%;"></div></div>
             </div>
             <div class="daily-come-back">${total} vote${total > 1 ? 's' : ''} aujourd'hui — reviens demain pour la prochaine séance.</div>`;
         hideAttentionAlert(); // le vote du jour est fait (ou déjà fait), plus besoin d'attirer l'attention
+
+        // Petit suspense : les barres partent de 0 et se remplissent juste après l'affichage,
+        // plutôt que d'apparaître déjà pleines.
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                const fillA = document.getElementById('dailyFillA');
+                const fillB = document.getElementById('dailyFillB');
+                if (fillA)
+                    fillA.style.width = pctA + '%';
+                if (fillB)
+                    fillB.style.width = pctB + '%';
+                animateCountUp('dailyPctA', pctA);
+                animateCountUp('dailyPctB', pctB);
+            }, 120);
+        });
+    }
+
+    function animateCountUp(elId, target) {
+        const el = document.getElementById(elId);
+        if (!el)
+            return;
+        const duration = 900;
+        const start = performance.now();
+        function step(now) {
+            const progress = Math.min((now - start) / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            el.textContent = Math.round(target * eased) + '%';
+            if (progress < 1)
+                requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
     }
 
     document.getElementById('tabFree').addEventListener('click', () => {
@@ -2395,7 +2513,7 @@
             currentPair = winnerSlot === 0 ? [winnerId, challengerId] : [challengerId, winnerId];
         }
         statusLine.textContent = 'Vote pris en compte. Enregistrement discret en coulisses…';
-        renderArena();
+        renderArena(challengerId !== null ? 1 - winnerSlot : undefined);
         renderLeaderboard();
         renderPersonalTop();
         renderProgress();
@@ -2988,7 +3106,7 @@
 
     const INTRO_SLIDES = [
     {
-        icon: '<svg viewBox="0 0 20 20" width="40" height="40" fill="none"><circle cx="10" cy="10" r="8.5" fill="currentColor" opacity="0.15"/><circle cx="10" cy="10" r="8.5" stroke="currentColor" stroke-width="1.3"/><text x="10" y="13.8" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="8.5" fill="currentColor">VS</text></svg>',
+        icon: '<svg viewBox="0 0 24 16" width="46" height="30" fill="none"><text x="12" y="13.5" text-anchor="middle" font-family="Bebas Neue, sans-serif" font-size="16" font-weight="700" fill="currentColor" letter-spacing="0.5">VS</text></svg>',
         title: 'Vote libre',
         text: "Deux films s'affrontent, tu choisis. Chaque vote construit LE classement collectif, duel après duel."
     },

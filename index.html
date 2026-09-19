@@ -573,7 +573,121 @@
     .tier-slots {
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 16px;
+    }/* Podium du trio de tête */
+
+    .tier-podium {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .podium-slot {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        border: 2px dashed var(--line);
+        border-radius: 10px 10px 4px 4px;
+        background: var(--bg-alt);
+        padding: 8px 8px 0;
+        transition: border-color .15s ease, background .15s ease;
+    }
+
+    .podium-slot.filled {
+        border-style: solid;
+        border-color: var(--line);
+    }
+
+    .podium-slot.drag-over {
+        border-color: var(--gold);
+        background: rgba(232, 184, 74, 0.08);
+    }
+
+    .podium-slot .tier-poster {
+        width: 100%;
+        aspect-ratio: 2/3;
+    }
+
+    .podium-slot .tier-slot-empty-label {
+        display: block;
+        padding: 14px 2px;
+        text-align: center;
+    }
+
+    .podium-1st {
+        width: 118px;
+        order: 2;
+    }
+
+    .podium-2nd {
+        width: 98px;
+        order: 1;
+    }
+
+    .podium-3rd {
+        width: 98px;
+        order: 3;
+    }
+
+    .podium-base {
+        width: 100%;
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        color: #1a1500;
+        font-weight: 700;
+    }
+
+    .podium-1st .podium-base {
+        height: 60px;
+        font-size: 32px;
+        background: linear-gradient(180deg, #f5d47a, #E8B84B);
+        border-radius: 4px 4px 0 0;
+    }
+
+    .podium-2nd .podium-base {
+        height: 42px;
+        font-size: 26px;
+        background: linear-gradient(180deg, #eaeaea, #C7C7C7);
+        border-radius: 4px 4px 0 0;
+    }
+
+    .podium-3rd .podium-base {
+        height: 32px;
+        font-size: 22px;
+        background: linear-gradient(180deg, #e3ac72, #CD7F32);
+        border-radius: 4px 4px 0 0;
+    }/* Rangs 4 à 10, en grille de 3 colonnes */
+
+    .tier-slots-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .tier-slots-grid .tier-slot {
+        flex-direction: column;
+        gap: 4px;
+        min-height: auto;
+        padding: 8px 6px;
+    }
+
+    .tier-slots-grid .tier-slot .tier-rank {
+        width: auto;
+        font-size: 16px;
+    }
+
+    .tier-slots-grid .tier-slot .tier-poster {
+        width: 100%;
+        height: auto;
+        aspect-ratio: 2/3;
+    }
+
+    .tier-slots-grid .tier-slot-empty-label {
+        text-align: center;
     }
 
     .tier-slot {
@@ -607,23 +721,45 @@
         flex-shrink: 0;
     }
 
-    .tier-slot:nth-child(1) .tier-rank {
-        color: #E8B84B;
-        text-shadow: 0 0 10px rgba(232, 184, 74, 0.5);
-    }
-
-    .tier-slot:nth-child(2) .tier-rank {
-        color: #C7C7C7;
-    }
-
-    .tier-slot:nth-child(3) .tier-rank {
-        color: #CD7F32;
-    }
-
     .tier-slot-empty-label {
         color: var(--muted);
         font-size: 11px;
         font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tier-pool-pagination {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-top: 10px;
+    }
+
+    .tier-page-btn {
+        background: var(--card);
+        border: 1px solid var(--line);
+        color: var(--cream);
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .tier-page-btn:hover:not(:disabled) {
+        border-color: var(--gold);
+        color: var(--gold);
+    }
+
+    .tier-page-btn:disabled {
+        opacity: 0.25;
+        cursor: default;
+    }
+
+    .tier-page-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 12px;
+        color: var(--muted);
     }
 
     .tier-pool-column {
@@ -633,15 +769,15 @@
     }
 
     .tier-pool {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 7px;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+        gap: 12px;
         align-content: flex-start;
         background: var(--bg-alt);
         border: 1px solid var(--line);
         border-radius: 10px;
-        padding: 8px;
-        max-height: 520px;
+        padding: 12px;
+        max-height: 560px;
         overflow-y: auto;
     }
 
@@ -652,6 +788,16 @@
         padding: 20px;
         width: 100%;
         text-align: center;
+        grid-column: 1 / -1;
+    }
+
+    .tier-pool-note {
+        color: var(--muted);
+        font-size: 11px;
+        font-family: 'JetBrains Mono', monospace;
+        text-align: center;
+        padding: 10px 4px 2px;
+        grid-column: 1 / -1;
     }
 
     .tier-tile {
@@ -666,9 +812,9 @@
     }
 
     .tier-poster {
-        width: 58px;
-        height: 87px;
-        border-radius: 5px;
+        width: 100%;
+        aspect-ratio: 2 / 3;
+        border-radius: 6px;
         background-size: cover;
         background-position: center top;
         background-color: var(--card);
@@ -685,17 +831,19 @@
     }
 
     .no-poster-label {
-        font-size: 9px;
+        font-size: 10px;
         color: var(--cream);
         text-align: center;
         line-height: 1.2;
-        padding: 2px;
+        padding: 3px;
         font-family: 'Inter', sans-serif;
     }
 
     .tier-slot .tier-poster {
         width: 42px;
         height: 63px;
+        aspect-ratio: auto;
+        flex-shrink: 0;
     }
 
     .tier-drag-clone {
@@ -1087,6 +1235,7 @@
                             <div class="tier-pool-column">
                                 <input type="text" id="categoryPoolSearch" placeholder="Filtrer par titre…" class="search-input" style="margin-bottom:8px;">
                                 <div class="tier-pool" id="categoryPool"></div>
+                                <div class="tier-pool-pagination" id="categoryPoolPagination"></div>
                             </div>
                         </div>
                         <div id="categoryCompletionArea"></div>
@@ -1283,6 +1432,7 @@
     let categoryPoolIds = []; // films pas encore placés
     let categoryFinished = false;
     let categoryPoolFilter = '';
+    let categoryPoolPage = 0;
 
     function getCategoryPool(genre) {
         return Object.keys(movies).filter(id => !skippedIds.has(id) && movies[id].genre === genre);
@@ -1321,6 +1471,7 @@
     async function selectCategory(genre) {
         categoryGenre = genre;
         categoryPoolFilter = '';
+        categoryPoolPage = 0;
         document.getElementById('categoryPoolSearch').value = '';
         document.getElementById('categoryPicker').style.display = 'none';
         document.getElementById('categorySelectedView').style.display = 'block';
@@ -1340,7 +1491,7 @@
             categorySlots.push(null);
 
         const placedSet = new Set(categorySlots.filter(Boolean));
-        categoryPoolIds = shuffleArray(pool.filter(id => !placedSet.has(id)));
+        categoryPoolIds = pool.filter(id => !placedSet.has(id)).sort((a, b) => (movies[b].votes || 0) - (movies[a].votes || 0));
         categoryFinished = !!(data && data.finished) && categorySlots.every(Boolean);
 
         if (categoryFinished) {
@@ -1376,33 +1527,82 @@
           </div>`;
     }
 
+    function slotHTML(id, i) {
+        const m = id ? movies[id] : null;
+        if (!m) {
+            return `<div class="tier-slot" data-slot-index="${i}"><div class="tier-rank">${i + 1}</div><div class="tier-slot-empty-label">Glisse un film ici</div></div>`;
+        }
+        return `<div class="tier-slot filled" data-slot-index="${i}">
+            <div class="tier-rank">${i + 1}</div>
+            ${posterTileHTML(m, id, 'slot', i)}
+          </div>`;
+    }
+
+    function podiumSlotHTML(id, i, podiumClass) {
+        const m = id ? movies[id] : null;
+        const rank = i + 1;
+        const inner = m
+        ? posterTileHTML(m, id, 'slot', i)
+        : `<div class="tier-slot-empty-label">Glisse ici</div>`;
+        return `<div class="tier-slot podium-slot ${podiumClass} ${m ? 'filled' : ''}" data-slot-index="${i}">
+            ${inner}
+            <div class="podium-base">${rank}</div>
+          </div>`;
+    }
+
     function renderCategoryEditView() {
         const slotsWrap = document.getElementById('categorySlots');
-        slotsWrap.innerHTML = categorySlots.map((id, i) => {
-            const m = id ? movies[id] : null;
-            if (!m) {
-                return `<div class="tier-slot" data-slot-index="${i}"><div class="tier-rank">${i + 1}</div><div class="tier-slot-empty-label">Glisse un film ici</div></div>`;
-            }
-            return `<div class="tier-slot filled" data-slot-index="${i}">
-                  <div class="tier-rank">${i + 1}</div>
-                  ${posterTileHTML(m, id, 'slot', i)}
-                </div>`;
-        }).join('');
+        const podiumHTML = `<div class="tier-podium">
+            ${podiumSlotHTML(categorySlots[1], 1, 'podium-2nd')}
+            ${podiumSlotHTML(categorySlots[0], 0, 'podium-1st')}
+            ${podiumSlotHTML(categorySlots[2], 2, 'podium-3rd')}
+          </div>`;
+        const gridHTML = `<div class="tier-slots-grid">
+            ${categorySlots.slice(3).map((id, i) => slotHTML(id, i + 3)).join('')}
+          </div>`;
+        slotsWrap.innerHTML = podiumHTML + gridHTML;
 
         const poolWrap = document.getElementById('categoryPool');
+        const pagerWrap = document.getElementById('categoryPoolPagination');
+        const POOL_PAGE_SIZE = 10;
         const filterNorm = categoryPoolFilter.trim().toLowerCase();
         const filteredPoolIds = filterNorm
         ? categoryPoolIds.filter(id => movies[id].title.toLowerCase().includes(filterNorm))
         : categoryPoolIds;
 
+        const totalPages = Math.max(1, Math.ceil(filteredPoolIds.length / POOL_PAGE_SIZE));
+        if (categoryPoolPage >= totalPages)
+            categoryPoolPage = totalPages - 1;
+        if (categoryPoolPage < 0)
+            categoryPoolPage = 0;
+        const pageIds = filteredPoolIds.slice(categoryPoolPage * POOL_PAGE_SIZE, (categoryPoolPage + 1) * POOL_PAGE_SIZE);
+
         if (categoryPoolIds.length === 0) {
             poolWrap.innerHTML = '<div class="tier-pool-empty-label">Tous les films sont placés 👇</div>';
+            pagerWrap.innerHTML = '';
         } else if (filteredPoolIds.length === 0) {
             poolWrap.innerHTML = '<div class="tier-pool-empty-label">Aucun film ne correspond à ta recherche.</div>';
+            pagerWrap.innerHTML = '';
         } else {
-            // data-from-index doit référencer la vraie position dans categoryPoolIds (pas la position filtrée),
+            // data-from-index doit référencer la vraie position dans categoryPoolIds (pas la position filtrée/paginée),
             // sinon le glisser-déposer déplacerait le mauvais film.
-            poolWrap.innerHTML = filteredPoolIds.map(id => posterTileHTML(movies[id], id, 'pool', categoryPoolIds.indexOf(id))).join('');
+            poolWrap.innerHTML = pageIds.map(id => posterTileHTML(movies[id], id, 'pool', categoryPoolIds.indexOf(id))).join('');
+            pagerWrap.innerHTML = `
+                  <button class="tier-page-btn" id="categoryPoolPrev" ${categoryPoolPage === 0 ? 'disabled' : ''} aria-label="Page précédente">‹</button>
+                  <span class="tier-page-label">Page ${categoryPoolPage + 1}/${totalPages}</span>
+                  <button class="tier-page-btn" id="categoryPoolNext" ${categoryPoolPage >= totalPages - 1 ? 'disabled' : ''} aria-label="Page suivante">›</button>`;
+            const prevBtn = document.getElementById('categoryPoolPrev');
+            const nextBtn = document.getElementById('categoryPoolNext');
+            if (prevBtn)
+                prevBtn.addEventListener('click', () => {
+                    categoryPoolPage--;
+                    renderCategoryEditView();
+                });
+            if (nextBtn)
+                nextBtn.addEventListener('click', () => {
+                    categoryPoolPage++;
+                    renderCategoryEditView();
+                });
         }
 
         document.querySelectorAll('.tier-tile').forEach(tile => {
@@ -1560,6 +1760,7 @@
 
     document.getElementById('categoryPoolSearch').addEventListener('input', (e) => {
         categoryPoolFilter = e.target.value;
+        categoryPoolPage = 0;
         renderCategoryEditView();
     });
 

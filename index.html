@@ -1421,9 +1421,96 @@
 
     const FRENCH_PSEUDO_CATEGORY = 'Film français';
 
+    // On ne garde que ces 5 genres "grand public" plutôt que tous ceux que TMDB fournit —
+    // comparaison normalisée (accents/casse ignorés) pour matcher quel que soit le format exact stocké.
+    const MAINSTREAM_GENRE_NAMES = ['Action', 'Comedie', 'Drame', 'Horreur', 'Science Fiction'];
+
+    // Catégories "façon connaisseur", curées à la main plutôt que dérivées du genre TMDB.
+    // type 'saga' : un seul film retenu par mot-clé (représente toute la franchise).
+    // type 'theme' : tous les films dont le titre correspond à un des mots-clés.
+    const CURATED_CATEGORIES = {
+        'Saga': {
+            type: 'saga',
+            keywords: [
+            'Matrix', 'Star Wars', 'Seigneur des Anneaux', 'Harry Potter', 'Fast', 'Terminator',
+            'Alien', 'Jurassic', 'Indiana Jones', 'Mission Impossible', 'Pirates des Caraibes', 'Rocky', 'Skyfall'
+            ]
+        },
+        'Marvel': {
+            type: 'theme',
+            keywords: [
+            'Iron Man', 'Thor', 'Captain America', 'Avengers', 'Spider-Man', 'Guardians of the Galaxy',
+            'Ant-Man', 'Doctor Strange', 'Black Panther', 'Captain Marvel', 'Eternals', 'Shang-Chi',
+            'Venom', 'Deadpool', 'X-Men', 'Wolverine', 'Hulk'
+            ]
+        },
+        'DC Comics': {
+            type: 'theme',
+            keywords: [
+            'Batman', 'Superman', 'Wonder Woman', 'Aquaman', 'Justice League', 'Joker', 'Suicide Squad',
+            'Flash', 'Shazam', 'Man of Steel'
+            ]
+        },
+        'Disney': {
+            type: 'theme',
+            keywords: [
+            'Roi Lion', 'Aladdin', 'Belle et la Bete', 'Blanche Neige', 'Raiponce', 'Vaiana', 'Encanto',
+            'Frozen', 'Reine des Neiges', 'Pinocchio', 'Cendrillon', 'Mulan', 'Dumbo', 'Peter Pan'
+            ]
+        },
+        'Pixar': {
+            type: 'theme',
+            keywords: [
+            'Toy Story', 'Cars', 'Ratatouille', 'WALL', 'Vice-Versa', 'Coco', 'Les Indestructibles',
+            'Monstres', 'Le Monde de Nemo', 'Le Monde de Dory', 'Rebelle', 'Luca', 'Elemental', 'Alerte Rouge'
+            ]
+        },
+        'Christopher Nolan': {
+            type: 'theme',
+            keywords: [
+            'Inception', 'Interstellar', 'The Dark Knight', 'Dunkirk', 'Tenet', 'Oppenheimer',
+            'Memento', 'Le Prestige', 'Insomnia'
+            ]
+        },
+        'Steven Spielberg': {
+            type: 'theme',
+            keywords: [
+            'Jurassic Park', "E.T.", 'Indiana Jones', 'Il faut sauver le soldat Ryan', 'Minority Report',
+            'Rencontres du troisieme type', 'Les Dents de la mer', 'Arrete-moi si tu peux', 'Le Terminal',
+            'Lincoln', 'Ready Player One', 'La Liste de Schindler', 'West Side Story'
+            ]
+        },
+        'Quentin Tarantino': {
+            type: 'theme',
+            keywords: [
+            'Pulp Fiction', 'Kill Bill', 'Django Unchained', 'Inglourious Basterds', 'Once Upon a Time',
+            'Reservoir Dogs', 'Jackie Brown', 'Boulevard de la mort', 'Les Huit Salopards'
+            ]
+        }
+    };
+
     function getCategoryPool(genre) {
         if (genre === FRENCH_PSEUDO_CATEGORY) {
             return Object.keys(movies).filter(id => !skippedIds.has(id) && movies[id].original_language === 'fr');
+        }
+        if (CURATED_CATEGORIES[genre]) {
+            const config = CURATED_CATEGORIES[genre];
+            if (config.type === 'saga') {
+                const ids = [];
+                config.keywords.forEach(kw => {
+                    const id = findMovieByKeyword(kw);
+                    if (id && !ids.includes(id) && !skippedIds.has(id))
+                        ids.push(id);
+                });
+                return ids;
+            }
+            const needles = config.keywords.map(normalizeTitle);
+            return Object.keys(movies).filter(id => {
+                if (skippedIds.has(id))
+                    return false;
+                const t = normalizeTitle(movies[id].title);
+                return needles.some(k => t.includes(k));
+            });
         }
         return Object.keys(movies).filter(id => !skippedIds.has(id) && movies[id].genre === genre);
     }
@@ -1443,8 +1530,12 @@
 
     function renderCategoryPicker() {
         const wrap = document.getElementById('categoryPicker');
-        const genres = [...new Set(Object.values(movies).map(m => m.genre).filter(Boolean))].sort();
-        const allCategories = [FRENCH_PSEUDO_CATEGORY, ...genres];
+        const allGenresPresent = [...new Set(Object.values(movies).map(m => m.genre).filter(Boolean))];
+        const strip = s => normalizeTitle(s).replace(/[^a-z0-9]/g, '');
+        const mainstreamGenres = allGenresPresent.filter(g =>
+        MAINSTREAM_GENRE_NAMES.some(name => strip(g) === strip(name))
+        );
+        const allCategories = [FRENCH_PSEUDO_CATEGORY, ...Object.keys(CURATED_CATEGORIES), ...mainstreamGenres];
         wrap.innerHTML = `
             <div class="daily-sub" style="margin-bottom:14px;">Choisis une catégorie et glisse ses 9 films dans l'ordre que tu préfères</div>
             <div class="category-grid">

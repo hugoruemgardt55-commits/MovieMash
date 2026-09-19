@@ -557,115 +557,223 @@
         border-color: var(--line);
     }
 
-    .tier-list {
+    .tier-columns {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        align-items: start;
+    }
+
+    @media (max-width: 640px) {
+        .tier-columns {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .tier-slots {
         display: flex;
         flex-direction: column;
-        gap: 10px;
-        max-width: 600px;
-        margin: 0 auto;
+        gap: 8px;
     }
 
-    .tier-row {
+    .tier-slot {
         display: flex;
         align-items: center;
-        gap: 14px;
+        gap: 12px;
+        min-height: 70px;
         background: var(--bg-alt);
-        border: 1px solid var(--line);
+        border: 2px dashed var(--line);
         border-radius: 10px;
-        padding: 10px 14px;
-        transition: border-color .2s ease;
+        padding: 8px 12px;
+        transition: border-color .15s ease, background .15s ease;
     }
 
-    .tier-rank {
+    .tier-slot.drag-over {
+        border-color: var(--gold);
+        background: rgba(232, 184, 74, 0.08);
+    }
+
+    .tier-slot.filled {
+        border-style: solid;
+        border-color: var(--line);
+    }
+
+    .tier-slot .tier-rank {
         font-family: 'Bebas Neue', sans-serif;
-        font-size: 30px;
-        width: 42px;
+        font-size: 26px;
+        width: 34px;
         text-align: center;
         color: var(--muted);
         flex-shrink: 0;
     }
 
-    .tier-row:nth-child(1) .tier-rank {
+    .tier-slot:nth-child(1) .tier-rank {
         color: #E8B84B;
         text-shadow: 0 0 10px rgba(232, 184, 74, 0.5);
     }
 
-    .tier-row:nth-child(2) .tier-rank {
+    .tier-slot:nth-child(2) .tier-rank {
         color: #C7C7C7;
-        text-shadow: 0 0 8px rgba(199, 199, 199, 0.35);
     }
 
-    .tier-row:nth-child(3) .tier-rank {
+    .tier-slot:nth-child(3) .tier-rank {
         color: #CD7F32;
-        text-shadow: 0 0 8px rgba(205, 127, 50, 0.35);
+    }
+
+    .tier-slot-empty-label {
+        color: var(--muted);
+        font-size: 12px;
+        font-family: 'JetBrains Mono', monospace;
+    }
+
+    .tier-pool {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-content: flex-start;
+        background: var(--bg-alt);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px;
+        min-height: 120px;
+    }
+
+    .tier-pool-empty-label {
+        color: var(--muted);
+        font-size: 12px;
+        font-family: 'JetBrains Mono', monospace;
+        padding: 20px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .tier-tile {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 6px 10px 6px 6px;
+        cursor: grab;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    .tier-tile:active {
+        cursor: grabbing;
     }
 
     .tier-poster {
-        width: 46px;
-        height: 69px;
-        border-radius: 5px;
+        width: 36px;
+        height: 54px;
+        border-radius: 4px;
         background-size: cover;
         background-position: center top;
-        background-color: var(--card);
+        background-color: var(--bg);
         flex-shrink: 0;
-        border: 1px solid var(--line);
     }
 
     .tier-info {
-        flex: 1;
         min-width: 0;
     }
 
     .tier-title {
-        font-size: 14px;
+        font-size: 12.5px;
         color: var(--cream);
+        max-width: 140px;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
     }
 
     .tier-year {
-        font-size: 11px;
+        font-size: 10.5px;
         color: var(--muted);
         font-family: 'JetBrains Mono', monospace;
-        margin-top: 2px;
     }
 
-    .tier-controls {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-        flex-shrink: 0;
+    .tier-slot .tier-tile {
+        flex: 1;
+        background: transparent;
+        border: none;
+        padding: 0;
     }
 
-    .tier-btn {
-        background: var(--card);
-        border: 1px solid var(--line);
-        color: var(--cream);
-        width: 32px;
-        height: 26px;
-        border-radius: 5px;
-        cursor: pointer;
-        font-size: 12px;
-        line-height: 1;
+    .tier-slot .tier-title {
+        max-width: none;
+        font-size: 13.5px;
     }
 
-    .tier-btn:hover:not(:disabled) {
-        border-color: var(--gold);
-        color: var(--gold);
+    .tier-drag-clone {
+        position: fixed;
+        z-index: 999;
+        pointer-events: none;
+        opacity: 0.9;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+        border-radius: 8px;
     }
 
-    .tier-btn:disabled {
-        opacity: 0.25;
-        cursor: default;
-    }
-
-    .tier-save-note {
+    .tier-complete-prompt {
         text-align: center;
-        color: var(--muted);
-        font-size: 11px;
+        background: rgba(232, 184, 74, 0.08);
+        border: 1px solid var(--gold);
+        border-radius: 10px;
+        padding: 18px;
+        margin-top: 20px;
+    }
+
+    .tier-complete-prompt p {
+        color: var(--gold);
         font-family: 'JetBrains Mono', monospace;
-        margin-top: 14px;
+        font-size: 13px;
+        margin: 0 0 14px;
+    }
+
+    .tier-complete-prompt .btn-row {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .tier-complete-prompt button {
+        padding: 10px 18px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 13px;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .tier-finish-btn {
+        background: var(--gold);
+        border: none;
+        color: #1a1500;
+    }
+
+    .tier-continue-btn {
+        background: transparent;
+        border: 1px solid var(--muted);
+        color: var(--cream);
+    }
+
+    .tier-resume-pin {
+        text-align: center;
+        margin-top: 16px;
+    }
+
+    .tier-resume-pin button {
+        background: transparent;
+        border: 1px solid var(--gold);
+        color: var(--gold);
+        padding: 9px 18px;
+        border-radius: 20px;
+        font-weight: 700;
+        font-size: 12.5px;
+        cursor: pointer;
+        font-family: 'JetBrains Mono', monospace;
     }
 
     .discovery-banner {
@@ -1007,37 +1115,46 @@
                     <div style="text-align:center; margin-bottom:18px;">
                         <button class="not-seen-link" id="categoryBackBtn" type="button" style="display:inline-flex;">← Changer de catégorie</button>
                     </div>
-                    <div id="categoryTierWrap"></div>
+                    <div id="categoryEditView">
+                        <div class="tier-columns">
+                            <div class="tier-slots" id="categorySlots"></div>
+                            <div class="tier-pool" id="categoryPool"></div>
+                        </div>
+                        <div id="categoryCompletionArea"></div>
+                    </div>
+                    <div id="categoryFinishedView" style="display:none;"></div>
                 </div>
             </div>
 
-            <section class="panel">
-                <div class="panel-header">
-                    <div class="panel-title">
-                        Mon Top 10, 
-                        <span id="pseudoDisplay"></span>
+            <div id="globalRankingsWrap">
+                <section class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">
+                            Mon Top 10, 
+                            <span id="pseudoDisplay"></span>
+                        </div>
                     </div>
-                </div>
-                <div id="personalTopWrap">
-                    <div class="empty-msg">Ton Top 10 est encore une salle vide. Vote pour la remplir.</div>
-                </div>
-                <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;">
-                    <button id="storyBtn" style="background:var(--gold); color:#1a1500; border:none; padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Balance ta story</button>
-                    <button id="shareBtn" style="background:transparent; color:var(--teal); border:1px solid var(--teal); padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Copier le lien</button>
-                </div>
-                <div class="panel-sub" id="shareStatus" style="margin-top:10px;"></div>
-            </section>
+                    <div id="personalTopWrap">
+                        <div class="empty-msg">Ton Top 10 est encore une salle vide. Vote pour la remplir.</div>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:14px;">
+                        <button id="storyBtn" style="background:var(--gold); color:#1a1500; border:none; padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Balance ta story</button>
+                        <button id="shareBtn" style="background:transparent; color:var(--teal); border:1px solid var(--teal); padding:7px 14px; border-radius:4px; font-weight:700; cursor:pointer; font-size:12px;">Copier le lien</button>
+                    </div>
+                    <div class="panel-sub" id="shareStatus" style="margin-top:10px;"></div>
+                </section>
 
-            <section class="panel">
-                <div class="panel-header">
-                    <div class="panel-title">Le classement</div>
-                    <div class="panel-sub" id="voteCount">— votes au total</div>
-                </div>
-                <input type="text" id="leaderboardSearch" placeholder="Rechercher un film dans le classement…" class="search-input">
-                <div id="leaderboardWrap">
-                    <div class="empty-msg">Chargement du classement…</div>
-                </div>
-            </section>
+                <section class="panel">
+                    <div class="panel-header">
+                        <div class="panel-title">Le classement</div>
+                        <div class="panel-sub" id="voteCount">— votes au total</div>
+                    </div>
+                    <input type="text" id="leaderboardSearch" placeholder="Rechercher un film dans le classement…" class="search-input">
+                    <div id="leaderboardWrap">
+                        <div class="empty-msg">Chargement du classement…</div>
+                    </div>
+                </section>
+            </div>
 
             <div class="disclaimer">
 
@@ -1188,12 +1305,15 @@
     }
 
     // ---------- Catégories ----------
-    // Classement manuel indépendant : l'utilisateur ordonne lui-même 10 films
-    // d'un genre donné, du meilleur au moins bon. Ne touche à aucun score
-    // de vote (ni global, ni personnel) — c'est un classement à part entière.
+    // Classement manuel indépendant : l'utilisateur glisse 10 films d'un genre donné
+    // dans un classement à sa main, du meilleur (1) au moins bon (10). Ne touche à
+    // aucun score de vote (ni global, ni personnel) — c'est un classement à part.
     const CATEGORY_TIER_SIZE = 10;
     let categoryGenre = null;
-    let categoryRanking = []; // tableau d'ids de films, position 0 = rang 1
+    let categorySlots = []; // tableau de 10 cases : id de film ou null
+    let categoryPoolIds = []; // films pas encore placés
+    let categoryFinished = false;
+    let categoryPromptMinimized = false;
 
     function getCategoryPool(genre) {
         return Object.keys(movies).filter(id => !skippedIds.has(id) && movies[id].genre === genre);
@@ -1208,6 +1328,10 @@
         return a;
     }
 
+    function showGlobalRankings(show) {
+        document.getElementById('globalRankingsWrap').style.display = show ? 'block' : 'none';
+    }
+
     function renderCategoryPicker() {
         const wrap = document.getElementById('categoryPicker');
         const genres = [...new Set(Object.values(movies).map(m => m.genre).filter(Boolean))].sort();
@@ -1216,7 +1340,7 @@
             return;
         }
         wrap.innerHTML = `
-            <div class="daily-sub" style="margin-bottom:14px;">Choisis une catégorie et classe ses 10 films toi-même, du meilleur au moins bon</div>
+            <div class="daily-sub" style="margin-bottom:14px;">Choisis une catégorie et glisse ses 10 films dans l'ordre que tu préfères</div>
             <div class="category-grid">
               ${genres.map(g => {const pool = getCategoryPool(g);const playable = pool.length >= CATEGORY_TIER_SIZE;return `<button class="category-chip ${playable ? '' : 'disabled'}" ${playable ? `data-genre="${g}"` : 'disabled'}>${g}<span class="chip-count">${playable ? `${pool.length} films` : `${pool.length}/${CATEGORY_TIER_SIZE} requis`}</span></button>`;}).join('')}
             </div>`;
@@ -1227,74 +1351,245 @@
 
     async function selectCategory(genre) {
         categoryGenre = genre;
+        categoryPromptMinimized = false;
         document.getElementById('categoryPicker').style.display = 'none';
         document.getElementById('categorySelectedView').style.display = 'block';
         document.getElementById('categoryTitle').textContent = genre;
-        document.getElementById('categoryTierWrap').innerHTML = '<div class="empty-msg">Chargement…</div>';
 
         const pool = getCategoryPool(genre);
-        const {data} = await supabaseClient.from('category_tiers').select('ranking').eq('visitor_id', visitorId).eq('genre', genre).maybeSingle();
+        const {data} = await supabaseClient.from('category_tiers').select('ranking, finished').eq('visitor_id', visitorId).eq('genre', genre).maybeSingle();
 
-        if (data && data.ranking && data.ranking.length > 0) {
-            // Reprend le classement existant, retire ce qui n'est plus éligible, complète si besoin
-            let ranking = data.ranking.filter(id => pool.includes(id));
-            const missing = pool.filter(id => !ranking.includes(id));
-            ranking = ranking.concat(shuffleArray(missing)).slice(0, CATEGORY_TIER_SIZE);
-            categoryRanking = ranking;
+        let ranking = (data && data.ranking) ? data.ranking.filter(id => pool.includes(id)) : [];
+        const missing = pool.filter(id => !ranking.includes(id));
+        ranking = ranking.concat(shuffleArray(missing));
+
+        categorySlots = ranking.slice(0, CATEGORY_TIER_SIZE);
+        while (categorySlots.length < CATEGORY_TIER_SIZE)
+            categorySlots.push(null);
+        categoryPoolIds = ranking.slice(CATEGORY_TIER_SIZE);
+        categoryFinished = !!(data && data.finished && categoryPoolIds.length === 0 && categorySlots.every(Boolean));
+
+        if (categoryFinished) {
+            renderCategoryFinishedView();
         } else {
-            categoryRanking = shuffleArray(pool).slice(0, CATEGORY_TIER_SIZE);
-            await saveCategoryRanking();
+            document.getElementById('categoryFinishedView').style.display = 'none';
+            document.getElementById('categoryEditView').style.display = 'block';
+            renderCategoryEditView();
         }
-        renderCategoryTierList();
     }
 
-    async function saveCategoryRanking() {
-        const status = document.getElementById('categorySaveStatus');
-        const {error} = await supabaseClient.from('category_tiers').upsert(
+    async function saveCategoryState() {
+        const ranking = [...categorySlots.filter(Boolean), ...categoryPoolIds];
+        await supabaseClient.from('category_tiers').upsert(
         [{
             visitor_id: visitorId,
             genre: categoryGenre,
-            ranking: categoryRanking,
+            ranking,
+            finished: categoryFinished,
             updated_at: new Date().toISOString()
         }],
         {
             onConflict: 'visitor_id,genre'
         }
         );
-        if (status)
-            status.textContent = error ? "Le classement n'a pas pu être enregistré. Réessaie." : 'Enregistré.';
     }
 
-    function renderCategoryTierList() {
-        const wrap = document.getElementById('categoryTierWrap');
+    function renderCategoryEditView() {
+        const slotsWrap = document.getElementById('categorySlots');
+        slotsWrap.innerHTML = categorySlots.map((id, i) => {
+            const m = id ? movies[id] : null;
+            if (!m) {
+                return `<div class="tier-slot" data-slot-index="${i}"><div class="tier-rank">${i + 1}</div><div class="tier-slot-empty-label">Glisse un film ici</div></div>`;
+            }
+            const posterStyle = m.poster_url ? `style="background-image:url('${m.poster_url}');"` : '';
+            return `<div class="tier-slot filled" data-slot-index="${i}">
+                  <div class="tier-rank">${i + 1}</div>
+                  <div class="tier-tile" data-movie-id="${id}" data-from="slot" data-from-index="${i}">
+                    <div class="tier-poster" ${posterStyle}></div>
+                    <div class="tier-info"><div class="tier-title">${m.title}</div><div class="tier-year">${m.year}</div></div>
+                  </div>
+                </div>`;
+        }).join('');
+
+        const poolWrap = document.getElementById('categoryPool');
+        if (categoryPoolIds.length === 0) {
+            poolWrap.innerHTML = '<div class="tier-pool-empty-label">Tous les films sont placés 👇</div>';
+        } else {
+            poolWrap.innerHTML = categoryPoolIds.map((id, i) => {
+                const m = movies[id];
+                const posterStyle = m.poster_url ? `style="background-image:url('${m.poster_url}');"` : '';
+                return `<div class="tier-tile" data-movie-id="${id}" data-from="pool" data-from-index="${i}">
+                        <div class="tier-poster" ${posterStyle}></div>
+                        <div class="tier-info"><div class="tier-title">${m.title}</div><div class="tier-year">${m.year}</div></div>
+                      </div>`;
+            }).join('');
+        }
+
+        document.querySelectorAll('.tier-tile').forEach(tile => {
+            tile.addEventListener('pointerdown', onTierDragStart);
+        });
+
+        renderCategoryCompletionArea();
+    }
+
+    function renderCategoryCompletionArea() {
+        const area = document.getElementById('categoryCompletionArea');
+        const complete = categoryPoolIds.length === 0 && categorySlots.every(Boolean);
+        if (!complete) {
+            area.innerHTML = '';
+            return;
+        }
+        if (categoryPromptMinimized) {
+            area.innerHTML = `<div class="tier-resume-pin"><button id="categoryFinishPinBtn" type="button">Terminer le classement ✓</button></div>`;
+            document.getElementById('categoryFinishPinBtn').addEventListener('click', finishCategoryRanking);
+        } else {
+            area.innerHTML = `
+                  <div class="tier-complete-prompt">
+                    <p>Les 10 films sont placés — tu peux encore les réorganiser, ou valider ton classement.</p>
+                    <div class="btn-row">
+                      <button class="tier-continue-btn" id="categoryContinueBtn" type="button">Continuer à modifier</button>
+                      <button class="tier-finish-btn" id="categoryFinishBtn" type="button">Terminer mon classement</button>
+                    </div>
+                  </div>`;
+            document.getElementById('categoryContinueBtn').addEventListener('click', () => {
+                categoryPromptMinimized = true;
+                renderCategoryCompletionArea();
+            });
+            document.getElementById('categoryFinishBtn').addEventListener('click', finishCategoryRanking);
+        }
+    }
+
+    async function finishCategoryRanking() {
+        categoryFinished = true;
+        await saveCategoryState();
+        renderCategoryFinishedView();
+    }
+
+    function renderCategoryFinishedView() {
+        document.getElementById('categoryEditView').style.display = 'none';
+        const wrap = document.getElementById('categoryFinishedView');
+        wrap.style.display = 'block';
+        const ranked = categorySlots.filter(Boolean);
         wrap.innerHTML = `
+            <div class="category-complete-banner">🏆 Ton Top ${ranked.length} ${categoryGenre} est prêt</div>
             <div class="tier-list">
-              ${categoryRanking.map((id, i) => {const m = movies[id];if (!m)return '';const posterStyle = m.poster_url ? `style="background-image:url('${m.poster_url}');"` : '';return `<div class="tier-row">
-                      <div class="tier-rank">${i + 1}</div>
+              ${ranked.map((id, i) => {const m = movies[id];const posterStyle = m.poster_url ? `style="background-image:url('${m.poster_url}');"` : '';return `<div class="tier-row-finished shared-row">
+                      <div class="shared-rank">#${i + 1}</div>
                       <div class="tier-poster" ${posterStyle}></div>
-                      <div class="tier-info">
-                        <div class="tier-title">${m.title}</div>
-                        <div class="tier-year">${m.year}</div>
-                      </div>
-                      <div class="tier-controls">
-                        <button class="tier-btn" data-dir="up" data-idx="${i}" ${i === 0 ? 'disabled' : ''} aria-label="Monter ${m.title}">▲</button>
-                        <button class="tier-btn" data-dir="down" data-idx="${i}" ${i === categoryRanking.length - 1 ? 'disabled' : ''} aria-label="Descendre ${m.title}">▼</button>
-                      </div>
+                      <div class="tier-info"><div class="tier-title">${m.title}</div><div class="tier-year">${m.year}</div></div>
                     </div>`;}).join('')}
             </div>
-            <div class="tier-save-note" id="categorySaveStatus"></div>`;
+            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:18px;">
+              <button id="categoryStoryBtn" style="background:var(--gold); color:#1a1500; border:none; padding:9px 18px; border-radius:20px; font-weight:700; cursor:pointer; font-size:13px;">Balance ta story</button>
+              <button id="categoryShareBtn" style="background:transparent; color:var(--teal); border:1px solid var(--teal); padding:9px 18px; border-radius:20px; font-weight:700; cursor:pointer; font-size:13px;">Copier le lien</button>
+            </div>
+            <div class="panel-sub" id="categoryShareStatus" style="margin-top:10px; text-align:center;"></div>
+            <div style="text-align:center; margin-top:14px;">
+              <button class="not-seen-link" id="categoryEditAgainBtn" type="button" style="display:inline-flex;">Modifier ce classement</button>
+            </div>`;
 
-        wrap.querySelectorAll('.tier-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const idx = parseInt(btn.dataset.idx, 10);
-                const swapWith = btn.dataset.dir === 'up' ? idx - 1 : idx + 1;
-                if (swapWith < 0 || swapWith >= categoryRanking.length)
-                    return;
-                [categoryRanking[idx], categoryRanking[swapWith]] = [categoryRanking[swapWith], categoryRanking[idx]];
-                renderCategoryTierList();
-                saveCategoryRanking();
-            });
+        document.getElementById('categoryEditAgainBtn').addEventListener('click', () => {
+            categoryFinished = false;
+            categoryPromptMinimized = true;
+            wrap.style.display = 'none';
+            document.getElementById('categoryEditView').style.display = 'block';
+            renderCategoryEditView();
         });
+        document.getElementById('categoryShareBtn').addEventListener('click', async () => {
+            const status = document.getElementById('categoryShareStatus');
+            const url = `${window.location.origin}${window.location.pathname}?u=${encodeURIComponent(visitorId)}&cat=${encodeURIComponent(categoryGenre)}`;
+            try {
+                await navigator.clipboard.writeText(url);
+                status.textContent = 'Lien copié : ' + url;
+            } catch (e) {
+                status.textContent = 'Voici ton lien à copier : ' + url;
+            }
+        });
+        document.getElementById('categoryStoryBtn').addEventListener('click', () => generateCategoryStoryImage(ranked));
+    }
+
+    // ---------- Glisser-déposer (souris + tactile via Pointer Events) ----------
+    let tierDrag = null;
+
+    function onTierDragStart(e) {
+        if (categoryFinished)
+            return;
+        const tile = e.currentTarget;
+        const rect = tile.getBoundingClientRect();
+        const clone = tile.cloneNode(true);
+        clone.classList.add('tier-drag-clone');
+        clone.style.width = rect.width + 'px';
+        clone.style.left = rect.left + 'px';
+        clone.style.top = rect.top + 'px';
+        document.body.appendChild(clone);
+        tile.style.visibility = 'hidden';
+
+        tierDrag = {
+            movieId: tile.dataset.movieId,
+            fromType: tile.dataset.from,
+            fromIndex: parseInt(tile.dataset.fromIndex, 10),
+            sourceEl: tile,
+            clone,
+            offsetX: e.clientX - rect.left,
+            offsetY: e.clientY - rect.top
+        };
+
+        window.addEventListener('pointermove', onTierDragMove);
+        window.addEventListener('pointerup', onTierDragEnd);
+    }
+
+    function onTierDragMove(e) {
+        if (!tierDrag)
+            return;
+        tierDrag.clone.style.left = (e.clientX - tierDrag.offsetX) + 'px';
+        tierDrag.clone.style.top = (e.clientY - tierDrag.offsetY) + 'px';
+        document.querySelectorAll('.tier-slot.drag-over').forEach(el => el.classList.remove('drag-over'));
+        const target = document.elementFromPoint(e.clientX, e.clientY);
+        const slot = target && target.closest('.tier-slot');
+        if (slot)
+            slot.classList.add('drag-over');
+    }
+
+    function onTierDragEnd(e) {
+        if (!tierDrag)
+            return;
+        const target = document.elementFromPoint(e.clientX, e.clientY);
+        const slotEl = target && target.closest('.tier-slot');
+        const poolEl = target && target.closest('.tier-pool');
+
+        const {movieId, fromType, fromIndex} = tierDrag;
+
+        if (slotEl) {
+            const targetIndex = parseInt(slotEl.dataset.slotIndex, 10);
+            const occupant = categorySlots[targetIndex];
+            if (fromType === 'slot') {
+                if (targetIndex !== fromIndex) {
+                    categorySlots[targetIndex] = movieId;
+                    categorySlots[fromIndex] = occupant; // swap (peut être null)
+                }
+            } else {
+                // depuis le pool
+                categoryPoolIds.splice(fromIndex, 1);
+                categorySlots[targetIndex] = movieId;
+                if (occupant)
+                    categoryPoolIds.push(occupant); // le film déplacé retourne dans le pool
+            }
+        } else if (poolEl && fromType === 'slot') {
+            categorySlots[fromIndex] = null;
+            categoryPoolIds.push(movieId);
+        }
+        // si lâché ailleurs (hors zones), rien ne bouge
+
+        tierDrag.clone.remove();
+        if (tierDrag.sourceEl)
+            tierDrag.sourceEl.style.visibility = '';
+        document.querySelectorAll('.tier-slot.drag-over').forEach(el => el.classList.remove('drag-over'));
+        window.removeEventListener('pointermove', onTierDragMove);
+        window.removeEventListener('pointerup', onTierDragEnd);
+        tierDrag = null;
+
+        renderCategoryEditView();
+        saveCategoryState();
     }
 
     document.getElementById('categoryBackBtn').addEventListener('click', () => {
@@ -1311,10 +1606,12 @@
         document.getElementById('freeTabContent').style.display = 'none';
         document.getElementById('dailyTabContent').style.display = 'none';
         document.getElementById('categoryTabContent').style.display = 'block';
+        showGlobalRankings(false);
         if (!categoryGenre) {
             renderCategoryPicker();
         }
     });
+
 
 
     function renderArena() {
@@ -1612,6 +1909,7 @@
         document.getElementById('freeTabContent').style.display = 'block';
         document.getElementById('dailyTabContent').style.display = 'none';
         document.getElementById('categoryTabContent').style.display = 'none';
+        showGlobalRankings(true);
     });
     document.getElementById('tabDaily').addEventListener('click', () => {
         document.getElementById('tabDaily').classList.add('active');
@@ -1620,6 +1918,7 @@
         document.getElementById('freeTabContent').style.display = 'none';
         document.getElementById('dailyTabContent').style.display = 'block';
         document.getElementById('categoryTabContent').style.display = 'none';
+        showGlobalRankings(true);
         renderDailyDuel();
         // Le bandeau explicatif ne doit s'afficher qu'une fois dans la vie du visiteur,
         // mais l'alerte rouge (badge + contour) reste tant que le vote du jour n'est pas fait.
@@ -1843,6 +2142,34 @@
               <h2>Le Top ${top.length} de ${name}</h2>
               <div class="shared-sub">Construit vote après vote sur MovieSmash</div>
               ${top.map((r, i) => {const m = movies[r.movie_id] || {title: r.movie_id,year: '',poster_url: null};return `<div class="shared-row">
+                      <div class="shared-rank">#${i + 1}</div>
+                      ${m.poster_url ? `<img class="shared-poster" src="${m.poster_url}" alt="">` : ''}
+                      <div class="shared-title">${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></div>
+                    </div>`;}).join('')}
+              <div class="cta-own"><a href="${window.location.pathname}">Voter et prouver que j'ai meilleur goût</a></div>
+            </div>`;
+    }
+
+    async function renderSharedCategoryView(sharedVisitorId, genre) {
+        const wrap = document.getElementById('sharedViewWrap');
+        wrap.innerHTML = '<div class="empty-msg">Chargement du classement partagé…</div>';
+        const {data: profile} = await supabaseClient.from('profiles').select('*').eq('id', sharedVisitorId).maybeSingle();
+        const {data: tier, error} = await supabaseClient.from('category_tiers').select('*').eq('visitor_id', sharedVisitorId).eq('genre', genre).maybeSingle();
+        if (error || !tier || !tier.finished || !tier.ranking || tier.ranking.length === 0) {
+            wrap.innerHTML = `
+                  <div class="shared-card">
+                    <h2>Classement pas encore prêt</h2>
+                    <div class="shared-sub">Ce Top ${genre} n'existe pas encore, ou son auteur n'a pas fini de le classer.</div>
+                    <div class="cta-own"><a href="${window.location.pathname}">Voter et prouver que j'ai meilleur goût</a></div>
+                  </div>`;
+            return;
+        }
+        const name = profile ? profile.pseudo : 'Quelqu\u2019un';
+        wrap.innerHTML = `
+            <div class="shared-card">
+              <h2>Le Top ${genre} de ${name}</h2>
+              <div class="shared-sub">Classé à la main, film par film, sur MovieSmash</div>
+              ${tier.ranking.slice(0, 10).map((movieId, i) => {const m = movies[movieId] || {title: movieId,year: '',poster_url: null};return `<div class="shared-row">
                       <div class="shared-rank">#${i + 1}</div>
                       ${m.poster_url ? `<img class="shared-poster" src="${m.poster_url}" alt="">` : ''}
                       <div class="shared-title">${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></div>
@@ -2094,6 +2421,158 @@
 
     document.getElementById('storyBtn').addEventListener('click', generateStoryImage);
 
+    async function generateCategoryStoryImage(rankedIds) {
+        const status = document.getElementById('categoryShareStatus');
+        const entries = rankedIds.slice(0, 3);
+        if (entries.length === 0)
+            return;
+
+        const btn = document.getElementById('categoryStoryBtn');
+        btn.disabled = true;
+        const originalLabel = btn.textContent;
+        btn.textContent = 'Génération…';
+
+        if (document.fonts && document.fonts.ready)
+            await document.fonts.ready;
+
+        const W = 1080,
+            H = 1920;
+        const canvas = document.createElement('canvas');
+        canvas.width = W;
+        canvas.height = H;
+        const ctx = canvas.getContext('2d');
+
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, H);
+        bgGrad.addColorStop(0, '#141117');
+        bgGrad.addColorStop(1, '#0B0B0D');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, W, H);
+
+        ctx.fillStyle = '#E8B84B';
+        for (let x = 20; x < W; x += 44) {
+            ctx.beginPath();
+            ctx.arc(x, 24, 9, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x, H - 24, 9, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#3C6E68';
+        ctx.font = '28px "JetBrains Mono", monospace';
+        ctx.fillText('MON TOP 3', W / 2, 150);
+        ctx.fillStyle = '#E8B84B';
+        ctx.font = '100px "Bebas Neue", sans-serif';
+        ctx.fillText(categoryGenre.toUpperCase(), W / 2, 250);
+        ctx.fillStyle = '#F5EDE0';
+        ctx.font = '34px "JetBrains Mono", monospace';
+        ctx.fillText(`par ${pseudo || ''} · MovieSmash`, W / 2, 305);
+
+        const posterW = 260,
+            posterH = 390;
+        const rowStartY = 420;
+        const rowGap = 460;
+
+        for (let i = 0; i < entries.length; i++) {
+            const movie = movies[entries[i]];
+            const rowY = rowStartY + i * rowGap;
+            const posterX = 150;
+            const posterY = rowY;
+
+            ctx.textAlign = 'left';
+            ctx.fillStyle = '#9A2846';
+            ctx.font = '220px "Bebas Neue", sans-serif';
+            ctx.fillText(String(i + 1), 20, posterY + posterH - 40);
+            ctx.strokeStyle = '#E8B84B';
+            ctx.lineWidth = 3;
+            ctx.strokeText(String(i + 1), 20, posterY + posterH - 40);
+
+            const img = await loadImageSafe(movie.poster_url);
+            ctx.save();
+            roundRect(ctx, posterX, posterY, posterW, posterH, 14);
+            ctx.clip();
+            if (img) {
+                ctx.drawImage(img, posterX, posterY, posterW, posterH);
+            } else {
+                const g = ctx.createLinearGradient(posterX, posterY, posterX + posterW, posterY + posterH);
+                g.addColorStop(0, '#1E1B22');
+                g.addColorStop(1, '#3C6E68');
+                ctx.fillStyle = g;
+                ctx.fillRect(posterX, posterY, posterW, posterH);
+                ctx.fillStyle = '#F5EDE0';
+                ctx.textAlign = 'center';
+                ctx.font = '30px "Bebas Neue", sans-serif';
+                wrapText(ctx, movie.title, posterX + posterW / 2, posterY + posterH / 2, posterW - 30, 34, 3);
+                ctx.textAlign = 'left';
+            }
+            ctx.restore();
+            ctx.strokeStyle = 'rgba(232,184,74,0.4)';
+            ctx.lineWidth = 2;
+            roundRect(ctx, posterX, posterY, posterW, posterH, 14);
+            ctx.stroke();
+
+            const textX = posterX + posterW + 40;
+            const textMaxWidth = W - textX - 60;
+            ctx.fillStyle = '#F5EDE0';
+            ctx.font = '46px "Bebas Neue", sans-serif';
+            const linesUsed = wrapText(ctx, movie.title, textX, posterY + 60, textMaxWidth, 50, 3);
+            ctx.fillStyle = '#948E86';
+            ctx.font = '26px "JetBrains Mono", monospace';
+            ctx.fillText(String(movie.year || ''), textX, posterY + 60 + linesUsed * 50 + 20);
+        }
+
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#948E86';
+        ctx.font = '26px "JetBrains Mono", monospace';
+        ctx.fillText('Toi aussi, prouve que t\'as raison sur MovieSmash', W / 2, H - 90);
+
+        try {
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+            if (!blob)
+                throw new Error('toBlob a renvoyé null');
+            const filename = `moviemash-top3-${categoryGenre.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-${(pseudo || 'moi').toLowerCase().replace(/[^a-z0-9]+/g, '-')}.png`;
+            const file = new File([blob], filename, {
+                type: 'image/png'
+            });
+
+            if (navigator.canShare && navigator.canShare({
+                files: [file]
+            })) {
+                try {
+                    await navigator.share({
+                        files: [file],
+                        title: `Mon Top 3 ${categoryGenre} MovieSmash`
+                    });
+                    status.textContent = "C'est parti !";
+                } catch (shareErr) {
+                    if (shareErr.name !== 'AbortError') {
+                        console.error(shareErr);
+                        status.textContent = "Le partage a capoté. Réessaie.";
+                    } else {
+                        status.textContent = '';
+                    }
+                }
+            } else {
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                status.textContent = "Récupérée ! Direction ta story Instagram.";
+            }
+        } catch (e) {
+            console.error(e);
+            status.textContent = "Ta story a fait un caprice (certaines affiches ont bloqué l'export). Réessaie.";
+        }
+
+        btn.disabled = false;
+        btn.textContent = originalLabel;
+    }
+
     document.getElementById('shareBtn').addEventListener('click', async () => {
         const shareStatus = document.getElementById('shareStatus');
         const url = `${window.location.origin}${window.location.pathname}?u=${encodeURIComponent(visitorId)}`;
@@ -2115,6 +2594,12 @@
 
         const params = new URLSearchParams(window.location.search);
         const sharedId = params.get('u');
+        const sharedCategory = params.get('cat');
+
+        if (sharedId && sharedCategory) {
+            renderSharedCategoryView(sharedId, sharedCategory);
+            return;
+        }
 
         if (sharedId) {
             // Vue "Top d'un ami" : lecture seule, pas besoin de pseudo

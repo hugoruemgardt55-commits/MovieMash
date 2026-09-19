@@ -1314,7 +1314,7 @@
                 <div id="categoryPicker"></div>
                 <div id="categorySelectedView" style="display:none;">
                     <div class="daily-theme" id="categoryTitle"></div>
-                    <div class="daily-sub">Classe ces 10 films du meilleur (1) au moins bon (10) — indépendant de tes votes en duel</div>
+                    <div class="daily-sub">Classe ces 9 films du meilleur (1) au moins bon (9) — indépendant de tes votes en duel</div>
                     <div style="text-align:center; margin-bottom:18px;">
                         <button class="not-seen-link" id="categoryBackBtn" type="button" style="display:inline-flex;">← Changer de catégorie</button>
                     </div>
@@ -1515,7 +1515,7 @@
     // Classement manuel indépendant : l'utilisateur glisse 10 films d'un genre donné
     // dans un classement à sa main, du meilleur (1) au moins bon (10). Ne touche à
     // aucun score de vote (ni global, ni personnel) — c'est un classement à part.
-    const CATEGORY_TIER_SIZE = 10;
+    const CATEGORY_TIER_SIZE = 9;
     let categoryGenre = null;
     let categorySlots = []; // tableau de 10 cases : id de film ou null
     let categoryPoolIds = []; // films pas encore placés
@@ -1780,6 +1780,7 @@
         const clone = tile.cloneNode(true);
         clone.classList.add('tier-drag-clone');
         clone.style.width = rect.width + 'px';
+        clone.style.height = rect.height + 'px';
         clone.style.left = rect.left + 'px';
         clone.style.top = rect.top + 'px';
         document.body.appendChild(clone);
@@ -2436,7 +2437,7 @@
             <div class="shared-card">
               <h2>Le Top ${genre} de ${name}</h2>
               <div class="shared-sub">Classé à la main, film par film, sur MovieSmash</div>
-              ${tier.ranking.slice(0, 10).map((movieId, i) => {const m = movies[movieId] || {title: movieId,year: '',poster_url: null};return `<div class="shared-row">
+              ${tier.ranking.slice(0, 9).map((movieId, i) => {const m = movies[movieId] || {title: movieId,year: '',poster_url: null};return `<div class="shared-row">
                       <div class="shared-rank">#${i + 1}</div>
                       ${m.poster_url ? `<img class="shared-poster" src="${m.poster_url}" alt="">` : ''}
                       <div class="shared-title">${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></div>

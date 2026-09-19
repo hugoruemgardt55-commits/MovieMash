@@ -514,6 +514,57 @@
         font-family: 'JetBrains Mono', monospace;
     }
 
+    .category-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        justify-content: center;
+        padding: 10px 0;
+    }
+
+    .category-chip {
+        background: var(--card);
+        border: 1px solid var(--line);
+        color: var(--cream);
+        padding: 12px 18px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-family: 'Inter', sans-serif;
+        font-size: 13.5px;
+        text-align: center;
+        transition: border-color .15s ease;
+        min-width: 110px;
+    }
+
+    .category-chip:hover, .category-chip:focus-visible {
+        border-color: var(--gold);
+    }
+
+    .category-chip .chip-count {
+        display: block;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10.5px;
+        color: var(--muted);
+        margin-top: 4px;
+    }
+
+    .category-chip.complete {
+        border-color: var(--gold);
+        background: rgba(232, 184, 74, 0.08);
+    }
+
+    .category-complete-banner {
+        text-align: center;
+        background: rgba(232, 184, 74, 0.1);
+        border: 1px solid var(--gold);
+        border-radius: 8px;
+        padding: 14px;
+        margin: 18px 0;
+        color: var(--gold);
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 13px;
+    }
+
     .discovery-banner {
         background: rgba(232, 184, 74, 0.08);
         border: 1px solid var(--gold);
@@ -836,6 +887,7 @@
                     La Séance du jour 
                     <span class="tab-badge" id="dailyTabBadge"></span>
                 </button>
+                <button class="tab-btn" id="tabCategory" type="button">Catégories</button>
             </div>
 
             <div id="freeTabContent">
@@ -843,6 +895,23 @@
             </div>
             <div id="dailyTabContent" style="display:none;">
                 <div id="dailyDuelWrap"></div>
+            </div>
+            <div id="categoryTabContent" style="display:none;">
+                <div id="categoryPicker"></div>
+                <div id="categorySelectedView" style="display:none;">
+                    <div class="daily-theme" id="categoryTitle"></div>
+                    <div style="text-align:center; margin-bottom:16px;">
+                        <button class="not-seen-link" id="categoryBackBtn" type="button" style="display:inline-flex;">← Changer de catégorie</button>
+                    </div>
+                    <div class="progress-wrap">
+                        <div class="progress-track">
+                            <div class="progress-fill" id="categoryProgressFill"></div>
+                        </div>
+                        <div class="progress-label" id="categoryProgressLabel">0 / 10 films classés</div>
+                    </div>
+                    <div class="arena" id="categoryArena"></div>
+                    <div id="categoryTop10Wrap"></div>
+                </div>
             </div>
 
             <section class="panel">
@@ -1020,6 +1089,228 @@
         markShown(challenger);
         return challenger;
     }
+
+    // ---------- Catégories ----------
+    // Même mécanique de vote que le mode libre, mais restreinte à un genre choisi,
+    // avec un objectif clair (10 films classés) plutôt qu'un vote sans fin.
+    const CATEGORY_TARGET = 10;
+    let categoryGenre = null;
+    let categoryPair = null;
+
+    function getCategoryPool(genre) {
+        return Object.keys(movies).filter(id => !skippedIds.has(id) && movies[id].genre === genre);
+    }
+
+    function categoryProgressCount(genre) {
+        return Object.keys(personalRatings).filter(id => personalRatings[id].votes > 0 && movies[id] && movies[id].genre === genre).length;
+    }
+
+    function pickCategoryPair() {
+        const pool = getCategoryPool(categoryGenre);
+        if (pool.length < 2)
+            return null;
+        let filtered = pool.filter(id => !recentlyShown.includes(id));
+        if (filtered.length < 2)
+            filtered = pool;
+        const a = filtered[Math.floor(Math.random() * filtered.length)];
+        let bPool = filtered.filter(id => id !== a);
+        if (bPool.length === 0)
+            bPool = pool.filter(id => id !== a);
+        const b = bPool[Math.floor(Math.random() * bPool.length)];
+        markShown(a, b);
+        return [a, b];
+    }
+
+    function pickCategoryChallenger(excludeId) {
+        const pool = getCategoryPool(categoryGenre).filter(id => id !== excludeId);
+        if (pool.length === 0)
+            return null;
+        let filtered = pool.filter(id => !recentlyShown.includes(id));
+        if (filtered.length === 0)
+            filtered = pool;
+        const challenger = filtered[Math.floor(Math.random() * filtered.length)];
+        markShown(challenger);
+        return challenger;
+    }
+
+    function renderCategoryPicker() {
+        const wrap = document.getElementById('categoryPicker');
+        const genres = [...new Set(Object.values(movies).map(m => m.genre).filter(Boolean))].sort();
+        if (genres.length === 0) {
+            wrap.innerHTML = '<div class="empty-msg">Aucune catégorie disponible pour le moment.</div>';
+            return;
+        }
+        wrap.innerHTML = `
+            <div class="daily-sub" style="margin-bottom:14px;">Choisis une catégorie et classe 10 films pour débloquer ton Top de la catégorie</div>
+            <div class="category-grid">
+              ${genres.map(g => {const total = getCategoryPool(g).length;const progress = Math.min(categoryProgressCount(g), CATEGORY_TARGET);const complete = progress >= CATEGORY_TARGET;return `<button class="category-chip ${complete ? 'complete' : ''}" data-genre="${g}">${g}<span class="chip-count">${complete ? '✓ complété' : `${progress}/${CATEGORY_TARGET}`}</span></button>`;}).join('')}
+            </div>`;
+        wrap.querySelectorAll('.category-chip').forEach(btn => {
+            btn.addEventListener('click', () => selectCategory(btn.dataset.genre));
+        });
+    }
+
+    function selectCategory(genre) {
+        categoryGenre = genre;
+        document.getElementById('categoryPicker').style.display = 'none';
+        document.getElementById('categorySelectedView').style.display = 'block';
+        document.getElementById('categoryTitle').textContent = genre;
+        categoryPair = pickCategoryPair();
+        renderCategoryArena();
+        renderCategoryProgress();
+    }
+
+    document.getElementById('categoryBackBtn').addEventListener('click', () => {
+        categoryGenre = null;
+        document.getElementById('categorySelectedView').style.display = 'none';
+        document.getElementById('categoryPicker').style.display = 'block';
+        renderCategoryPicker();
+    });
+
+    function renderCategoryProgress() {
+        const count = Math.min(categoryProgressCount(categoryGenre), CATEGORY_TARGET);
+        const pct = Math.round((count / CATEGORY_TARGET) * 100);
+        document.getElementById('categoryProgressFill').style.width = pct + '%';
+        document.getElementById('categoryProgressLabel').textContent = `${count} / ${CATEGORY_TARGET} films classés`;
+        renderCategoryTop10();
+    }
+
+    function renderCategoryTop10() {
+        const wrap = document.getElementById('categoryTop10Wrap');
+        const count = categoryProgressCount(categoryGenre);
+        if (count < CATEGORY_TARGET) {
+            wrap.innerHTML = '';
+            return;
+        }
+        const entries = Object.entries(personalRatings)
+        .filter(([id, r]) => r.votes > 0 && movies[id] && movies[id].genre === categoryGenre)
+        .sort((a, b) => b[1].rating - a[1].rating)
+        .slice(0, 10);
+        wrap.innerHTML = `
+            <div class="category-complete-banner">🏆 Catégorie complétée — voici ton Top ${entries.length} ${categoryGenre}</div>
+            <table><thead><tr><th>Rang</th><th>Film</th><th style="text-align:right;">Score</th></tr></thead>
+              <tbody>${entries.map(([id, r], i) => `<tr><td class="rank">#${i + 1}</td><td>${movies[id].title} <span style="color:var(--muted); font-size:12px;">(${movies[id].year})</span></td><td class="rating">${r.rating}</td></tr>`).join('')}</tbody></table>`;
+    }
+
+    function renderCategoryArena() {
+        const arena = document.getElementById('categoryArena');
+        if (!categoryPair) {
+            arena.innerHTML = '<div class="empty-msg">Pas assez de films dans cette catégorie pour continuer le duel.</div>';
+            return;
+        }
+        const [idA, idB] = categoryPair;
+        const a = movies[idA],
+            b = movies[idB];
+        const cardStyle = (m) => m.poster_url
+        ? `style="background-image: linear-gradient(180deg, rgba(11,11,13,0.15) 45%, rgba(11,11,13,0.97) 92%), url('${m.poster_url}'); background-size: cover; background-position: center top;"`
+        : '';
+        arena.innerHTML = `
+            <div class="card-slot">
+              <div class="card" id="catCardA" ${cardStyle(a)} tabindex="0" role="button" aria-label="Voter pour ${a.title}">
+                <div class="year">${a.year}</div>
+                <div class="title">${a.title}</div>
+              </div>
+            </div>
+            <div class="vs-badge">VS</div>
+            <div class="card-slot">
+              <div class="card" id="catCardB" ${cardStyle(b)} tabindex="0" role="button" aria-label="Voter pour ${b.title}">
+                <div class="year">${b.year}</div>
+                <div class="title">${b.title}</div>
+              </div>
+            </div>`;
+        const onKeyActivate = (fn) => (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                fn();
+            }
+        };
+        document.getElementById('catCardA').addEventListener('click', () => handleCategoryVote(idA, idB));
+        document.getElementById('catCardA').addEventListener('keydown', onKeyActivate(() => handleCategoryVote(idA, idB)));
+        document.getElementById('catCardB').addEventListener('click', () => handleCategoryVote(idB, idA));
+        document.getElementById('catCardB').addEventListener('keydown', onKeyActivate(() => handleCategoryVote(idB, idA)));
+    }
+
+    function handleCategoryVote(winnerId, loserId) {
+        const winner = movies[winnerId],
+            loser = movies[loserId];
+        const K = 32;
+        const expWin = expectedScore(winner.rating, loser.rating);
+        const expLose = expectedScore(loser.rating, winner.rating);
+        winner.rating = Math.round(winner.rating + K * (1 - expWin));
+        loser.rating = Math.round(loser.rating + K * (0 - expLose));
+        winner.votes += 1;
+        loser.votes += 1;
+
+        if (!personalRatings[winnerId])
+            personalRatings[winnerId] = {
+                rating: 1500,
+                votes: 0
+            };
+        if (!personalRatings[loserId])
+            personalRatings[loserId] = {
+                rating: 1500,
+                votes: 0
+            };
+        const pWinner = personalRatings[winnerId],
+            pLoser = personalRatings[loserId];
+        const pExpWin = expectedScore(pWinner.rating, pLoser.rating);
+        const pExpLose = expectedScore(pLoser.rating, pWinner.rating);
+        pWinner.rating = Math.round(pWinner.rating + K * (1 - pExpWin));
+        pLoser.rating = Math.round(pLoser.rating + K * (0 - pExpLose));
+        pWinner.votes += 1;
+        pLoser.votes += 1;
+
+        const winnerSlot = winnerId === categoryPair[0] ? 0 : 1;
+        const challengerId = pickCategoryChallenger(winnerId);
+        categoryPair = challengerId === null ? null : (winnerSlot === 0 ? [winnerId, challengerId] : [challengerId, winnerId]);
+
+        renderCategoryArena();
+        renderCategoryProgress();
+        renderLeaderboard();
+        renderPersonalTop();
+        renderProgress();
+
+        Promise.all([
+        supabaseClient.from('movies').update({
+            rating: winner.rating,
+            votes: winner.votes
+        }).eq('id', winnerId),
+        supabaseClient.from('movies').update({
+            rating: loser.rating,
+            votes: loser.votes
+        }).eq('id', loserId),
+        supabaseClient.from('personal_ratings').upsert([
+        {
+            visitor_id: visitorId,
+            movie_id: winnerId,
+            rating: pWinner.rating,
+            votes: pWinner.votes
+        },
+        {
+            visitor_id: visitorId,
+            movie_id: loserId,
+            rating: pLoser.rating,
+            votes: pLoser.votes
+        }
+        ], {
+            onConflict: 'visitor_id,movie_id'
+        })
+        ]).catch(err => console.error('Erreur en enregistrant le vote de catégorie :', err));
+    }
+
+    document.getElementById('tabCategory').addEventListener('click', () => {
+        document.getElementById('tabCategory').classList.add('active');
+        document.getElementById('tabFree').classList.remove('active');
+        document.getElementById('tabDaily').classList.remove('active');
+        document.getElementById('freeTabContent').style.display = 'none';
+        document.getElementById('dailyTabContent').style.display = 'none';
+        document.getElementById('categoryTabContent').style.display = 'block';
+        if (categoryGenre) {
+            renderCategoryProgress();
+        } else {
+            renderCategoryPicker();
+        }
+    });
 
     function renderArena() {
         const arena = document.getElementById('arena');
@@ -1312,14 +1603,18 @@
     document.getElementById('tabFree').addEventListener('click', () => {
         document.getElementById('tabFree').classList.add('active');
         document.getElementById('tabDaily').classList.remove('active');
+        document.getElementById('tabCategory').classList.remove('active');
         document.getElementById('freeTabContent').style.display = 'block';
         document.getElementById('dailyTabContent').style.display = 'none';
+        document.getElementById('categoryTabContent').style.display = 'none';
     });
     document.getElementById('tabDaily').addEventListener('click', () => {
         document.getElementById('tabDaily').classList.add('active');
         document.getElementById('tabFree').classList.remove('active');
+        document.getElementById('tabCategory').classList.remove('active');
         document.getElementById('freeTabContent').style.display = 'none';
         document.getElementById('dailyTabContent').style.display = 'block';
+        document.getElementById('categoryTabContent').style.display = 'none';
         renderDailyDuel();
         // Le bandeau explicatif ne doit s'afficher qu'une fois dans la vie du visiteur,
         // mais l'alerte rouge (badge + contour) reste tant que le vote du jour n'est pas fait.

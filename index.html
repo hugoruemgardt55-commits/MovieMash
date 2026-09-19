@@ -759,7 +759,11 @@
         border: 2px dashed var(--line);
         border-radius: 8px;
         padding: 5px 10px;
-        transition: border-color .15s ease, background .15s ease;
+        transition: border-color .15s ease, background .15s ease, transform .12s ease-out;
+    }
+
+    .tier-slot.magnet-pull {
+        border-color: rgba(232, 184, 74, 0.55);
     }
 
     @keyframes chip-pop-in {
@@ -801,6 +805,180 @@
         z-index: 1000;
         border-radius: 2px;
         animation: confetti-burst .85s cubic-bezier(.15, .65, .35, 1) forwards;
+    }
+
+    .category-curtain {
+        position: absolute;
+        inset: 0;
+        z-index: 60;
+        display: flex;
+        pointer-events: none;
+    }
+
+    .curtain-panel {
+        width: 50%;
+        height: 100%;
+        background: linear-gradient(120deg, #7a1f38, #4a1020 60%, #2a0912);
+        position: relative;
+        box-shadow: inset 0 0 70px rgba(0, 0, 0, 0.55);
+    }
+
+    .curtain-panel::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0 8px, rgba(0, 0, 0, 0.08) 8px 16px);
+    }
+
+    .curtain-left {
+        border-right: 2px solid rgba(232, 184, 74, 0.4);
+    }
+
+    .curtain-right {
+        border-left: 2px solid rgba(232, 184, 74, 0.4);
+    }
+
+    .category-curtain.opening .curtain-left {
+        animation: curtain-open-left .7s cubic-bezier(.6, 0, .3, 1) forwards;
+    }
+
+    .category-curtain.opening .curtain-right {
+        animation: curtain-open-right .7s cubic-bezier(.6, 0, .3, 1) forwards;
+    }
+
+    @keyframes curtain-open-left {
+        to {
+            transform: translateX(-100%);
+        }
+    }
+
+    @keyframes curtain-open-right {
+        to {
+            transform: translateX(100%);
+        }
+    }
+
+    .camera-flash {
+        position: fixed;
+        width: 14px;
+        height: 14px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 18px 6px rgba(255, 255, 255, 0.9);
+        pointer-events: none;
+        z-index: 1001;
+        animation: camera-flash-anim .35s ease-out forwards;
+    }
+
+    @keyframes camera-flash-anim {
+        0% {
+            opacity: 0;
+            transform: scale(0.3);
+        }
+
+        30% {
+            opacity: 1;
+            transform: scale(1.2);
+        }
+
+        100% {
+            opacity: 0;
+            transform: scale(0.6);
+        }
+    }
+
+    .result-podium {
+        display: flex;
+        align-items: flex-end;
+        justify-content: center;
+        gap: 14px;
+        margin: 6px 0 22px;
+    }
+
+    .result-podium-slot {
+        position: relative;
+        border-radius: 10px;
+        background-size: cover;
+        background-position: center top;
+        background-color: var(--card);
+        opacity: 0;
+        animation: podium-rise .6s cubic-bezier(.34, 1.56, .64, 1) forwards;
+        overflow: hidden;
+    }
+
+    .result-podium-slot.no-poster {
+        background-image: none !important;
+        background: linear-gradient(160deg, var(--card), var(--teal));
+    }
+
+    .result-podium-1st {
+        width: 128px;
+        height: 192px;
+        order: 2;
+        border: 2px solid #E8B84B;
+        box-shadow: 0 0 20px rgba(232, 184, 74, 0.45);
+    }
+
+    .result-podium-2nd {
+        width: 96px;
+        height: 144px;
+        order: 1;
+        border: 2px solid #C7C7C7;
+        box-shadow: 0 0 14px rgba(199, 199, 199, 0.3);
+    }
+
+    .result-podium-3rd {
+        width: 96px;
+        height: 144px;
+        order: 3;
+        border: 2px solid #CD7F32;
+        box-shadow: 0 0 14px rgba(205, 127, 50, 0.3);
+    }
+
+    .result-podium-rank {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        color: #1a1500;
+        z-index: 2;
+    }
+
+    .result-podium-1st .result-podium-rank {
+        background: #E8B84B;
+    }
+
+    .result-podium-2nd .result-podium-rank {
+        background: #C7C7C7;
+    }
+
+    .result-podium-3rd .result-podium-rank {
+        background: #CD7F32;
+    }
+
+    @keyframes podium-rise {
+        from {
+            opacity: 0;
+            transform: translateY(46px) scale(0.7);
+        }
+
+        65% {
+            opacity: 1;
+            transform: translateY(-8px) scale(1.06);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
     }
 
     @keyframes confetti-burst {
@@ -1475,7 +1653,11 @@
             </div>
             <div id="categoryTabContent" style="display:none;">
                 <div id="categoryPicker"></div>
-                <div id="categorySelectedView" style="display:none;">
+                <div id="categorySelectedView" style="display:none; position:relative;">
+                    <div id="categoryCurtain" class="category-curtain" style="display:none;">
+                        <div class="curtain-panel curtain-left"></div>
+                        <div class="curtain-panel curtain-right"></div>
+                    </div>
                     <div class="daily-theme" id="categoryTitle"></div>
                     <div class="daily-sub">Classe ces 9 films du meilleur (1) au moins bon (9) — indépendant de tes votes en duel</div>
                     <div style="text-align:center; margin-bottom:18px;">
@@ -1825,7 +2007,7 @@
         document.getElementById('categoryPicker').style.display = 'none';
         const selectedView = document.getElementById('categorySelectedView');
         selectedView.style.display = 'block';
-        fadeInEl(selectedView);
+        playCurtainOpen();
         document.getElementById('categoryTitle').textContent = genre;
 
         const pool = getCategoryPool(genre);
@@ -1976,6 +2158,20 @@
         }
     }
 
+    function launchCameraFlashes(container, count) {
+        if (!container)
+            return;
+        const rect = container.getBoundingClientRect();
+        for (let i = 0; i < (count || 2); i++) {
+            const f = document.createElement('div');
+            f.className = 'camera-flash';
+            f.style.left = (rect.left + Math.random() * rect.width) + 'px';
+            f.style.top = (rect.top + rect.height * 0.15 + Math.random() * rect.height * 0.5) + 'px';
+            document.body.appendChild(f);
+            setTimeout(() => f.remove(), 400);
+        }
+    }
+
     function renderCategoryCompletionArea() {
         const area = document.getElementById('categoryCompletionArea');
         const complete = categorySlots.every(Boolean);
@@ -2012,11 +2208,31 @@
         const wrap = document.getElementById('categoryFinishedView');
         wrap.style.display = 'block';
         const ranked = categorySlots.filter(Boolean);
+        const top3 = ranked.slice(0, 3);
+        const rest = ranked.slice(3);
+
+        const podiumSlotHTML = (id, rank, cls, delay) => {
+            if (!id)
+                return '';
+            const m = movies[id];
+            const posterStyle = m.poster_url ? `style="background-image:url('${m.poster_url}');"` : '';
+            return `<div class="result-podium-slot ${cls} ${m.poster_url ? '' : 'no-poster'}" ${posterStyle} style="animation-delay:${delay}ms;">
+                  <div class="result-podium-rank">${rank}</div>
+                </div>`;
+        };
+        // Le 3e monte en premier, puis le 2e, puis le 1er en dernier avec le plus gros impact
+        const podiumHTML = top3.length > 0 ? `<div class="result-podium">
+            ${podiumSlotHTML(top3[1], 2, 'result-podium-2nd', 280)}
+            ${podiumSlotHTML(top3[0], 1, 'result-podium-1st', 560)}
+            ${podiumSlotHTML(top3[2], 3, 'result-podium-3rd', 0)}
+          </div>` : '';
+
         wrap.innerHTML = `
             <div class="category-complete-banner shine-sweep"><svg viewBox="0 0 20 20" width="16" height="16" fill="none" style="vertical-align:-3px; margin-right:6px;"><rect x="2" y="11" width="4" height="7" rx="1" fill="var(--gold)"/><rect x="8" y="6" width="4" height="12" rx="1" fill="var(--gold)"/><rect x="14" y="2" width="4" height="16" rx="1" fill="var(--gold)"/></svg>Ton Top ${ranked.length} ${categoryGenre} est prêt</div>
+            ${podiumHTML}
             <div class="tier-list">
-              ${ranked.map((id, i) => {const m = movies[id];const posterStyle = m.poster_url ? `style="background-image:url('${m.poster_url}');"` : '';const medalClass = i === 0 ? 'rank-gold' : i === 1 ? 'rank-silver' : i === 2 ? 'rank-bronze' : '';return `<div class="tier-row-finished" style="animation: row-fade-in .35s ease both; animation-delay:${Math.min(i * 60, 480)}ms;">
-                      <div class="shared-rank ${medalClass}">#${i + 1}</div>
+              ${rest.map((id, i) => {const m = movies[id];const posterStyle = m.poster_url ? `style="background-image:url('${m.poster_url}');"` : '';return `<div class="tier-row-finished" style="animation: row-fade-in .35s ease both; animation-delay:${700 + Math.min(i * 60, 480)}ms;">
+                      <div class="shared-rank">#${i + 4}</div>
                       <div class="finished-poster ${m.poster_url ? '' : 'no-poster'}" ${posterStyle}></div>
                       <div class="finished-info"><div class="finished-title">${m.title}</div><div class="finished-year">${m.year}</div></div>
                     </div>`;}).join('')}
@@ -2029,6 +2245,14 @@
             <div style="text-align:center; margin-top:14px;">
               <button class="not-seen-link" id="categoryEditAgainBtn" type="button" style="display:inline-flex;">Modifier ce classement</button>
             </div>`;
+
+        // Flashs de photographe synchronisés avec l'arrivée de chaque marche du podium
+        const podiumEl = wrap.querySelector('.result-podium');
+        if (podiumEl) {
+            [0, 280, 560].forEach(delay => {
+                setTimeout(() => launchCameraFlashes(podiumEl, 2), delay + 140);
+            });
+        }
 
         document.getElementById('categoryEditAgainBtn').addEventListener('click', () => {
             categoryFinished = false;
@@ -2100,6 +2324,31 @@
         const slot = target && target.closest('.tier-slot');
         if (slot)
             slot.classList.add('drag-over');
+
+        // Effet magnétique : les emplacements proches (mais pas encore directement survolés)
+        // sont légèrement attirés vers le curseur, pour un geste plus satisfaisant.
+        const MAGNET_RADIUS = 70;
+        document.querySelectorAll('.tier-slot').forEach(s => {
+            if (s === slot) {
+                s.classList.remove('magnet-pull');
+                s.style.transform = '';
+                return;
+            }
+            const r = s.getBoundingClientRect();
+            const cx = r.left + r.width / 2,
+                cy = r.top + r.height / 2;
+            const dist = Math.hypot(e.clientX - cx, e.clientY - cy);
+            if (dist < MAGNET_RADIUS) {
+                const pull = (1 - dist / MAGNET_RADIUS) * 6;
+                const dx = (e.clientX - cx) / (dist || 1) * pull;
+                const dy = (e.clientY - cy) / (dist || 1) * pull;
+                s.classList.add('magnet-pull');
+                s.style.transform = `translate(${dx}px, ${dy}px) scale(1.03)`;
+            } else if (s.classList.contains('magnet-pull')) {
+                s.classList.remove('magnet-pull');
+                s.style.transform = '';
+            }
+        });
     }
 
     function onTierDragEnd(e) {
@@ -2140,6 +2389,10 @@
         if (tierDrag.sourceEl)
             tierDrag.sourceEl.style.visibility = '';
         document.querySelectorAll('.tier-slot.drag-over').forEach(el => el.classList.remove('drag-over'));
+        document.querySelectorAll('.tier-slot.magnet-pull').forEach(el => {
+            el.classList.remove('magnet-pull');
+            el.style.transform = '';
+        });
         document.body.classList.remove('tier-dragging');
         window.removeEventListener('pointermove', onTierDragMove);
         window.removeEventListener('pointerup', onTierDragEnd);
@@ -2176,6 +2429,20 @@
         fadeInEl(picker);
         renderCategoryPicker();
     });
+
+    function playCurtainOpen() {
+        const curtain = document.getElementById('categoryCurtain');
+        if (!curtain)
+            return;
+        curtain.style.display = 'flex';
+        curtain.classList.remove('opening');
+        void curtain.offsetWidth; // force le navigateur à relancer l'animation à chaque fois
+        curtain.classList.add('opening');
+        setTimeout(() => {
+            curtain.style.display = 'none';
+            curtain.classList.remove('opening');
+        }, 750);
+    }
 
     function fadeInEl(el) {
         if (!el)

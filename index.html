@@ -35,7 +35,7 @@
         --gold: #E8B84B;
         --velvet: #9A2846;
         --cream: #F5EDE0;
-        --teal: #3C6E68;
+        --teal: #52948C;
         --muted: #948E86;
         --line: #322E36;
         --rec: #FF3B3B;
@@ -759,8 +759,6 @@
         border: 1px solid var(--line);
         border-radius: 10px;
         padding: 12px;
-        max-height: 560px;
-        overflow-y: auto;
     }
 
     .tier-pool-empty-label {
@@ -835,6 +833,11 @@
         opacity: 0.9;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         border-radius: 8px;
+    }
+
+    body.tier-dragging {
+        user-select: none;
+        -webkit-user-select: none;
     }
 
     .tier-complete-prompt {
@@ -1263,7 +1266,7 @@
 
                       Ce produit utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.
                 <br>
-                <a href="./legal.html" style="color:var(--muted);">Mentions légales & confidentialité</a>
+                <a href="./legal.html" style="color:var(--muted);">CGU, mentions légales & confidentialité</a>
             </div>
         </div>
     </main>
@@ -1647,6 +1650,8 @@
     function onTierDragStart(e) {
         if (categoryFinished)
             return;
+        e.preventDefault();
+        document.body.classList.add('tier-dragging');
         const tile = e.currentTarget;
         const rect = tile.getBoundingClientRect();
         const clone = tile.cloneNode(true);
@@ -1718,6 +1723,7 @@
         if (tierDrag.sourceEl)
             tierDrag.sourceEl.style.visibility = '';
         document.querySelectorAll('.tier-slot.drag-over').forEach(el => el.classList.remove('drag-over'));
+        document.body.classList.remove('tier-dragging');
         window.removeEventListener('pointermove', onTierDragMove);
         window.removeEventListener('pointerup', onTierDragEnd);
         tierDrag = null;
@@ -2283,7 +2289,7 @@
               <div class="shared-sub">Construit vote après vote sur MovieSmash</div>
               ${top.map((r, i) => {const m = movies[r.movie_id] || {title: r.movie_id,year: '',poster_url: null};return `<div class="shared-row">
                       <div class="shared-rank">#${i + 1}</div>
-                      ${m.poster_url ? `<img class="shared-poster" src="${m.poster_url}" alt="">` : ''}
+                      ${m.poster_url ? `<img class="shared-poster" src="${m.poster_url}" alt="Affiche du film ${m.title}">` : ''}
                       <div class="shared-title">${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></div>
                     </div>`;}).join('')}
               <div class="cta-own"><a href="${window.location.pathname}">Voter et prouver que j'ai meilleur goût</a></div>
@@ -2311,7 +2317,7 @@
               <div class="shared-sub">Classé à la main, film par film, sur MovieSmash</div>
               ${tier.ranking.slice(0, 9).map((movieId, i) => {const m = movies[movieId] || {title: movieId,year: '',poster_url: null};return `<div class="shared-row">
                       <div class="shared-rank">#${i + 1}</div>
-                      ${m.poster_url ? `<img class="shared-poster" src="${m.poster_url}" alt="">` : ''}
+                      ${m.poster_url ? `<img class="shared-poster" src="${m.poster_url}" alt="Affiche du film ${m.title}">` : ''}
                       <div class="shared-title">${m.title} <span style="color:var(--muted); font-size:12px;">(${m.year})</span></div>
                     </div>`;}).join('')}
               <div class="cta-own"><a href="${window.location.pathname}">Voter et prouver que j'ai meilleur goût</a></div>

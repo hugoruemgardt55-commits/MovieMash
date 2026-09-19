@@ -839,22 +839,22 @@
     }
 
     .category-curtain.opening .curtain-left {
-        animation: curtain-open-left .7s cubic-bezier(.6, 0, .3, 1) forwards;
+        animation: curtain-open-left 1.3s cubic-bezier(.65, 0, .35, 1) forwards;
     }
 
     .category-curtain.opening .curtain-right {
-        animation: curtain-open-right .7s cubic-bezier(.6, 0, .3, 1) forwards;
+        animation: curtain-open-right 1.3s cubic-bezier(.65, 0, .35, 1) forwards;
     }
 
     @keyframes curtain-open-left {
         to {
-            transform: translateX(-100%);
+            transform: translateX(-82%);
         }
     }
 
     @keyframes curtain-open-right {
         to {
-            transform: translateX(100%);
+            transform: translateX(82%);
         }
     }
 
@@ -2436,13 +2436,13 @@
             return;
         curtain.style.display = 'flex';
         curtain.classList.remove('opening');
-        void curtain.offsetWidth; // force le navigateur à relancer l'animation à chaque fois
+        void curtain.offsetWidth; // force le navigateur à relancer l'animation à chaque fois, même déjà ouvert
         curtain.classList.add('opening');
-        setTimeout(() => {
-            curtain.style.display = 'none';
-            curtain.classList.remove('opening');
-        }, 750);
+
+
     }
+    // Le rideau ne se referme/cache plus après coup : il reste tiré sur les côtés,
+    // comme un vrai cadre de scène, tant que la catégorie est affichée.
 
     function fadeInEl(el) {
         if (!el)

@@ -848,14 +848,36 @@
 
     @keyframes curtain-open-left {
         to {
-            transform: translateX(-82%);
+            transform: translateX(-100%);
         }
     }
 
     @keyframes curtain-open-right {
         to {
-            transform: translateX(82%);
+            transform: translateX(100%);
         }
+    }/* Liseré permanent, largeur fixe en pixels (pas de % fragile) — reste visible en cadre
+         tout le temps que la catégorie est affichée, indépendamment de l'animation des grands pans. */
+
+    #categorySelectedView::before, #categorySelectedView::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 9px;
+        z-index: 55;
+        pointer-events: none;
+        background: linear-gradient(180deg, #7a1f38, #4a1020 60%, #2a0912);
+    }
+
+    #categorySelectedView::before {
+        left: 0;
+        border-right: 2px solid rgba(232, 184, 74, 0.4);
+    }
+
+    #categorySelectedView::after {
+        right: 0;
+        border-left: 2px solid rgba(232, 184, 74, 0.4);
     }
 
     .camera-flash {

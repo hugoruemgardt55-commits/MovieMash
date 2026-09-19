@@ -574,129 +574,7 @@
         display: flex;
         flex-direction: column;
         gap: 16px;
-    }/* Podium du trio de tête — l'affiche EST le podium, différenciée par taille + bordure colorée */
-
-    .tier-podium {
-        display: flex;
-        align-items: flex-end;
-        justify-content: center;
-        gap: 14px;
-        margin-bottom: 4px;
-    }
-
-    .podium-slot {
-        position: relative;
-        border: 2px dashed var(--line);
-        border-radius: 10px;
-        background-color: var(--bg-alt);
-        background-size: cover;
-        background-position: center top;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: grab;
-        touch-action: none;
-        user-select: none;
-        -webkit-user-select: none;
-        overflow: hidden;
-        transition: border-color .15s ease, background-color .15s ease;
-        flex-shrink: 0;
-        padding: 0;
-        min-height: 0;
-        gap: 0;
-    }
-
-    .podium-slot:active {
-        cursor: grabbing;
-    }
-
-    .podium-slot.drag-over {
-        border-color: var(--gold);
-        background-color: rgba(232, 184, 74, 0.08);
-    }
-
-    .podium-slot.no-poster {
-        background: linear-gradient(160deg, var(--card), var(--teal));
-    }
-
-    .podium-slot .tier-slot-empty-label {
-        text-align: center;
-        padding: 0 6px;
-    }
-
-    .podium-1st {
-        width: 128px;
-        height: 192px;
-        order: 2;
-    }
-
-    .podium-2nd {
-        width: 94px;
-        height: 141px;
-        order: 1;
-    }
-
-    .podium-3rd {
-        width: 94px;
-        height: 141px;
-        order: 3;
-    }
-
-    .podium-1st.filled {
-        border-style: solid;
-        border-color: #E8B84B;
-        box-shadow: 0 0 16px rgba(232, 184, 74, 0.4);
-    }
-
-    .podium-2nd.filled {
-        border-style: solid;
-        border-color: #C7C7C7;
-        box-shadow: 0 0 10px rgba(199, 199, 199, 0.3);
-    }
-
-    .podium-3rd.filled {
-        border-style: solid;
-        border-color: #CD7F32;
-        box-shadow: 0 0 10px rgba(205, 127, 50, 0.3);
-    }
-
-    .podium-rank-badge {
-        position: absolute;
-        top: 6px;
-        left: 6px;
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: 'Bebas Neue', sans-serif;
-        font-size: 13px;
-        color: #1a1500;
-        font-weight: 700;
-        z-index: 2;
-    }
-
-    .podium-1st .podium-rank-badge {
-        background: #E8B84B;
-    }
-
-    .podium-2nd .podium-rank-badge {
-        background: #C7C7C7;
-    }
-
-    .podium-3rd .podium-rank-badge {
-        background: #CD7F32;
-    }
-
-    .podium-no-poster-label {
-        font-size: 10px;
-        color: var(--cream);
-        text-align: center;
-        line-height: 1.2;
-        padding: 4px;
-        font-family: 'Inter', sans-serif;
-    }/* Rangs 4 à 10, en grille de 3 colonnes */
+    }/* Grille unique de 9 films — rangs 1 à 3 repérés par une pastille colorée */
 
     .tier-slots-grid {
         display: grid;
@@ -716,6 +594,21 @@
         width: auto;
         font-size: 16px;
         text-align: center;
+    }
+
+    .tier-slots-grid .tier-slot .tier-rank.rank-gold {
+        color: #E8B84B;
+        text-shadow: 0 0 8px rgba(232, 184, 74, 0.5);
+    }
+
+    .tier-slots-grid .tier-slot .tier-rank.rank-silver {
+        color: #C7C7C7;
+        text-shadow: 0 0 6px rgba(199, 199, 199, 0.35);
+    }
+
+    .tier-slots-grid .tier-slot .tier-rank.rank-bronze {
+        color: #CD7F32;
+        text-shadow: 0 0 6px rgba(205, 127, 50, 0.35);
     }
 
     .tier-slots-grid .tier-slot .tier-tile {
@@ -859,8 +752,8 @@
 
     .tier-pool {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-        gap: 12px;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
         align-content: flex-start;
         background: var(--bg-alt);
         border: 1px solid var(--line);
@@ -1523,7 +1416,12 @@
     let categoryPoolFilter = '';
     let categoryPoolPage = 0;
 
+    const FRENCH_PSEUDO_CATEGORY = 'Film français';
+
     function getCategoryPool(genre) {
+        if (genre === FRENCH_PSEUDO_CATEGORY) {
+            return Object.keys(movies).filter(id => !skippedIds.has(id) && movies[id].original_language === 'fr');
+        }
         return Object.keys(movies).filter(id => !skippedIds.has(id) && movies[id].genre === genre);
     }
 
@@ -1543,14 +1441,11 @@
     function renderCategoryPicker() {
         const wrap = document.getElementById('categoryPicker');
         const genres = [...new Set(Object.values(movies).map(m => m.genre).filter(Boolean))].sort();
-        if (genres.length === 0) {
-            wrap.innerHTML = '<div class="empty-msg">Aucune catégorie disponible pour le moment.</div>';
-            return;
-        }
+        const allCategories = [FRENCH_PSEUDO_CATEGORY, ...genres];
         wrap.innerHTML = `
-            <div class="daily-sub" style="margin-bottom:14px;">Choisis une catégorie et glisse ses 10 films dans l'ordre que tu préfères</div>
+            <div class="daily-sub" style="margin-bottom:14px;">Choisis une catégorie et glisse ses 9 films dans l'ordre que tu préfères</div>
             <div class="category-grid">
-              ${genres.map(g => {const pool = getCategoryPool(g);const playable = pool.length >= CATEGORY_TIER_SIZE;return `<button class="category-chip ${playable ? '' : 'disabled'}" ${playable ? `data-genre="${g}"` : 'disabled'}>${g}<span class="chip-count">${playable ? `${pool.length} films` : `${pool.length}/${CATEGORY_TIER_SIZE} requis`}</span></button>`;}).join('')}
+              ${allCategories.map(g => {const pool = getCategoryPool(g);const playable = pool.length >= CATEGORY_TIER_SIZE;return `<button class="category-chip ${playable ? '' : 'disabled'}" ${playable ? `data-genre="${g}"` : 'disabled'}>${g}<span class="chip-count">${playable ? `${pool.length} films` : `${pool.length}/${CATEGORY_TIER_SIZE} requis`}</span></button>`;}).join('')}
             </div>`;
         wrap.querySelectorAll('.category-chip[data-genre]').forEach(btn => {
             btn.addEventListener('click', () => selectCategory(btn.dataset.genre));
@@ -1618,44 +1513,21 @@
 
     function slotHTML(id, i) {
         const m = id ? movies[id] : null;
+        const medalClass = i === 0 ? 'rank-gold' : i === 1 ? 'rank-silver' : i === 2 ? 'rank-bronze' : '';
         if (!m) {
-            return `<div class="tier-slot" data-slot-index="${i}"><div class="tier-rank">${i + 1}</div><div class="tier-slot-empty-label">Glisse un film ici</div></div>`;
+            return `<div class="tier-slot" data-slot-index="${i}"><div class="tier-rank ${medalClass}">${i + 1}</div><div class="tier-slot-empty-label">Glisse un film ici</div></div>`;
         }
         return `<div class="tier-slot filled" data-slot-index="${i}">
-            <div class="tier-rank">${i + 1}</div>
+            <div class="tier-rank ${medalClass}">${i + 1}</div>
             ${posterTileHTML(m, id, 'slot', i)}
-          </div>`;
-    }
-
-    function podiumSlotHTML(id, i, podiumClass) {
-        const m = id ? movies[id] : null;
-        const rank = i + 1;
-        if (!m) {
-            return `<div class="tier-slot podium-slot ${podiumClass}" data-slot-index="${i}">
-                  <div class="podium-rank-badge">${rank}</div>
-                  <div class="tier-slot-empty-label">Glisse ici</div>
-                </div>`;
-        }
-        const label = `${m.title} (${m.year})`;
-        const posterStyle = m.poster_url ? `style="background-image:url('${m.poster_url}');"` : '';
-        const fallback = m.poster_url ? '' : `<span class="podium-no-poster-label">${m.title.slice(0, 14)}</span>`;
-        return `<div class="tier-slot podium-slot tier-tile filled ${podiumClass} ${m.poster_url ? '' : 'no-poster'}" data-slot-index="${i}" data-movie-id="${id}" data-from="slot" data-from-index="${i}" title="${label}" aria-label="${label}" ${posterStyle}>
-            <div class="podium-rank-badge">${rank}</div>
-            ${fallback}
           </div>`;
     }
 
     function renderCategoryEditView() {
         const slotsWrap = document.getElementById('categorySlots');
-        const podiumHTML = `<div class="tier-podium">
-            ${podiumSlotHTML(categorySlots[1], 1, 'podium-2nd')}
-            ${podiumSlotHTML(categorySlots[0], 0, 'podium-1st')}
-            ${podiumSlotHTML(categorySlots[2], 2, 'podium-3rd')}
+        slotsWrap.innerHTML = `<div class="tier-slots-grid">
+            ${categorySlots.map((id, i) => slotHTML(id, i)).join('')}
           </div>`;
-        const gridHTML = `<div class="tier-slots-grid">
-            ${categorySlots.slice(3).map((id, i) => slotHTML(id, i + 3)).join('')}
-          </div>`;
-        slotsWrap.innerHTML = podiumHTML + gridHTML;
 
         const poolWrap = document.getElementById('categoryPool');
         const pagerWrap = document.getElementById('categoryPoolPagination');

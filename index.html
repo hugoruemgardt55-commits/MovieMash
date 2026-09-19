@@ -813,6 +813,7 @@
         z-index: 60;
         display: flex;
         pointer-events: none;
+        overflow: hidden;
     }
 
     .curtain-panel {
@@ -836,28 +837,8 @@
 
     .curtain-right {
         border-left: 2px solid rgba(232, 184, 74, 0.4);
-    }
-
-    .category-curtain.opening .curtain-left {
-        animation: curtain-open-left 1.3s cubic-bezier(.65, 0, .35, 1) forwards;
-    }
-
-    .category-curtain.opening .curtain-right {
-        animation: curtain-open-right 1.3s cubic-bezier(.65, 0, .35, 1) forwards;
-    }
-
-    @keyframes curtain-open-left {
-        to {
-            transform: translateX(-100%);
-        }
-    }
-
-    @keyframes curtain-open-right {
-        to {
-            transform: translateX(100%);
-        }
-    }/* Liseré permanent, largeur fixe en pixels (pas de % fragile) — reste visible en cadre
-         tout le temps que la catégorie est affichée, indépendamment de l'animation des grands pans. */
+    }/* Liseré permanent, largeur fixe en pixels — pur CSS, aucune dépendance JS/animation.
+         Reste affiché tout le temps que la catégorie est ouverte. */
 
     #categorySelectedView::before, #categorySelectedView::after {
         content: '';
@@ -2456,15 +2437,41 @@
         const curtain = document.getElementById('categoryCurtain');
         if (!curtain)
             return;
+        const left = curtain.querySelector('.curtain-left');
+        const right = curtain.querySelector('.curtain-right');
+        if (!left || !right)
+            return;
+
         curtain.style.display = 'flex';
-        curtain.classList.remove('opening');
-        void curtain.offsetWidth; // force le navigateur à relancer l'animation à chaque fois, même déjà ouvert
-        curtain.classList.add('opening');
 
-
+        // API d'animation native du navigateur : pas de classe CSS, pas de @keyframes,
+        // pas de rejeu de reflow — le navigateur pilote directement l'animation.
+        // Position de repos en calc(100% - 9px) : 9px fixes qui restent visibles, peu
+        // importe la largeur réelle du conteneur (fini les pourcentages approximatifs).
+        const options = {
+            duration: 1300,
+            easing: 'cubic-bezier(.65,0,.35,1)',
+            fill: 'forwards'
+        };
+        left.style.transform = 'translateX(calc(-100% + 9px))';
+        right.style.transform = 'translateX(calc(100% - 9px))';
+        left.animate(
+        [{
+            transform: 'translateX(0)'
+        }, {
+            transform: 'translateX(calc(-100% + 9px))'
+        }],
+        options
+        );
+        right.animate(
+        [{
+            transform: 'translateX(0)'
+        }, {
+            transform: 'translateX(calc(100% - 9px))'
+        }],
+        options
+        );
     }
-    // Le rideau ne se referme/cache plus après coup : il reste tiré sur les côtés,
-    // comme un vrai cadre de scène, tant que la catégorie est affichée.
 
     function fadeInEl(el) {
         if (!el)

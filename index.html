@@ -717,63 +717,37 @@
 
     .tier-complete-prompt {
         text-align: center;
-        background: rgba(232, 184, 74, 0.08);
-        border: 1px solid var(--gold);
-        border-radius: 10px;
-        padding: 18px;
         margin-top: 20px;
     }
 
-    .tier-complete-prompt p {
-        color: var(--gold);
-        font-family: 'JetBrains Mono', monospace;
-        font-size: 13px;
-        margin: 0 0 14px;
-    }
-
-    .tier-complete-prompt .btn-row {
-        display: flex;
-        gap: 10px;
-        justify-content: center;
-        flex-wrap: wrap;
-    }
-
-    .tier-complete-prompt button {
-        padding: 10px 18px;
-        border-radius: 20px;
-        font-weight: 700;
-        font-size: 13px;
-        cursor: pointer;
-        font-family: 'Inter', sans-serif;
-    }
-
-    .tier-finish-btn {
-        background: var(--gold);
+    .tier-finish-btn-big {
+        background: linear-gradient(135deg, var(--gold), #f5d47a);
         border: none;
         color: #1a1500;
-    }
-
-    .tier-continue-btn {
-        background: transparent;
-        border: 1px solid var(--muted);
-        color: var(--cream);
-    }
-
-    .tier-resume-pin {
-        text-align: center;
-        margin-top: 16px;
-    }
-
-    .tier-resume-pin button {
-        background: transparent;
-        border: 1px solid var(--gold);
-        color: var(--gold);
-        padding: 9px 18px;
-        border-radius: 20px;
-        font-weight: 700;
-        font-size: 12.5px;
+        font-weight: 800;
+        font-size: 16px;
+        padding: 18px 28px;
+        border-radius: 14px;
         cursor: pointer;
-        font-family: 'JetBrains Mono', monospace;
+        font-family: 'Inter', sans-serif;
+        width: 100%;
+        max-width: 480px;
+        box-shadow: 0 6px 24px rgba(232, 184, 74, 0.35);
+        animation: finish-btn-pulse 1.8s ease-in-out infinite;
+    }
+
+    .tier-finish-btn-big:hover {
+        transform: translateY(-1px);
+    }
+
+    @keyframes finish-btn-pulse {
+        0%, 100% {
+            box-shadow: 0 6px 24px rgba(232, 184, 74, 0.35);
+        }
+
+        50% {
+            box-shadow: 0 6px 32px rgba(232, 184, 74, 0.6);
+        }
     }
 
     .discovery-banner {
@@ -1313,7 +1287,6 @@
     let categorySlots = []; // tableau de 10 cases : id de film ou null
     let categoryPoolIds = []; // films pas encore placés
     let categoryFinished = false;
-    let categoryPromptMinimized = false;
 
     function getCategoryPool(genre) {
         return Object.keys(movies).filter(id => !skippedIds.has(id) && movies[id].genre === genre);
@@ -1351,7 +1324,6 @@
 
     async function selectCategory(genre) {
         categoryGenre = genre;
-        categoryPromptMinimized = false;
         document.getElementById('categoryPicker').style.display = 'none';
         document.getElementById('categorySelectedView').style.display = 'block';
         document.getElementById('categoryTitle').textContent = genre;
@@ -1359,15 +1331,19 @@
         const pool = getCategoryPool(genre);
         const {data} = await supabaseClient.from('category_tiers').select('ranking, finished').eq('visitor_id', visitorId).eq('genre', genre).maybeSingle();
 
-        let ranking = (data && data.ranking) ? data.ranking.filter(id => pool.includes(id)) : [];
-        const missing = pool.filter(id => !ranking.includes(id));
-        ranking = ranking.concat(shuffleArray(missing));
-
-        categorySlots = ranking.slice(0, CATEGORY_TIER_SIZE);
+        if (data && data.ranking) {
+            // Reprend exactement l'état sauvegardé : les emplacements gardent leur position,
+            // vide (null) ou remplie — on ne réintroduit jamais un film déjà placé dans le pool.
+            categorySlots = data.ranking.slice(0, CATEGORY_TIER_SIZE).map(id => (id && pool.includes(id)) ? id : null);
+        } else {
+            categorySlots = [];
+        }
         while (categorySlots.length < CATEGORY_TIER_SIZE)
             categorySlots.push(null);
-        categoryPoolIds = ranking.slice(CATEGORY_TIER_SIZE);
-        categoryFinished = !!(data && data.finished && categoryPoolIds.length === 0 && categorySlots.every(Boolean));
+
+        const placedSet = new Set(categorySlots.filter(Boolean));
+        categoryPoolIds = shuffleArray(pool.filter(id => !placedSet.has(id)));
+        categoryFinished = !!(data && data.finished) && categorySlots.every(Boolean);
 
         if (categoryFinished) {
             renderCategoryFinishedView();
@@ -1379,12 +1355,11 @@
     }
 
     async function saveCategoryState() {
-        const ranking = [...categorySlots.filter(Boolean), ...categoryPoolIds];
         await supabaseClient.from('category_tiers').upsert(
         [{
             visitor_id: visitorId,
             genre: categoryGenre,
-            ranking,
+            ranking: categorySlots,
             finished: categoryFinished,
             updated_at: new Date().toISOString()
         }],
@@ -1434,29 +1409,16 @@
 
     function renderCategoryCompletionArea() {
         const area = document.getElementById('categoryCompletionArea');
-        const complete = categoryPoolIds.length === 0 && categorySlots.every(Boolean);
+        const complete = categorySlots.every(Boolean);
         if (!complete) {
             area.innerHTML = '';
             return;
         }
-        if (categoryPromptMinimized) {
-            area.innerHTML = `<div class="tier-resume-pin"><button id="categoryFinishPinBtn" type="button">Terminer le classement ✓</button></div>`;
-            document.getElementById('categoryFinishPinBtn').addEventListener('click', finishCategoryRanking);
-        } else {
-            area.innerHTML = `
-                  <div class="tier-complete-prompt">
-                    <p>Les 10 films sont placés — tu peux encore les réorganiser, ou valider ton classement.</p>
-                    <div class="btn-row">
-                      <button class="tier-continue-btn" id="categoryContinueBtn" type="button">Continuer à modifier</button>
-                      <button class="tier-finish-btn" id="categoryFinishBtn" type="button">Terminer mon classement</button>
-                    </div>
-                  </div>`;
-            document.getElementById('categoryContinueBtn').addEventListener('click', () => {
-                categoryPromptMinimized = true;
-                renderCategoryCompletionArea();
-            });
-            document.getElementById('categoryFinishBtn').addEventListener('click', finishCategoryRanking);
-        }
+        area.innerHTML = `
+            <div class="tier-complete-prompt">
+              <button class="tier-finish-btn-big" id="categoryFinishBtn" type="button">🏆 Ton classement est terminé — Valide-le !</button>
+            </div>`;
+        document.getElementById('categoryFinishBtn').addEventListener('click', finishCategoryRanking);
     }
 
     async function finishCategoryRanking() {
@@ -1490,7 +1452,6 @@
 
         document.getElementById('categoryEditAgainBtn').addEventListener('click', () => {
             categoryFinished = false;
-            categoryPromptMinimized = true;
             wrap.style.display = 'none';
             document.getElementById('categoryEditView').style.display = 'block';
             renderCategoryEditView();

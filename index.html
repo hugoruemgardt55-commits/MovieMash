@@ -574,29 +574,27 @@
         display: flex;
         flex-direction: column;
         gap: 16px;
-    }/* Podium du trio de tête */
+    }/* Podium du trio de tête — l'affiche EST le podium, différenciée par taille + bordure colorée */
 
     .tier-podium {
         display: flex;
         align-items: flex-end;
         justify-content: center;
-        gap: 10px;
+        gap: 14px;
+        margin-bottom: 4px;
     }
 
     .podium-slot {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
+        position: relative;
+        aspect-ratio: 2/3;
         border: 2px dashed var(--line);
-        border-radius: 10px 10px 4px 4px;
+        border-radius: 10px;
         background: var(--bg-alt);
-        padding: 8px 8px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         transition: border-color .15s ease, background .15s ease;
-    }
-
-    .podium-slot.filled {
-        border-style: solid;
-        border-color: var(--line);
+        overflow: hidden;
     }
 
     .podium-slot.drag-over {
@@ -604,62 +602,84 @@
         background: rgba(232, 184, 74, 0.08);
     }
 
+    .podium-slot .tier-tile {
+        width: 100%;
+        height: 100%;
+    }
+
     .podium-slot .tier-poster {
         width: 100%;
-        aspect-ratio: 2/3;
+        height: 100%;
+        aspect-ratio: auto;
+        border: none;
+        border-radius: 0;
     }
 
     .podium-slot .tier-slot-empty-label {
-        display: block;
-        padding: 14px 2px;
         text-align: center;
+        padding: 0 6px;
     }
 
     .podium-1st {
-        width: 118px;
+        width: 130px;
         order: 2;
     }
 
     .podium-2nd {
-        width: 98px;
+        width: 94px;
         order: 1;
     }
 
     .podium-3rd {
-        width: 98px;
+        width: 94px;
         order: 3;
     }
 
-    .podium-base {
-        width: 100%;
-        margin-top: 8px;
+    .podium-1st.filled {
+        border-style: solid;
+        border-color: #E8B84B;
+        box-shadow: 0 0 16px rgba(232, 184, 74, 0.4);
+    }
+
+    .podium-2nd.filled {
+        border-style: solid;
+        border-color: #C7C7C7;
+        box-shadow: 0 0 10px rgba(199, 199, 199, 0.3);
+    }
+
+    .podium-3rd.filled {
+        border-style: solid;
+        border-color: #CD7F32;
+        box-shadow: 0 0 10px rgba(205, 127, 50, 0.3);
+    }
+
+    .podium-rank-badge {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
         font-family: 'Bebas Neue', sans-serif;
+        font-size: 13px;
         color: #1a1500;
         font-weight: 700;
+        z-index: 2;
     }
 
-    .podium-1st .podium-base {
-        height: 60px;
-        font-size: 32px;
-        background: linear-gradient(180deg, #f5d47a, #E8B84B);
-        border-radius: 4px 4px 0 0;
+    .podium-1st .podium-rank-badge {
+        background: #E8B84B;
     }
 
-    .podium-2nd .podium-base {
-        height: 42px;
-        font-size: 26px;
-        background: linear-gradient(180deg, #eaeaea, #C7C7C7);
-        border-radius: 4px 4px 0 0;
+    .podium-2nd .podium-rank-badge {
+        background: #C7C7C7;
     }
 
-    .podium-3rd .podium-base {
-        height: 32px;
-        font-size: 22px;
-        background: linear-gradient(180deg, #e3ac72, #CD7F32);
-        border-radius: 4px 4px 0 0;
+    .podium-3rd .podium-rank-badge {
+        background: #CD7F32;
     }/* Rangs 4 à 10, en grille de 3 colonnes */
 
     .tier-slots-grid {
@@ -670,14 +690,20 @@
 
     .tier-slots-grid .tier-slot {
         flex-direction: column;
+        align-items: stretch;
         gap: 4px;
         min-height: auto;
-        padding: 8px 6px;
+        padding: 6px;
     }
 
     .tier-slots-grid .tier-slot .tier-rank {
         width: auto;
         font-size: 16px;
+        text-align: center;
+    }
+
+    .tier-slots-grid .tier-slot .tier-tile {
+        width: 100%;
     }
 
     .tier-slots-grid .tier-slot .tier-poster {
@@ -688,6 +714,53 @@
 
     .tier-slots-grid .tier-slot-empty-label {
         text-align: center;
+    }
+
+    .tier-row-finished {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 4px;
+        border-bottom: 1px solid var(--line);
+    }
+
+    .tier-row-finished:last-child {
+        border-bottom: none;
+    }
+
+    .finished-poster {
+        width: 44px;
+        height: 66px;
+        flex-shrink: 0;
+        border-radius: 4px;
+        background-size: cover;
+        background-position: center top;
+        background-color: var(--card);
+        border: 1px solid var(--line);
+    }
+
+    .finished-poster.no-poster {
+        background: linear-gradient(160deg, var(--card), var(--teal));
+    }
+
+    .finished-info {
+        min-width: 0;
+        flex: 1;
+    }
+
+    .finished-title {
+        font-size: 14px;
+        color: var(--cream);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .finished-year {
+        font-size: 11px;
+        color: var(--muted);
+        font-family: 'JetBrains Mono', monospace;
+        margin-top: 2px;
     }
 
     .tier-slot {
@@ -1545,8 +1618,8 @@
         ? posterTileHTML(m, id, 'slot', i)
         : `<div class="tier-slot-empty-label">Glisse ici</div>`;
         return `<div class="tier-slot podium-slot ${podiumClass} ${m ? 'filled' : ''}" data-slot-index="${i}">
+            <div class="podium-rank-badge">${rank}</div>
             ${inner}
-            <div class="podium-base">${rank}</div>
           </div>`;
     }
 
@@ -1564,7 +1637,7 @@
 
         const poolWrap = document.getElementById('categoryPool');
         const pagerWrap = document.getElementById('categoryPoolPagination');
-        const POOL_PAGE_SIZE = 10;
+        const POOL_PAGE_SIZE = 12;
         const filterNorm = categoryPoolFilter.trim().toLowerCase();
         const filteredPoolIds = filterNorm
         ? categoryPoolIds.filter(id => movies[id].title.toLowerCase().includes(filterNorm))
@@ -1640,10 +1713,10 @@
         wrap.innerHTML = `
             <div class="category-complete-banner">🏆 Ton Top ${ranked.length} ${categoryGenre} est prêt</div>
             <div class="tier-list">
-              ${ranked.map((id, i) => {const m = movies[id];const posterStyle = m.poster_url ? `style="background-image:url('${m.poster_url}');"` : '';return `<div class="tier-row-finished shared-row">
+              ${ranked.map((id, i) => {const m = movies[id];const posterStyle = m.poster_url ? `style="background-image:url('${m.poster_url}');"` : '';return `<div class="tier-row-finished">
                       <div class="shared-rank">#${i + 1}</div>
-                      <div class="tier-poster" ${posterStyle}></div>
-                      <div class="tier-info"><div class="tier-title">${m.title}</div><div class="tier-year">${m.year}</div></div>
+                      <div class="finished-poster ${m.poster_url ? '' : 'no-poster'}" ${posterStyle}></div>
+                      <div class="finished-info"><div class="finished-title">${m.title}</div><div class="finished-year">${m.year}</div></div>
                     </div>`;}).join('')}
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:18px;">

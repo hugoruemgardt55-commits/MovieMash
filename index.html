@@ -875,33 +875,86 @@
         }
     }
 
-    .discovery-banner {
-        background: rgba(232, 184, 74, 0.08);
-        border: 1px solid var(--gold);
-        border-radius: 8px;
-        padding: 14px 16px;
-        margin-bottom: 18px;
-        font-size: 13px;
-        color: var(--cream);
-        line-height: 1.5;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        flex-wrap: wrap;
-        justify-content: center;
+    #introTour {
+        max-width: 440px;
+        margin: 20px auto;
         text-align: center;
     }
 
-    .discovery-banner button {
+    .intro-slide {
+        min-height: 140px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 6px;
+    }
+
+    .intro-slide .intro-icon {
+        font-size: 40px;
+    }
+
+    .intro-slide .intro-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 26px;
+        color: var(--gold);
+        letter-spacing: 0.02em;
+    }
+
+    .intro-slide .intro-text {
+        color: var(--muted);
+        font-size: 13.5px;
+        line-height: 1.5;
+        max-width: 360px;
+    }
+
+    .intro-dots {
+        display: flex;
+        gap: 6px;
+        justify-content: center;
+        margin: 14px 0;
+    }
+
+    .intro-dots span {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--line);
+        transition: background .2s ease;
+    }
+
+    .intro-dots span.active {
+        background: var(--gold);
+    }
+
+    .intro-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .intro-actions button {
+        font-family: 'Inter', sans-serif;
+    }
+
+    #introNextBtn {
         background: var(--gold);
         color: #1a1500;
         border: none;
-        padding: 7px 16px;
+        padding: 9px 20px;
         border-radius: 20px;
         font-weight: 700;
         cursor: pointer;
-        font-size: 12px;
-        flex-shrink: 0;
+        font-size: 13px;
+    }
+
+    .tab-description {
+        text-align: center;
+        color: var(--muted);
+        font-size: 12.5px;
+        font-family: 'JetBrains Mono', monospace;
+        margin: -6px 0 18px;
     }
 
     .tab-badge {
@@ -1154,6 +1207,15 @@
              Ouverture du rideau…
         </div>
 
+        <section class="panel" id="introTour" style="display:none;">
+            <div class="intro-slide" id="introSlideContent"></div>
+            <div class="intro-dots" id="introDots"></div>
+            <div class="intro-actions">
+                <button class="not-seen-link" id="introSkipBtn" type="button">Passer</button>
+                <button id="introNextBtn" type="button">Suivant</button>
+            </div>
+        </section>
+
         <section class="panel" id="pseudoGate" style="display:none;">
             <div class="panel-header">
                 <div class="panel-title">Ton nom en haut de l'affiche</div>
@@ -1180,25 +1242,15 @@
                 <div class="progress-label" id="progressLabel">0 / 0 films jugés</div>
             </div>
 
-            <div class="discovery-banner" id="discoveryBanner" style="display:none;">
-
-                      🎬 Deux façons de voter ici : le 
-                <strong>Vote libre</strong>
-                 pour construire ton classement, et 
-                <strong>La Séance du jour</strong>
-                , un duel unique partagé par tout le monde chaque jour.
-                      
-                <button id="discoveryDismiss" type="button">Compris</button>
-            </div>
-
             <div class="tab-bar">
-                <button class="tab-btn active" id="tabFree" type="button">Vote libre</button>
+                <button class="tab-btn active" id="tabFree" type="button">🎬 Vote libre</button>
                 <button class="tab-btn" id="tabDaily" type="button">
-                    La Séance du jour 
+                    📅 La Séance du jour 
                     <span class="tab-badge" id="dailyTabBadge"></span>
                 </button>
-                <button class="tab-btn" id="tabCategory" type="button">Catégories</button>
+                <button class="tab-btn" id="tabCategory" type="button">🏆 Catégories</button>
             </div>
+            <div class="tab-description" id="tabDescription"></div>
 
             <div id="freeTabContent">
                 <div class="arena" id="arena"></div>
@@ -1848,6 +1900,7 @@
         document.getElementById('dailyTabContent').style.display = 'none';
         document.getElementById('categoryTabContent').style.display = 'block';
         showGlobalRankings(false);
+        setTabDescription('category');
         if (!categoryGenre) {
             renderCategoryPicker();
         }
@@ -2151,6 +2204,7 @@
         document.getElementById('dailyTabContent').style.display = 'none';
         document.getElementById('categoryTabContent').style.display = 'none';
         showGlobalRankings(true);
+        setTabDescription('free');
     });
     document.getElementById('tabDaily').addEventListener('click', () => {
         document.getElementById('tabDaily').classList.add('active');
@@ -2161,15 +2215,7 @@
         document.getElementById('categoryTabContent').style.display = 'none';
         showGlobalRankings(true);
         renderDailyDuel();
-        // Le bandeau explicatif ne doit s'afficher qu'une fois dans la vie du visiteur,
-        // mais l'alerte rouge (badge + contour) reste tant que le vote du jour n'est pas fait.
-        document.getElementById('discoveryBanner').style.display = 'none';
-        localStorage.setItem('moviemash_seen_daily_tab', '1');
-    });
-
-    document.getElementById('discoveryDismiss').addEventListener('click', () => {
-        document.getElementById('discoveryBanner').style.display = 'none';
-        localStorage.setItem('moviemash_seen_daily_tab', '1');
+        setTabDescription('daily');
     });
 
     function showAttentionAlert() {
@@ -2195,12 +2241,17 @@
         }
     }
 
+    const TAB_DESCRIPTIONS = {
+        free: "Duel après duel, tu construis LE classement collectif.",
+        daily: "Un seul duel, le même pour tout le monde, chaque jour.",
+        category: "Classe tes films à la main par thème, et partage ton Top."
+    };
+    function setTabDescription(tab) {
+        document.getElementById('tabDescription').textContent = TAB_DESCRIPTIONS[tab] || '';
+    }
+
     function initDiscoveryHint() {
-        const alreadySeen = localStorage.getItem('moviemash_seen_daily_tab');
-        if (!alreadySeen) {
-            document.getElementById('discoveryBanner').style.display = 'flex';
-        }
-        updateDailyAlertState(); // indépendant du bandeau : dépend uniquement du vote du jour
+        updateDailyAlertState();
     }
 
     let voteInProgress = false;
@@ -2852,12 +2903,68 @@
         pseudo = localStorage.getItem('moviemash_pseudo');
 
         if (!pseudo) {
+            if (!localStorage.getItem('moviemash_seen_intro')) {
+                startIntroTour();
+                return; // la suite s'enchaîne une fois le tour terminé/passé
+            }
             document.getElementById('pseudoGate').style.display = 'block';
             return; // la suite se lance après soumission du formulaire pseudo
         }
 
         await startMainApp();
     })();
+
+    const INTRO_SLIDES = [
+    {
+        icon: '🎬',
+        title: 'Vote libre',
+        text: "Deux films s'affrontent, tu choisis. Chaque vote construit LE classement collectif, duel après duel."
+    },
+    {
+        icon: '📅',
+        title: 'La Séance du jour',
+        text: "Un seul duel, le même pour tout le monde, chaque jour. Vote et découvre ce que la communauté a choisi."
+    },
+    {
+        icon: '🏆',
+        title: 'Catégories',
+        text: "Classe tes films préférés à la main, par thème (Marvel, Nolan, Saga...), et partage ton Top en story."
+    }
+    ];
+    let introIndex = 0;
+
+    function startIntroTour() {
+        introIndex = 0;
+        document.getElementById('introTour').style.display = 'block';
+        renderIntroSlide();
+    }
+
+    function renderIntroSlide() {
+        const slide = INTRO_SLIDES[introIndex];
+        document.getElementById('introSlideContent').innerHTML = `
+            <div class="intro-icon">${slide.icon}</div>
+            <div class="intro-title">${slide.title}</div>
+            <div class="intro-text">${slide.text}</div>`;
+        document.getElementById('introDots').innerHTML = INTRO_SLIDES.map((_, i) =>
+        `<span class="${i === introIndex ? 'active' : ''}"></span>`).join('');
+        document.getElementById('introNextBtn').textContent = introIndex === INTRO_SLIDES.length - 1 ? "C'est parti" : 'Suivant';
+    }
+
+    function finishIntroTour() {
+        localStorage.setItem('moviemash_seen_intro', '1');
+        document.getElementById('introTour').style.display = 'none';
+        document.getElementById('pseudoGate').style.display = 'block';
+    }
+
+    document.getElementById('introNextBtn').addEventListener('click', () => {
+        if (introIndex < INTRO_SLIDES.length - 1) {
+            introIndex++;
+            renderIntroSlide();
+        } else {
+            finishIntroTour();
+        }
+    });
+    document.getElementById('introSkipBtn').addEventListener('click', finishIntroTour);
 
     document.getElementById('pseudoForm').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -2888,6 +2995,7 @@
         renderPersonalTop();
         renderProgress();
         initDiscoveryHint();
+        setTabDescription('free');
 
         document.getElementById('leaderboardSearch').addEventListener('input', (e) => {
             leaderboardSearchTerm = e.target.value;

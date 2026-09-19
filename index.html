@@ -1423,7 +1423,7 @@
 
     // On ne garde que ces 5 genres "grand public" plutôt que tous ceux que TMDB fournit —
     // comparaison normalisée (accents/casse ignorés) pour matcher quel que soit le format exact stocké.
-    const MAINSTREAM_GENRE_NAMES = ['Action', 'Comedie', 'Drame', 'Horreur', 'Science Fiction'];
+    const MAINSTREAM_GENRE_NAMES = ['Action', 'Comédie', 'Drame', 'Horreur', 'Science-Fiction'];
 
     // Catégories "façon connaisseur", curées à la main plutôt que dérivées du genre TMDB.
     // type 'saga' : un seul film retenu par mot-clé (représente toute la franchise).
@@ -1489,6 +1489,10 @@
         }
     };
 
+    function stripName(s) {
+        return normalizeTitle(s).replace(/[^a-z0-9]/g, '');
+    }
+
     function getCategoryPool(genre) {
         if (genre === FRENCH_PSEUDO_CATEGORY) {
             return Object.keys(movies).filter(id => !skippedIds.has(id) && movies[id].original_language === 'fr');
@@ -1512,6 +1516,11 @@
                 return needles.some(k => t.includes(k));
             });
         }
+        if (MAINSTREAM_GENRE_NAMES.includes(genre)) {
+            // Regroupe toutes les variantes d'orthographe stockées en base (ex : "Science-Fiction"
+            // vs "Science Fiction") sous une seule catégorie canonique, au lieu de les séparer.
+            return Object.keys(movies).filter(id => !skippedIds.has(id) && stripName(movies[id].genre || '') === stripName(genre));
+        }
         return Object.keys(movies).filter(id => !skippedIds.has(id) && movies[id].genre === genre);
     }
 
@@ -1530,12 +1539,7 @@
 
     function renderCategoryPicker() {
         const wrap = document.getElementById('categoryPicker');
-        const allGenresPresent = [...new Set(Object.values(movies).map(m => m.genre).filter(Boolean))];
-        const strip = s => normalizeTitle(s).replace(/[^a-z0-9]/g, '');
-        const mainstreamGenres = allGenresPresent.filter(g =>
-        MAINSTREAM_GENRE_NAMES.some(name => strip(g) === strip(name))
-        );
-        const allCategories = [FRENCH_PSEUDO_CATEGORY, ...Object.keys(CURATED_CATEGORIES), ...mainstreamGenres];
+        const allCategories = [FRENCH_PSEUDO_CATEGORY, ...Object.keys(CURATED_CATEGORIES), ...MAINSTREAM_GENRE_NAMES];
         wrap.innerHTML = `
             <div class="daily-sub" style="margin-bottom:14px;">Choisis une catégorie et glisse ses 9 films dans l'ordre que tu préfères</div>
             <div class="category-grid">
